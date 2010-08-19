@@ -1323,6 +1323,7 @@ infoParm_t	infoParms[] = {
 	{"water",		1,	0,	CONTENTS_WATER },
 	{"slime",		1,	0,	CONTENTS_SLIME },		// mildly damaging
 	{"lava",		1,	0,	CONTENTS_LAVA },		// very damaging
+	{"moor",		1,	0,	CONTENTS_MOOR },		// very damaging :D
 	{"playerclip",	1,	0,	CONTENTS_PLAYERCLIP },
 	{"monsterclip",	1,	0,	CONTENTS_MONSTERCLIP },
 	{"nodrop",		1,	0,	CONTENTS_NODROP },		// don't drop items or leave bodies (death fog, lava, etc)

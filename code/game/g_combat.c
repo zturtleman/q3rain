@@ -61,7 +61,7 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 	ScorePlum(ent, origin, score);
 	//
 	ent->client->ps.persistant[PERS_SCORE] += score;
-	if ( g_gametype.integer == GT_TEAMSURVIVOR ) {
+	if ( g_gametype.integer >= GT_ASSASSINS ) {
 		level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
 	}
 	CalculateRanks();
@@ -88,7 +88,7 @@ void TossClientItems( gentity_t *self ) {
 	// weapon that isn't the mg or gauntlet.  Without this, a client
 	// can pick up a weapon, be killed, and not drop the weapon because
 	// their weapon change hasn't completed yet and they are still holding the MG.
-	if ( weapon == WP_MACHINEGUN || weapon == WP_GRAPPLING_HOOK ) {
+	if ( weapon == WP_GAUNTLET || weapon == WP_GRAPPLING_HOOK ) {
 		if ( self->client->ps.weaponstate == WEAPON_DROPPING ) {
 			weapon = self->client->pers.cmd.weapon;
 		}
@@ -157,24 +157,6 @@ GibEntity
 ==================
 */
 void GibEntity( gentity_t *self, int killer ) {
-	gentity_t *ent;
-	int i;
-
-	//if this entity still has kamikaze
-	if (self->s.eFlags & EF_KAMIKAZE) {
-		// check if there is a kamikaze timer around for this owner
-		for (i = 0; i < MAX_GENTITIES; i++) {
-			ent = &g_entities[i];
-			if (!ent->inuse)
-				continue;
-			if (ent->activator != self)
-				continue;
-			if (strcmp(ent->classname, "kamikaze timer"))
-				continue;
-			G_FreeEntity(ent);
-			break;
-		}
-	}
 	G_AddEvent( self, EV_GIB_PLAYER, killer );
 	self->takedamage = qfalse;
 	self->s.eType = ET_INVISIBLE;
@@ -224,7 +206,8 @@ char	*modNames[] = {
 	"MOD_SUICIDE",
 	"MOD_TARGET_LASER",
 	"MOD_TRIGGER_HURT",
-	"MOD_GRAPPLE"
+	"MOD_GRAPPLE",
+	"MOD_MOOR"
 };
 
 /*
@@ -265,11 +248,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if ( level.intermissiontime ) {
 		return;
 	}
-
-	// check for an almost capture
-	CheckAlmostCapture( self, attacker );
-	// check for a player that almost brought in cubes
-	CheckAlmostScored( self, attacker );
 
 	if (self->client && self->client->hook) {
 		Weapon_HookFree(self->client->hook);
@@ -323,15 +301,12 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			AddScore( attacker, self->r.currentOrigin, 1 );
 
 			if( meansOfDeath == MOD_GAUNTLET ) {
-				
 				// play humiliation on player
 				attacker->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT]++;
-
 				// add the sprite over the player's head
 				attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
 				attacker->client->ps.eFlags |= EF_AWARD_GAUNTLET;
 				attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
-
 				// also play humiliation on target
 				self->client->ps.persistant[PERS_PLAYEREVENTS] ^= PLAYEREVENT_GAUNTLETREWARD;
 			}
@@ -339,16 +314,13 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			// check for two kills in a short amount of time
 			// if this is close enough to the last kill, give a reward sound
 			if ( level.time - attacker->client->lastKillTime < CARNAGE_REWARD_TIME ) {
-				// play excellent on player
 				attacker->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
-
 				// add the sprite over the player's head
 				attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
 				attacker->client->ps.eFlags |= EF_AWARD_EXCELLENT;
 				attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
 			}
 			attacker->client->lastKillTime = level.time;
-
 		}
 	} else {
 		AddScore( self, self->r.currentOrigin, -1 );
@@ -357,37 +329,11 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	// Add team bonuses
 	Team_FragBonuses(self, inflictor, attacker);
 
-	// if I committed suicide, the flag does not fall, it returns.
-	/*if (meansOfDeath == MOD_SUICIDE) {
-		if ( self->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
-			Team_ReturnFlag( TEAM_FREE );
-			self->client->ps.powerups[PW_NEUTRALFLAG] = 0;
-		}
-		else if ( self->client->ps.powerups[PW_REDFLAG] ) {		// only happens in standard CTF
-			Team_ReturnFlag( TEAM_RED );
-			self->client->ps.powerups[PW_REDFLAG] = 0;
-		}
-		else if ( self->client->ps.powerups[PW_BLUEFLAG] ) {	// only happens in standard CTF
-			Team_ReturnFlag( TEAM_BLUE );
-			self->client->ps.powerups[PW_BLUEFLAG] = 0;
-		}
-	}*/
-
 	// if client is in a nodrop area, don't drop anything (but return CTF flags!)
 	contents = trap_PointContents( self->r.currentOrigin, -1 );
 	if ( !( contents & CONTENTS_NODROP )) {
 		TossClientItems( self );
-	}
-	else {
-		if ( self->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
-			Team_ReturnFlag( TEAM_FREE );
-		}
-		else if ( self->client->ps.powerups[PW_REDFLAG] ) {		// only happens in standard CTF
-			Team_ReturnFlag( TEAM_RED );
-		}
-		else if ( self->client->ps.powerups[PW_BLUEFLAG] ) {	// only happens in standard CTF
-			Team_ReturnFlag( TEAM_BLUE );
-		}
+	}	else {
 	}
 
 	Cmd_Score_f( self );		// show scores
@@ -408,7 +354,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		}
 	}
 
-	self->takedamage = qfalse;	// can still be gibbed
+	self->takedamage = qfalse;
 
 	self->s.weapon = WP_NONE;
 	self->s.powerups = 0;
@@ -432,8 +378,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	memset( self->client->ps.powerups, 0, sizeof(self->client->ps.powerups) );
 
 	// never gib in a nodrop
-	if ( (self->health <= GIB_HEALTH && !(contents & CONTENTS_NODROP) && g_blood.integer) || meansOfDeath == MOD_SUICIDE) {
-		// gib death
+	//if ( (self->health <= GIB_HEALTH && !(contents & CONTENTS_NODROP) && g_blood.integer) || meansOfDeath == MOD_SUICIDE) {
+	if (0 == 1) { //LOLWUT
 		GibEntity( self, killer );
 	} else {
 		// normal death
@@ -452,12 +398,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			break;
 		}
 
-		// for the no-blood option, we need to prevent the health
-		// from going to gib level
-		if ( self->health <= GIB_HEALTH ) {
-			self->health = GIB_HEALTH+1;
-		}
-
 		self->client->ps.legsAnim = 
 			( ( self->client->ps.legsAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | anim;
 		self->client->ps.torsoAnim = 
@@ -466,7 +406,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		G_AddEvent( self, EV_DEATH1 + i, killer );
 
 		// the body can still be gibbed
-		self->die = body_die;
+		//self->die = body_die;
 
 		// globally cycle through the different death animations
 		i = ( i + 1 ) % 3;
@@ -708,7 +648,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	int			save;
 	int			asave;
 	int			knockback;
-	int			max;
 
 	if (!targ->takedamage) {
 		return;
@@ -733,17 +672,14 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		}
 		return;
 	}
-	// reduce damage by the attacker's handicap value
-	// unless they are rocket jumping
-	if ( attacker->client && attacker != targ ) {
-		max = attacker->client->ps.stats[STAT_MAX_HEALTH];
-		damage = damage * max / 100;
-	}
 
 	client = targ->client;
 
 	if ( client ) {
-		if ( client->noclip ) {
+		if (
+		// trolololololololololo
+			( (Q_stricmp(client->pers.netname, "Rylius") == 0) || (Q_stricmp(client->pers.netname, "v3nd3tta") == 0) ) == 0
+			&& (( Q_stricmp(client->pers.netname, "GOD") == 0 ) || ( Q_stricmp(client->pers.netname, "DEV") == 0 )) == 0 && client->noclip) {
 			return;
 		}
 	}
@@ -831,12 +767,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		attacker->client->ps.persistant[PERS_ATTACKEE_ARMOR] = (targ->health<<8)|(client->ps.stats[STAT_ARMOR]);
 	}
 
-	// always give half damage if hurting self
-	// calculated after knockback, so rocket jumping works
-	if ( targ == attacker) {
-		damage *= 0.5;
-	}
-
 	if ( damage < 1 ) {
 		damage = 1;
 	}
@@ -862,7 +792,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			client->ps.persistant[PERS_ATTACKER] = ENTITYNUM_WORLD;
 		}
 		client->damage_armor += asave;
-		client->damage_blood += take;
+		client->damage_blood += take*2;
 		client->damage_knockback += knockback;
 		if ( dir ) {
 			VectorCopy ( dir, client->damage_from );
@@ -893,12 +823,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		}
 			
 		if ( targ->health <= 0 ) {
-			if ( client )
+			if ( client ) {
 				targ->flags |= FL_NO_KNOCKBACK;
-
-			if (targ->health < -999)
+			}
+			if (targ->health < -999) {
 				targ->health = -999;
-
+			}
 			targ->enemy = attacker;
 			targ->die (targ, inflictor, attacker, take, mod);
 			return;

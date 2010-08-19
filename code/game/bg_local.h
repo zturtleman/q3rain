@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	STEPSIZE		18
 
-#define	JUMP_VELOCITY	300
+#define	JUMP_VELOCITY	270
 
 #define	TIMER_LAND		130
 #define	TIMER_GESTURE	(34*66+50)
@@ -47,6 +47,8 @@ typedef struct {
 	trace_t		groundTrace;
 	
 	qboolean ladder; //LADDER
+	
+	qboolean moor; // MOOR
 
 	float		impactSpeed;
 
@@ -67,6 +69,7 @@ extern	float	pm_wadeScale;
 extern	float	pm_accelerate;
 extern	float	pm_airaccelerate;
 extern	float	pm_wateraccelerate;
+extern	float	pm_mooraccelerate;
 extern	float	pm_flyaccelerate;
 
 extern	float	pm_friction;

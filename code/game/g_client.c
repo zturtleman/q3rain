@@ -464,17 +464,18 @@ void CopyToBodyQue( gentity_t *ent ) {
 	body->r.contents = CONTENTS_CORPSE;
 	body->r.ownerNum = ent->s.number;
 
-	body->nextthink = level.time + 5000;
-	body->think = BodySink;
+	//body->nextthink = level.time + 5000;
+	//body->think = BodySink;
 
 	body->die = body_die;
+	body->takedamage = qfalse;
 
 	// don't take more damage if already gibbed
-	if ( ent->health <= GIB_HEALTH ) {
+	/*if ( ent->health <= GIB_HEALTH ) {
 		body->takedamage = qfalse;
 	} else {
 		body->takedamage = qtrue;
-	}
+	}*/
 
 
 	VectorCopy ( body->s.pos.trBase, body->r.currentOrigin );
@@ -626,45 +627,28 @@ static void ClientCleanName(const char *in, char *out, int outSize)
 
 	// discard leading spaces
 	for(; *in == ' '; in++);
-	
-	for(; *in && outpos < outSize - 1; in++)
-	{
+	for(; *in && outpos < outSize - 1; in++) {
 		out[outpos] = *in;
-
-		if(*in == ' ')
-		{
+		if(*in == ' ') {
 			// don't allow too many consecutive spaces
 			if(spaces > 2)
 				continue;
-			
 			spaces++;
-		}
-		else if(outpos > 0 && out[outpos - 1] == Q_COLOR_ESCAPE)
-		{
-			if(Q_IsColorString(&out[outpos - 1]))
-			{
+		} else if (outpos > 0 && out[outpos - 1] == Q_COLOR_ESCAPE) {
+			if(Q_IsColorString(&out[outpos - 1])) {
 				colorlessLen--;
-				
-				if(ColorIndex(*in) == 0)
-				{
-					// Disallow color black in names to prevent players
-					// from getting advantage playing in front of black backgrounds
+				if(ColorIndex(*in) == 0) {
 					outpos--;
 					continue;
 				}
-			}
-			else
-			{
+			} else {
 				spaces = 0;
 				colorlessLen++;
 			}
-		}
-		else
-		{
+		}	else {
 			spaces = 0;
 			colorlessLen++;
 		}
-		
 		outpos++;
 	}
 

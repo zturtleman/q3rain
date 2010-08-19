@@ -98,7 +98,7 @@ Check for lava / slime contents and drowning
 =============
 */
 void P_WorldEffects( gentity_t *ent ) {
-	qboolean	envirosuit;
+	qboolean	divesuit;
 	int			waterlevel;
 
 	if ( ent->client->noclip ) {
@@ -108,24 +108,24 @@ void P_WorldEffects( gentity_t *ent ) {
 
 	waterlevel = ent->waterlevel;
 
-	envirosuit = ent->client->ps.powerups[PW_BATTLESUIT] > level.time;
+	divesuit = ent->client->ps.powerups[PW_DIVESUIT] > level.time;
 
 	//
 	// check for drowning
 	//
 	if ( waterlevel == 3 ) {
-		// envirosuit give air
-		if ( envirosuit ) {
+		if ( divesuit ) {
 			ent->client->airOutTime = level.time + 10000;
 		}
 
 		// if out of air, start drowning
 		if ( ent->client->airOutTime < level.time) {
 			// drown!
-			ent->client->airOutTime += 1000;
+			//ent->client->airOutTime += 1000;
+			ent->client->airOutTime += 500;
 			if ( ent->health > 0 ) {
-				// take more damage the longer underwater
-				ent->damage += 2;
+				//ent->damage += 2;
+				ent->damage = 5;
 				if (ent->damage > 15)
 					ent->damage = 15;
 
@@ -141,8 +141,7 @@ void P_WorldEffects( gentity_t *ent ) {
 				// don't play a normal pain sound
 				ent->pain_debounce_time = level.time + 200;
 
-				G_Damage (ent, NULL, NULL, NULL, NULL, 
-					ent->damage, DAMAGE_NO_ARMOR, MOD_WATER);
+				G_Damage(ent, NULL, NULL, NULL, NULL, ent->damage, DAMAGE_NO_ARMOR, MOD_WATER);
 			}
 		}
 	} else {
@@ -154,22 +153,16 @@ void P_WorldEffects( gentity_t *ent ) {
 	// check for sizzle damage (move to pmove?)
 	//
 	if (waterlevel && 
-		(ent->watertype&(CONTENTS_LAVA|CONTENTS_SLIME)) ) {
-		if (ent->health > 0
-			&& ent->pain_debounce_time <= level.time	) {
-
-			if ( envirosuit ) {
-				G_AddEvent( ent, EV_POWERUP_BATTLESUIT, 0 );
-			} else {
-				if (ent->watertype & CONTENTS_LAVA) {
-					G_Damage (ent, NULL, NULL, NULL, NULL, 
-						30*waterlevel, 0, MOD_LAVA);
-				}
-
-				if (ent->watertype & CONTENTS_SLIME) {
-					G_Damage (ent, NULL, NULL, NULL, NULL, 
-						10*waterlevel, 0, MOD_SLIME);
-				}
+		(ent->watertype&(CONTENTS_LAVA|CONTENTS_SLIME|CONTENTS_MOOR)) ) {
+		if (ent->health > 0 && ent->pain_debounce_time <= level.time	) {
+			if (ent->watertype & CONTENTS_LAVA) {
+				G_Damage (ent, NULL, NULL, NULL, NULL, 30*waterlevel, 0, MOD_LAVA);
+			}
+			if (ent->watertype & CONTENTS_SLIME) {
+				G_Damage (ent, NULL, NULL, NULL, NULL, 10*waterlevel, 0, MOD_SLIME);
+			}
+			if (ent->watertype & CONTENTS_MOOR) {
+				G_Damage (ent, NULL, NULL, NULL, NULL, 10*waterlevel, 0, MOD_MOOR);
 			}
 		}
 	}
@@ -275,10 +268,7 @@ void	G_TouchTriggers( gentity_t *ent ) {
 
 		// ignore most entities if a spectator
 		if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-			if ( hit->s.eType != ET_TELEPORT_TRIGGER &&
-				// this is ugly but adding a new ET_? type will
-				// most likely cause network incompatibilities
-				hit->touch != Touch_DoorTrigger) {
+			if ( hit->s.eType != ET_TELEPORT_TRIGGER &&	hit->touch != Touch_DoorTrigger) {
 				continue;
 			}
 		}
@@ -382,7 +372,7 @@ qboolean ClientInactivityTimer( gclient_t *client ) {
 		}
 		if ( level.time > client->inactivityTime - 10000 && !client->inactivityWarning ) {
 			client->inactivityWarning = qtrue;
-			trap_SendServerCommand( client - level.clients, "cp \"Ten seconds until inactivity drop!\n\"" );
+			trap_SendServerCommand( client - level.clients, "cp \"^1Ten seconds until inactivity drop!\n\"" );
 		}
 	}
 	return qtrue;
@@ -404,8 +394,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 	while ( client->timeResidual >= 1000 ) {
 		client->timeResidual -= 1000;
 
-		// regenerate
-
 		if ( client->ps.powerups[PW_REGEN] ) {
 			if ( ent->health < client->ps.stats[STAT_MAX_HEALTH]) {
 				ent->health += 15;
@@ -421,15 +409,13 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				G_AddEvent( ent, EV_POWERUP_REGEN, 0 );
 			}
 		} else {
-			// count down health when over max
 			if ( ent->health > client->ps.stats[STAT_MAX_HEALTH] ) {
-				ent->health--;
+				ent->health = 100;
 			}
 		}
-
-		// count down armor when over max
+		
 		if ( client->ps.stats[STAT_ARMOR] > client->ps.stats[STAT_MAX_HEALTH] ) {
-			client->ps.stats[STAT_ARMOR]--;
+			client->ps.stats[STAT_ARMOR] = 100;
 		}
 	}
 }
@@ -508,20 +494,8 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			break;
 
 		case EV_USE_ITEM1:		// teleporter
-			// drop flags in CTF
 			item = NULL;
 			j = 0;
-
-			if ( ent->client->ps.powerups[ PW_REDFLAG ] ) {
-				item = BG_FindItemForPowerup( PW_REDFLAG );
-				j = PW_REDFLAG;
-			} else if ( ent->client->ps.powerups[ PW_BLUEFLAG ] ) {
-				item = BG_FindItemForPowerup( PW_BLUEFLAG );
-				j = PW_BLUEFLAG;
-			} else if ( ent->client->ps.powerups[ PW_NEUTRALFLAG ] ) {
-				item = BG_FindItemForPowerup( PW_NEUTRALFLAG );
-				j = PW_NEUTRALFLAG;
-			}
 
 			if ( item ) {
 				drop = Drop_Item( ent, item, 0 );
@@ -539,7 +513,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			break;
 
 		case EV_USE_ITEM2:		// medkit
-			ent->health = ent->client->ps.stats[STAT_MAX_HEALTH] + 25;
+			ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
 
 			break;
 
@@ -578,7 +552,7 @@ void ThrowWeapon( gentity_t *ent )
 
 	xr_item = BG_FindItemForWeapon( client->ps.weapon );
 
-	amount= client->ps.ammo[ client->ps.weapon ]; // XRAY save amount
+	amount = client->ps.ammo[ client->ps.weapon ]; // XRAY save amount
 	client->ps.ammo[ client->ps.weapon ] = 0;
 
 	client->ps.stats[STAT_WEAPONS] &= ~( 1 << client->ps.weapon );
@@ -590,11 +564,11 @@ void ThrowWeapon( gentity_t *ent )
 		}
 	}
 
-	xr_drop= dropWeapon( ent, xr_item, 0, FL_DROPPED_ITEM | FL_THROWN_ITEM );
+	xr_drop = dropWeapon( ent, xr_item, 0, FL_DROPPED_ITEM | FL_THROWN_ITEM );
 	if( amount != 0)
-		xr_drop->count= amount;
+		xr_drop->count = amount;
 	else
-		xr_drop->count= -1; // XRAY FMJ 0 is already taken, -1 means no ammo
+		xr_drop->count = -1; // XRAY FMJ 0 is already taken, -1 means no ammo
 }
 
 void BotTestSolid(vec3_t origin);
@@ -718,7 +692,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// clear the rewards if time
 	if ( level.time > client->rewardTime ) {
-		client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
+		client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET );
 	}
 
 	if ( client->noclip ) {
@@ -1004,8 +978,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	// set the latest infor
 	if (g_smoothClients.integer) {
 		BG_PlayerStateToEntityStateExtraPolate( &ent->client->ps, &ent->s, ent->client->ps.commandTime, qtrue );
-	}
-	else {
+	}	else {
 		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue );
 	}
 	SendPendingPredictableEvents( &ent->client->ps );

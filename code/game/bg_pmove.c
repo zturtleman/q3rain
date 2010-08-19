@@ -45,6 +45,8 @@ float	pm_wateraccelerate = 4.0f;
 float	pm_flyaccelerate = 8.0f;
 float	pm_ladderaccelerate = 4000.0f;
 
+float pm_mooraccelerate = 3.0f;
+
 float	pm_friction = 6.0f;
 float	pm_waterfriction = 1.0f;
 float	pm_flightfriction = 3.0f;
@@ -590,6 +592,60 @@ static void PM_WaterJumpMove( void ) {
 
 /*
 ===================
+CheckMoor
+
+===================
+*/
+void CheckMoor( void )
+{
+	vec3_t spot;
+	int cont;
+	vec3_t flatforward;
+	
+	pml.moor = qfalse;
+
+	flatforward[0] = pml.forward[0];
+	flatforward[1] = pml.forward[1];
+	flatforward[2] = 0;
+	VectorNormalize(flatforward);
+
+	VectorMA(pm->ps->origin, 30, flatforward, spot);
+	spot[2] += 4;
+	cont = pm->pointcontents(spot, pm->ps->clientNum);
+	if (cont & MASK_MOOR) {
+		pml.moor = qtrue;
+		Com_Printf("MOOR\n");
+		return;
+	}
+}
+
+/*
+===================
+PM_MoorMove
+Totally ignore user input and suck the player down :D
+===================
+*/
+static void PM_MoorMove( void ) {
+	float	wishspeed;
+	vec3_t wishdir;
+	vec3_t velvec;
+	
+	PM_Friction ();
+	
+	velvec[0] = 0;
+	velvec[1] = 0;
+	velvec[2] = -40;		// sink towards bottom
+
+	VectorCopy (velvec, wishdir);
+	wishspeed = VectorNormalize(wishdir);
+
+	PM_Accelerate (wishdir, wishspeed, pm_mooraccelerate);
+
+	PM_SlideMove( qfalse );
+}
+
+/*
+===================
 PM_WaterMove
 
 ===================
@@ -620,6 +676,7 @@ static void PM_WaterMove( void ) {
 		}
 	}
 #endif
+
 	PM_Friction ();
 
 	scale = PM_CmdScale( &pm->cmd );
@@ -1072,9 +1129,11 @@ static void PM_CrashLand( void ) {
 	// ducking while falling doubles damage
 	if ( pm->ps->pm_flags & PMF_DUCKED ) {
 		delta *= 2;
+		if (delta >= 120) {
+			delta = 90;
+		}
 	}
-
-	// never take falling damage if completely underwater
+	
 	if ( pm->waterlevel == 3 ) {
 		return;
 	}
@@ -1096,14 +1155,11 @@ static void PM_CrashLand( void ) {
 	// SURF_NODAMAGE is used for bounce pads where you don't ever
 	// want to take damage or play a crunch sound
 	if ( !(pml.groundTrace.surfaceFlags & SURF_NODAMAGE) )  {
-		if ( delta > 60 ) {
+		if ( delta > 50 ) {
 			PM_AddEvent( EV_FALL_FAR );
-		} else if ( delta > 40 ) {
-			// this is a pain grunt, so don't play it if dead
-			if ( pm->ps->stats[STAT_HEALTH] > 0 ) {
-				PM_AddEvent( EV_FALL_MEDIUM );
-			}
-		} else if ( delta > 7 ) {
+		} else if ( delta > 30 ) {
+			PM_AddEvent( EV_FALL_MEDIUM );
+		} else if ( delta > 10 ) {
 			PM_AddEvent( EV_FALL_SHORT );
 		} else {
 			PM_AddEvent( PM_FootstepForSurface() );
@@ -1474,7 +1530,7 @@ static void PM_Footsteps( void ) {
 	footstep = qfalse;
 
 	if ( pm->ps->pm_flags & PMF_DUCKED ) {
-		bobmove = 0.5;	// ducked characters bob much faster
+		//bobmove = 0.5;	// ducked characters bob much faster
 		if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN ) {
 			PM_ContinueLegsAnim( LEGS_BACKCR );
 		}
@@ -1718,7 +1774,7 @@ static void PM_Weapon( void ) {
 	// COOKING inolen.com
 
 	// check for fire
-	// if they are pressing attack and their current weapon is the railgun
+	// if they are pressing attack and their current weapon is the nade launcher
 	if ((pm->cmd.buttons & 1) && (pm->ps->weapon == WP_GRENADE_LAUNCHER)) {
 		pm->ps->weaponTime = 0;
 		// put it in the "cocked" position
@@ -1728,12 +1784,9 @@ static void PM_Weapon( void ) {
 	// check for fire release
 	// if they arn't pressing attack
 	if (!(pm->cmd.buttons & 1)) {
-		// if we had them cocked and then they arnt pressing it then that means they released it
 		if (pm->ps->weaponstate == WEAPON_COCKED) {
-			// set to be able to fire
 			pm->ps->weaponstate = WEAPON_READY;
 		} else {
-			// else if they arn't pressing attack, then they just are running around
 			pm->ps->weaponTime = 0;
 			pm->ps->weaponstate = WEAPON_READY;
 			return;
@@ -1808,9 +1861,6 @@ static void PM_Weapon( void ) {
 	case WP_GRAPPLING_HOOK:
 		addTime = 400;
 		break;*/
-	}
-	if ( pm->ps->powerups[PW_HASTE] ) {
-		addTime /= 1.3;
 	}
 
 	pm->ps->weaponTime += addTime;
@@ -2048,6 +2098,7 @@ void PmoveSingle (pmove_t *pmove) {
 	PM_DropTimers();
 	
 	CheckLadder(); //LADDER
+	CheckMoor(); // MOOR
 	
 	if ( pm->ps->powerups[PW_FLIGHT] ) {
 		// flight powerup doesn't allow jump and has different friction
@@ -2066,6 +2117,9 @@ void PmoveSingle (pmove_t *pmove) {
 	} else if ( pml.walking ) {
 		// walking on ground
 		PM_WalkMove();
+	} else if ( pml.moor ) {
+		// drowning :D
+		PM_MoorMove();
 	} else {
 		// airborne
 		PM_AirMove();

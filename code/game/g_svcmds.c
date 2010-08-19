@@ -435,7 +435,28 @@ void	Svcmd_ForceTeam_f( void ) {
 	SetTeam( &g_entities[cl - level.clients], str );
 }
 
+/*
+===================
+Svcmd_KillClient_f
+
+killclient <player>
+===================
+*/
+void	Svcmd_KillClient_f( void ) {
+	gclient_t	*cl;
+	char		str[MAX_TOKEN_CHARS];
+	
+	trap_Argv( 1, str, sizeof( str ) );
+	cl = ClientForString( str );
+	if ( !cl ) {
+		return;
+	}
+	
+	G_Damage(&g_entities[cl - level.clients], NULL, NULL, NULL, NULL, 999, DAMAGE_NO_PROTECTION, MOD_ADMIN);
+}
+
 char	*ConcatArgs( int start );
+
 
 /*
 =================
@@ -480,6 +501,11 @@ qboolean	ConsoleCommand( void ) {
 
 	if (Q_stricmp (cmd, "addip") == 0) {
 		Svcmd_AddIP_f();
+		return qtrue;
+	}
+
+	if (Q_stricmp (cmd, "killclient") == 0) {
+		Svcmd_KillClient_f();
 		return qtrue;
 	}
 
