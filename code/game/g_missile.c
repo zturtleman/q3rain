@@ -353,8 +353,8 @@ gentity_t *fire_grenade (gentity_t *self, vec3_t start, vec3_t dir) {
 	bolt->s.eFlags = EF_BOUNCE_HALF;
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent = self;
-	bolt->damage = 200;
-	bolt->splashDamage = 300;
+	bolt->damage = 150;
+	bolt->splashDamage = 250;
 	bolt->splashRadius = 300;
 	bolt->methodOfDeath = MOD_GRENADE;
 	bolt->splashMethodOfDeath = MOD_GRENADE_SPLASH;
@@ -366,15 +366,15 @@ gentity_t *fire_grenade (gentity_t *self, vec3_t start, vec3_t dir) {
   bolt->takedamage = qtrue;
   bolt->die = G_MissileDie;
   bolt->r.contents = CONTENTS_BODY;
-  VectorSet(bolt->r.mins, -10, -3, 0);
+  VectorSet(bolt->r.mins, -10, -5, 0);
   VectorCopy(bolt->r.mins, bolt->r.absmin);
-  VectorSet(bolt->r.maxs, 10, 3, 6);
+  VectorSet(bolt->r.maxs, 10, 5, 6);
   VectorCopy(bolt->r.maxs, bolt->r.absmax);
 
 	bolt->s.pos.trType = TR_GRAVITY;
 	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( dir, 1000, bolt->s.pos.trDelta );
+	VectorScale( dir, 800, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 
 	VectorCopy (start, bolt->r.currentOrigin);
@@ -498,100 +498,3 @@ gentity_t *fire_grapple (gentity_t *self, vec3_t start, vec3_t dir) {
 	return hook;
 }
 
-
-#ifdef MISSIONPACK
-/*
-=================
-fire_nail
-=================
-*/
-#define NAILGUN_SPREAD	500
-
-gentity_t *fire_nail( gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up ) {
-	gentity_t	*bolt;
-	vec3_t		dir;
-	vec3_t		end;
-	float		r, u, scale;
-
-	bolt = G_Spawn();
-	bolt->classname = "nail";
-	bolt->nextthink = level.time + 10000;
-	bolt->think = G_ExplodeMissile;
-	bolt->s.eType = ET_MISSILE;
-	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	bolt->s.weapon = WP_NAILGUN;
-	bolt->r.ownerNum = self->s.number;
-	bolt->parent = self;
-	bolt->damage = 20;
-	bolt->methodOfDeath = MOD_NAIL;
-	bolt->clipmask = MASK_SHOT;
-	bolt->target_ent = NULL;
-
-	bolt->s.pos.trType = TR_LINEAR;
-	bolt->s.pos.trTime = level.time;
-	VectorCopy( start, bolt->s.pos.trBase );
-
-	r = random() * M_PI * 2.0f;
-	u = sin(r) * crandom() * NAILGUN_SPREAD * 16;
-	r = cos(r) * crandom() * NAILGUN_SPREAD * 16;
-	VectorMA( start, 8192 * 16, forward, end);
-	VectorMA (end, r, right, end);
-	VectorMA (end, u, up, end);
-	VectorSubtract( end, start, dir );
-	VectorNormalize( dir );
-
-	scale = 555 + random() * 1800;
-	VectorScale( dir, scale, bolt->s.pos.trDelta );
-	SnapVector( bolt->s.pos.trDelta );
-
-	VectorCopy( start, bolt->r.currentOrigin );
-
-	return bolt;
-}	
-
-
-/*
-=================
-fire_prox
-=================
-*/
-gentity_t *fire_prox( gentity_t *self, vec3_t start, vec3_t dir ) {
-	gentity_t	*bolt;
-
-	VectorNormalize (dir);
-
-	bolt = G_Spawn();
-	bolt->classname = "prox mine";
-	bolt->nextthink = level.time + 3000;
-	bolt->think = G_ExplodeMissile;
-	bolt->s.eType = ET_MISSILE;
-	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	bolt->s.weapon = WP_PROX_LAUNCHER;
-	bolt->s.eFlags = 0;
-	bolt->r.ownerNum = self->s.number;
-	bolt->parent = self;
-	bolt->damage = 0;
-	bolt->splashDamage = 100;
-	bolt->splashRadius = 150;
-	bolt->methodOfDeath = MOD_PROXIMITY_MINE;
-	bolt->splashMethodOfDeath = MOD_PROXIMITY_MINE;
-	bolt->clipmask = MASK_SHOT;
-	bolt->target_ent = NULL;
-	// count is used to check if the prox mine left the player bbox
-	// if count == 1 then the prox mine left the player bbox and can attack to it
-	bolt->count = 0;
-
-	//FIXME: we prolly wanna abuse another field
-	bolt->s.generic1 = self->client->sess.sessionTeam;
-
-	bolt->s.pos.trType = TR_GRAVITY;
-	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
-	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( dir, 700, bolt->s.pos.trDelta );
-	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-
-	VectorCopy (start, bolt->r.currentOrigin);
-
-	return bolt;
-}
-#endif

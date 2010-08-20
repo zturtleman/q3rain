@@ -530,11 +530,9 @@ static int CG_CalcFov( void ) {
 		fov_x += v;
 		fov_y -= v;
 		inwater = qtrue;
-	}
-	else {
+	}	else {
 		inwater = qfalse;
 	}
-
 
 	// set it
 	cg.refdef.fov_x = fov_x;
@@ -590,7 +588,7 @@ static void CG_DamageBlendBlob( void ) {
 	VectorMA( ent.origin, cg.damageX * -8, cg.refdef.viewaxis[1], ent.origin );
 	VectorMA( ent.origin, cg.damageY * 8, cg.refdef.viewaxis[2], ent.origin );
 
-	ent.radius = cg.damageValue * 3;
+	ent.radius = cg.damageValue * 5;
 	ent.customShader = cgs.media.viewBloodShader;
 	ent.shaderRGBA[0] = 255;
 	ent.shaderRGBA[1] = 255;

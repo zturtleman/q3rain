@@ -45,8 +45,8 @@ static void CG_MachineGunEjectBrass( centity_t *cent ) {
 	re = &le->refEntity;
 
 	velocity[0] = 0;
-	velocity[1] = -50 + 40 * crandom();
-	velocity[2] = 100 + 50 * crandom();
+	velocity[1] = -70 + 40 * crandom();
+	velocity[2] = 100;
 
 	le->leType = LE_FRAGMENT;
 	le->startTime = cg.time;

@@ -654,6 +654,8 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( msec > 200 ) {
 		msec = 200;
 	}
+	
+	//GibEntity(ent); // uncomment that line for ultra gore :)
 
 	if ( pmove_msec.integer < 8 ) {
 		trap_Cvar_Set("pmove_msec", "8");
