@@ -117,7 +117,7 @@ AddTeamScore
  for gametype GT_TEAM the level.teamScores is updated in AddScore in g_combat.c
 ==============
 */
-void AddTeamScore(vec3_t origin, int team, int score) {
+void AddTeamScore(vec3_t origin, int team, int score) {/*
 	gentity_t	*te;
 
 	te = G_TempEntity(origin, EV_GLOBAL_TEAM_SOUND );
@@ -153,7 +153,7 @@ void AddTeamScore(vec3_t origin, int team, int score) {
 			te->s.eventParm = GTS_BLUETEAM_SCORED;
 		}
 	}
-	level.teamScores[ team ] += score;
+	level.teamScores[ team ] += score;*/
 }
 
 /*
@@ -505,87 +505,15 @@ void Team_ResetFlags( void ) {
 }
 
 void Team_ReturnFlagSound( gentity_t *ent, int team ) {
-	gentity_t	*te;
-
-	if (ent == NULL) {
-		G_Printf ("Warning:  NULL passed to Team_ReturnFlagSound\n");
-		return;
-	}
-
-	te = G_TempEntity( ent->s.pos.trBase, EV_GLOBAL_TEAM_SOUND );
-	if( team == TEAM_BLUE ) {
-		te->s.eventParm = GTS_RED_RETURN;
-	}
-	else {
-		te->s.eventParm = GTS_BLUE_RETURN;
-	}
-	te->r.svFlags |= SVF_BROADCAST;
 }
 
 void Team_TakeFlagSound( gentity_t *ent, int team ) {
-	gentity_t	*te;
-
-	if (ent == NULL) {
-		G_Printf ("Warning:  NULL passed to Team_TakeFlagSound\n");
-		return;
-	}
-
-	// only play sound when the flag was at the base
-	// or not picked up the last 10 seconds
-	switch(team) {
-		case TEAM_RED:
-			if( teamgame.blueStatus != FLAG_ATBASE ) {
-				if (teamgame.blueTakenTime > level.time - 10000)
-					return;
-			}
-			teamgame.blueTakenTime = level.time;
-			break;
-
-		case TEAM_BLUE:	// CTF
-			if( teamgame.redStatus != FLAG_ATBASE ) {
-				if (teamgame.redTakenTime > level.time - 10000)
-					return;
-			}
-			teamgame.redTakenTime = level.time;
-			break;
-	}
-
-	te = G_TempEntity( ent->s.pos.trBase, EV_GLOBAL_TEAM_SOUND );
-	if( team == TEAM_BLUE ) {
-		te->s.eventParm = GTS_RED_TAKEN;
-	}
-	else {
-		te->s.eventParm = GTS_BLUE_TAKEN;
-	}
-	te->r.svFlags |= SVF_BROADCAST;
 }
 
 void Team_CaptureFlagSound( gentity_t *ent, int team ) {
-	gentity_t	*te;
-
-	if (ent == NULL) {
-		G_Printf ("Warning:  NULL passed to Team_CaptureFlagSound\n");
-		return;
-	}
-
-	te = G_TempEntity( ent->s.pos.trBase, EV_GLOBAL_TEAM_SOUND );
-	if( team == TEAM_BLUE ) {
-		te->s.eventParm = GTS_BLUE_CAPTURE;
-	}
-	else {
-		te->s.eventParm = GTS_RED_CAPTURE;
-	}
-	te->r.svFlags |= SVF_BROADCAST;
 }
 
 void Team_ReturnFlag( int team ) {
-	Team_ReturnFlagSound(Team_ResetFlag(team), team);
-	if( team == TEAM_FREE ) {
-		PrintMsg(NULL, "The flag has returned!\n" );
-	}
-	else {
-		PrintMsg(NULL, "The %s flag has returned!\n", TeamName(team));
-	}
 }
 
 void Team_FreeEntity( gentity_t *ent ) {

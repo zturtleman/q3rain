@@ -22,7 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
 #include "g_local.h"
-#undef MISSIONPACK
 
 level_locals_t	level;
 
@@ -444,7 +443,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_FindTeams();
 
 	// make sure we have flags for CTF, etc
-	if( g_gametype.integer == GT_TEAMSURVIVOR ) {
+	if( g_gametype.integer >= GT_ASSASSINS ) {
 		G_CheckTeamItems();
 	}
 
@@ -1334,7 +1333,7 @@ CheckTournament
 Once a frame, check for changes in tournement player state
 =============
 */
-void CheckTournament( void ) {
+void CheckTournament( void ) {/*
 	// check because we run 3 game frames before calling Connect and/or ClientBegin
 	// for clients on a map_restart
 	if ( level.numPlayingClients == 0 ) {
@@ -1391,7 +1390,7 @@ void CheckTournament( void ) {
 			level.restarted = qtrue;
 			return;
 		}
-	}
+	}*/
 }
 
 
