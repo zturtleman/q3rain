@@ -28,8 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	GAME_VERSION		BASEGAME "-1"
 
 #define	DEFAULT_GRAVITY		800
-//#define	GIB_HEALTH			-40
-#define GIB_HEALTH 100
+#define GIB_HEALTH -999
 #define	ARMOR_PROTECTION	0.66
 
 #define	MAX_ITEMS			256
@@ -424,11 +423,10 @@ typedef enum {
 	
 	EV_WALLJUMP,
 	EV_GRAB
-
 } entity_event_t;
 
 // TODO remove
-typedef enum {
+/*typedef enum {
 	GTS_RED_CAPTURE,
 	GTS_BLUE_CAPTURE,
 	GTS_RED_RETURN,
@@ -443,7 +441,7 @@ typedef enum {
 	GTS_BLUETEAM_TOOK_LEAD,
 	GTS_TEAMS_ARE_TIED,
 	GTS_KAMIKAZE
-} global_team_sound_t;
+} global_team_sound_t;*/
 
 // animations
 typedef enum {
@@ -592,6 +590,7 @@ typedef enum {
 	MOD_GRAPPLE,
 	MOD_MOOR,
 	MOD_ADMIN,
+	MOD_BOMB,
 } meansOfDeath_t;
 
 

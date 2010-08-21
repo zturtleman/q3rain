@@ -1098,6 +1098,11 @@ static void PM_CrashLand( void ) {
 	float		vel, acc;
 	float		t;
 	float		a, b, c, den;
+	
+	// no need to calculate that stuff if already dead...
+	if (pm->ps->stats[STAT_HEALTH] <= 0) {
+		return;
+	}
 
 	// decide which landing animation to use
 	if ( pm->ps->pm_flags & PMF_BACKWARDS_JUMP ) {
@@ -1129,9 +1134,6 @@ static void PM_CrashLand( void ) {
 	// ducking while falling doubles damage
 	if ( pm->ps->pm_flags & PMF_DUCKED ) {
 		delta *= 2;
-		if (delta >= 120) {
-			delta = 90;
-		}
 	}
 	
 	if ( pm->waterlevel == 3 ) {
@@ -1531,6 +1533,7 @@ static void PM_Footsteps( void ) {
 
 	if ( pm->ps->pm_flags & PMF_DUCKED ) {
 		//bobmove = 0.5;	// ducked characters bob much faster
+		bobmove = 0.1f;
 		if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN ) {
 			PM_ContinueLegsAnim( LEGS_BACKCR );
 		}

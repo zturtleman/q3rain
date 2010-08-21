@@ -378,8 +378,9 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	memset( self->client->ps.powerups, 0, sizeof(self->client->ps.powerups) );
 
 	// never gib in a nodrop
-	if ( (self->health <= GIB_HEALTH && !(contents & CONTENTS_NODROP) && g_blood.integer) || meansOfDeath == MOD_SUICIDE) {
-	//if (0 == 1) { //LOLWUT
+	//if ( (self->health <= GIB_HEALTH && !(contents & CONTENTS_NODROP) && g_blood.integer) || meansOfDeath == MOD_SUICIDE) {
+	if ( meansOfDeath == MOD_ADMIN) { // :D :D
+		self->s.eType = ET_INVISIBLE;
 		GibEntity( self, killer );
 	} else {
 		// normal death

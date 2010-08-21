@@ -445,8 +445,8 @@ void Cmd_Kill_f( gentity_t *ent ) {
 		return;
 	}
 	ent->flags &= ~FL_GODMODE;
-	ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;
-	player_die (ent, ent, ent, 100000, MOD_SUICIDE);
+	ent->client->ps.stats[STAT_HEALTH] = ent->health = -500;
+	player_die (ent, ent, ent, 500, MOD_SUICIDE);
 }
 
 /*
@@ -1588,6 +1588,9 @@ void Cmd_Reload( gentity_t *ent )	{
 	int ammotoadd;
 
 	weapon = ent->client->ps.weapon;
+	
+	if (weapon == WP_GRENADE_LAUNCHER) return; // f00king cant reload grenades :X
+	
 	amt = ClipAmountForWeapon(weapon);
 	ammotoadd = amt;
 	if (ent->client->clipammo[weapon] >= ClipAmountForWeapon(weapon))	{
@@ -1595,15 +1598,27 @@ void Cmd_Reload( gentity_t *ent )	{
 		return;
 	}
 	ent->client->ps.weaponstate = WEAPON_RELOADING;
-	ent->client->ps.torsoAnim = ( ( ent->client->ps.torsoAnim & ANIM_TOGGLEBIT )
-		^ ANIM_TOGGLEBIT )	| TORSO_DROP;
-	ent->client->ps.weaponTime += 2000; // RELOADINGTIME
-	//Play a sound maybe: thats up to you.
-	if (ent->client->ps.ammo[weapon] == 0) return;
-	//We can only add ammo(to weapon) what we need
+	ent->client->ps.torsoAnim = ( ( ent->client->ps.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT )	| TORSO_DROP;
+	
+	
+	if (ent->client->ps.ammo[weapon] == 0) {
+		trap_SendServerCommand(ent-g_entities, "cp \"Out of ammo\n\"");
+		return;
+	}
 	if (ent->client->clipammo[weapon] > 0)	{
 			ammotoadd -= ent->client->clipammo[weapon];
 	}
+	
+	// RELOADINGTIME
+	switch (weapon) {
+		case WP_SHOTGUN:
+			ent->client->ps.weaponTime += 500;//*ammotoadd;
+			ammotoadd = 1;
+			break;
+		default:
+			ent->client->ps.weaponTime += 2000;
+	}
+	
 	//We can only remove (from bag) what ammo we have
 	if (ent->client->ps.ammo[weapon] < ammotoadd)	{
 		ammotoadd = ent->client->ps.ammo[weapon];

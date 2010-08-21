@@ -27,8 +27,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 
-#undef MISSIONPACK
-
 /*
 ==============
 CG_CheckAmmo
@@ -41,6 +39,8 @@ void CG_CheckAmmo( void ) {
 	int		total;
 	int		previous;
 	int		weapons;
+	
+	return; // annoying warning :)
 
 	// see about how many seconds of ammo we have remaining
 	weapons = cg.snap->ps.stats[ STAT_WEAPONS ];
@@ -54,9 +54,6 @@ void CG_CheckAmmo( void ) {
 		case WP_GRENADE_LAUNCHER:
 		case WP_RAILGUN:
 		case WP_SHOTGUN:
-#ifdef MISSIONPACK
-		case WP_PROX_LAUNCHER:
-#endif
 			total += cg.snap->ps.ammo[i] * 1000;
 			break;
 		default:
@@ -97,14 +94,16 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 	vec3_t		angles;
 	float		dist;
 	float		yaw, pitch;
+	int fov;
 
 	// show the attacking player's head and name in corner
 	cg.attackerTime = cg.time;
 
 	// the lower on health you are, the greater the view kick will be
 	health = cg.snap->ps.stats[STAT_HEALTH];
+	
 	if ( health < 40 ) {
-		scale = 1;
+		scale = 2;
 	} else {
 		scale = 40.0 / health;
 	}
@@ -112,8 +111,8 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 
 	if (kick < 5)
 		kick = 5;
-	if (kick > 10)
-		kick = 10;
+	if (kick > 50)
+		kick = 50;
 
 	// if yaw and pitch are both 255, make the damage always centered (falling, etc)
 	if ( yawByte == 255 && pitchByte == 255 ) {
@@ -179,9 +178,6 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 	cg.v_dmg_time = cg.time + DAMAGE_TIME;
 	cg.damageTime = cg.snap->serverTime;
 }
-
-
-
 
 /*
 ================
