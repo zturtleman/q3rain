@@ -257,6 +257,7 @@ typedef enum {
 typedef enum {
 	PW_NONE,
 
+	// TODO remove
 	PW_QUAD,
 	PW_BATTLESUIT,
 	PW_HASTE,
@@ -273,6 +274,7 @@ typedef enum {
 	PW_DOUBLER,
 	PW_AMMOREGEN,
 	PW_INVULNERABILITY,
+	// end remove
 	
 	PW_DIVESUIT,
 
@@ -292,6 +294,7 @@ typedef enum {
 typedef enum {
 	WP_NONE,
 
+	// TODO remove
 	WP_GAUNTLET,
 	WP_MACHINEGUN,
 	WP_SHOTGUN,
@@ -302,6 +305,12 @@ typedef enum {
 	WP_PLASMAGUN,
 	WP_BFG,
 	WP_GRAPPLING_HOOK,
+	
+	WP_KNIFE,
+	WP_HE,
+	WP_BARRETT,
+	WP_INTERVENTION,
+	WP_CROSSBOW,
 
 	WP_NUM_WEAPONS
 } weapon_t;
@@ -425,24 +434,6 @@ typedef enum {
 	EV_GRAB
 } entity_event_t;
 
-// TODO remove
-/*typedef enum {
-	GTS_RED_CAPTURE,
-	GTS_BLUE_CAPTURE,
-	GTS_RED_RETURN,
-	GTS_BLUE_RETURN,
-	GTS_RED_TAKEN,
-	GTS_BLUE_TAKEN,
-	GTS_REDOBELISK_ATTACKED,
-	GTS_BLUEOBELISK_ATTACKED,
-	GTS_REDTEAM_SCORED,
-	GTS_BLUETEAM_SCORED,
-	GTS_REDTEAM_TOOK_LEAD,
-	GTS_BLUETEAM_TOOK_LEAD,
-	GTS_TEAMS_ARE_TIED,
-	GTS_KAMIKAZE
-} global_team_sound_t;*/
-
 // animations
 typedef enum {
 	BOTH_DEATH1,
@@ -564,7 +555,8 @@ typedef enum {
 
 // means of death
 typedef enum {
-	MOD_UNKNOWN,
+
+	// TODO remove
 	MOD_SHOTGUN,
 	MOD_GAUNTLET,
 	MOD_MACHINEGUN,
@@ -578,17 +570,28 @@ typedef enum {
 	MOD_LIGHTNING,
 	MOD_BFG,
 	MOD_BFG_SPLASH,
+	MOD_GRAPPLE,
+	
+	MOD_UNKNOWN,
+	// weapons
+	MOD_KNIFE,
+	MOD_HE,
+	MOD_HE_SPLASH,
+	MOD_BARRETT,
+	MOD_INTERVENTION,
+	MOD_CROSSBOW,
+	// env
 	MOD_WATER,
 	MOD_SLIME,
 	MOD_LAVA,
 	MOD_CRUSH,
-	MOD_TELEFRAG,
+	MOD_MOOR,
 	MOD_FALLING,
+	MOD_TELEFRAG,
 	MOD_SUICIDE,
 	MOD_TARGET_LASER,
 	MOD_TRIGGER_HURT,
-	MOD_GRAPPLE,
-	MOD_MOOR,
+	// misc
 	MOD_ADMIN,
 	MOD_BOMB,
 } meansOfDeath_t;

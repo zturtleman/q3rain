@@ -638,7 +638,92 @@ void CalcMuzzlePointOrigin ( gentity_t *ent, vec3_t origin, vec3_t forward, vec3
 	SnapVector( muzzlePoint );
 }
 
+/*
+===============
+Weapon_Knife_Fire
 
+===============
+*/
+void Weapon_Knife_Fire (gentity_t *ent) {
+	trace_t		tr;
+	vec3_t		end;
+	gentity_t	*tent;
+	gentity_t	*traceEnt;
+	int			damage;
+
+	// set aiming directions
+	AngleVectors (ent->client->ps.viewangles, forward, right, up);
+
+	CalcMuzzlePoint ( ent, forward, right, up, muzzle );
+
+	VectorMA (muzzle, 32, forward, end);
+
+	trap_Trace (&tr, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
+	if ( tr.surfaceFlags & SURF_NOIMPACT ) {
+		return;
+	}
+
+	traceEnt = &g_entities[ tr.entityNum ];
+
+	// send blood impact
+	if ( traceEnt->takedamage && traceEnt->client ) {
+		tent = G_TempEntity( tr.endpos, EV_MISSILE_HIT );
+		tent->s.otherEntityNum = traceEnt->s.number;
+		tent->s.eventParm = DirToByte( tr.plane.normal );
+		tent->s.weapon = ent->s.weapon;
+	}
+
+	if ( !traceEnt->takedamage) {
+		return;
+	}
+
+	damage = 50;
+	G_Damage(traceEnt, ent, ent, forward, tr.endpos, damage, 0, MOD_KNIFE);
+}
+
+/*
+===============
+Weapon_HE_Fire
+
+===============
+*/
+void Weapon_HE_Fire (gentity_t *ent) {
+	// TODO stub
+	weapon_grenadelauncher_fire( ent );
+}
+
+/*
+===============
+Weapon_Barrett_Fire
+
+===============
+*/
+void Weapon_Barrett_Fire (gentity_t *ent) {
+	// TODO stub
+	weapon_railgun_fire( ent, 0 );
+}
+
+/*
+===============
+Weapon_Intervention_Fire
+
+===============
+*/
+void Weapon_Intervention_Fire (gentity_t *ent) {
+	// TODO stub
+	weapon_railgun_fire( ent, 0 );
+}
+
+/*
+===============
+Weapon_Crossbow_Fire
+
+===============
+*/
+void Weapon_Crossbow_Fire (gentity_t *ent) {
+	// TODO stub
+	weapon_railgun_fire( ent, 0 );
+}
 
 /*
 ===============
@@ -670,6 +755,24 @@ void FireWeapon( gentity_t *ent ) {
 
 	// fire the specific weapon
 	switch( ent->s.weapon ) {
+	// rain weapons
+	case WP_KNIFE:
+		Weapon_Knife_Fire(ent);
+		break;
+	case WP_HE:
+		Weapon_HE_Fire(ent);
+		break;
+	case WP_BARRETT:
+		Weapon_Barrett_Fire(ent);
+		break;
+	case WP_INTERVENTION:
+		Weapon_Intervention_Fire(ent);
+		break;
+	case WP_CROSSBOW:
+		Weapon_Crossbow_Fire(ent);
+		break;
+	// end rain weapons
+	// TODO remove
 	case WP_GAUNTLET:
 		Weapon_Gauntlet( ent );
 		break;
