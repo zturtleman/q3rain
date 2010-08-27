@@ -1766,7 +1766,7 @@ static void PM_Weapon( void ) {
 
 	if ( pm->ps->weaponstate == WEAPON_RAISING ) {
 		pm->ps->weaponstate = WEAPON_READY;
-		if ( pm->ps->weapon == WP_GAUNTLET ) {
+		if ( pm->ps->weapon == WP_KNIFE ) {
 			PM_StartTorsoAnim( TORSO_STAND2 );
 		} else {
 			PM_StartTorsoAnim( TORSO_STAND );
@@ -1778,14 +1778,14 @@ static void PM_Weapon( void ) {
 
 	// check for fire
 	// if they are pressing attack and their current weapon is the nade launcher
-	if ((pm->cmd.buttons & 1) && (pm->ps->weapon == WP_GRENADE_LAUNCHER)) {
+	if ((pm->cmd.buttons & 1) && (pm->ps->weapon == WP_HE)) {
 		pm->ps->weaponTime = 0;
 		// put it in the "cocked" position
 		pm->ps->weaponstate = WEAPON_COCKED;
 		return;
 	}
 	// check for fire release
-	// if they arn't pressing attack
+	// if they aren't pressing attack
 	if (!(pm->cmd.buttons & 1)) {
 		if (pm->ps->weaponstate == WEAPON_COCKED) {
 			pm->ps->weaponstate = WEAPON_READY;
@@ -1797,7 +1797,7 @@ static void PM_Weapon( void ) {
 	}
 
 	// start the animation even if out of ammo
-	if ( pm->ps->weapon == WP_GAUNTLET ) {
+	/*if ( pm->ps->weapon == WP_KNIFE ) {
 		// the guantlet only "fires" when it actually hits something
 		if ( !pm->gauntletHit ) {
 			pm->ps->weaponTime = 0;
@@ -1805,9 +1805,9 @@ static void PM_Weapon( void ) {
 			return;
 		}
 		PM_StartTorsoAnim( TORSO_ATTACK2 );
-	} else {
+	} else {*/
 		PM_StartTorsoAnim( TORSO_ATTACK );
-	}
+	//}
 
 	pm->ps->weaponstate = WEAPON_FIRING;
 
@@ -1825,14 +1825,13 @@ static void PM_Weapon( void ) {
 	/*if ( pm->ps->ammo[ pm->ps->weapon ] != -1 ) {
 		pm->ps->ammo[ pm->ps->weapon ]--;
 	}*/
-	
-	// RELOADING
 
 	// fire weapon
 	PM_AddEvent( EV_FIRE_WEAPON );
 
 	switch( pm->ps->weapon ) {
 	default:
+	// TODO remove
 	case WP_GAUNTLET:
 		addTime = 400;
 		break;
@@ -1848,22 +1847,24 @@ static void PM_Weapon( void ) {
 	case WP_GRENADE_LAUNCHER:
 		addTime = 800;
 		break;
-		/*
-	case WP_LIGHTNING:
-		addTime = 50;
-		break;
-	case WP_ROCKET_LAUNCHER:
-		addTime = 800;
-		break;
-	case WP_PLASMAGUN:
-		addTime = 100;
-		break;
-	case WP_BFG:
+	// end remove
+	// RAIN WEAPONS
+	case WP_KNIFE:
 		addTime = 200;
 		break;
-	case WP_GRAPPLING_HOOK:
+	case WP_BARRETT:
+		addTime = 4000;
+		break;
+	case WP_INTERVENTION:
+		addTime = 3500;
+		break;
+	case WP_CROSSBOW:
 		addTime = 400;
-		break;*/
+		break;
+	case WP_HE:
+		addTime = 800;
+		break;
+	// end rain weapons
 	}
 
 	pm->ps->weaponTime += addTime;

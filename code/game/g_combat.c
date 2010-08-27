@@ -183,7 +183,7 @@ void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 
 // these are just for logging, the client prints its own messages
 char	*modNames[] = {
-	"MOD_UNKNOWN",
+	// TODO remove
 	"MOD_SHOTGUN",
 	"MOD_GAUNTLET",
 	"MOD_MACHINEGUN",
@@ -197,17 +197,30 @@ char	*modNames[] = {
 	"MOD_LIGHTNING",
 	"MOD_BFG",
 	"MOD_BFG_SPLASH",
+	"MOD_GRAPPLE",
+	
+	"MOD_UNKNOWN",
+	// weapons
+	"MOD_KNIFE",
+	"MOD_HE",
+	"MOD_HE_SPLASH",
+	"MOD_BARRETT",
+	"MOD_INTERVENTION",
+	"MOD_CROSSBOW",
+	// env
 	"MOD_WATER",
 	"MOD_SLIME",
 	"MOD_LAVA",
 	"MOD_CRUSH",
-	"MOD_TELEFRAG",
+	"MOD_MOOR",
 	"MOD_FALLING",
+	"MOD_TELEFRAG",
 	"MOD_SUICIDE",
 	"MOD_TARGET_LASER",
 	"MOD_TRIGGER_HURT",
-	"MOD_GRAPPLE",
-	"MOD_MOOR"
+	// misc
+	"MOD_ADMIN",
+	"MOD_BOMB",
 };
 
 /*

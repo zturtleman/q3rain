@@ -546,6 +546,7 @@ void ThrowWeapon( gentity_t *ent )
 
 	if( client->ps.weapon == WP_GAUNTLET
 		|| client->ps.weapon == WP_GRAPPLING_HOOK
+		|| client->ps.weapon == WP_KNIFE
 		|| ( ucmd->buttons & BUTTON_ATTACK ))
 		return;
 
@@ -556,7 +557,7 @@ void ThrowWeapon( gentity_t *ent )
 	client->ps.ammo[ client->ps.weapon ] = 0;
 
 	client->ps.stats[STAT_WEAPONS] &= ~( 1 << client->ps.weapon );
-	client->ps.weapon = WP_MACHINEGUN;
+	client->ps.weapon = WP_NONE;
 	for ( i = WP_NUM_WEAPONS - 1 ; i > 0 ; i-- ) {
 		if ( client->ps.stats[STAT_WEAPONS] & ( 1 << i ) ) {
 			client->ps.weapon = i;

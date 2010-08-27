@@ -273,6 +273,28 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "tried to invade";
 			message2 = "'s personal space";
 			break;
+		// RAIN WEAPONS
+		case MOD_BARRETT:
+			message = "was sniped down by";
+			break;
+		case MOD_INTERVENTION:
+			message = "was sniped down by";
+			break;
+		case MOD_HE:
+			message = "was epicly pwnt by";
+			message2 = "'s grenade";
+			break;
+		case MOD_HE_SPLASH:
+			message = "was pulverized by";
+			message2 = "'s grenade";
+			break;
+		case MOD_CROSSBOW:
+			message = "was sniped down by";
+			break;
+		case MOD_KNIFE:
+			message = "was sliced by";
+			break;
+		// end rain weapon
 		default:
 			message = "was killed by";
 			break;
@@ -557,7 +579,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_JUMP:
 		DEBUGNAME("EV_JUMP");
-		trap_S_StartSound (NULL, es->number, CHAN_VOICE, CG_CustomSound( es->number, "*jump1.wav" ) );
+		//trap_S_StartSound (NULL, es->number, CHAN_VOICE, CG_CustomSound( es->number, "*jump1.wav" ) );
 		break;
 	case EV_TAUNT:
 		DEBUGNAME("EV_TAUNT");

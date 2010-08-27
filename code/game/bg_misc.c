@@ -349,6 +349,86 @@ gitem_t	bg_itemlist[] =
 /* sounds */ ""
 	},
 
+/*QUAKED weapon_barrett (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*/
+	{
+		"weapon_barrett", 
+		"sound/misc/w_pkup.wav",
+        { "models/weapons2/railgun/railgun.md3", 
+		NULL, NULL, NULL},
+/* icon */		"icons/iconw_railgun",
+/* pickup */	"Barrett M82A1",
+		10,
+		IT_WEAPON,
+		WP_BARRETT,
+/* precache */ "",
+/* sounds */ ""
+	},
+
+/*QUAKED weapon_intervention (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*/
+	{
+		"weapon_intervention", 
+		"sound/misc/w_pkup.wav",
+        { "models/weapons2/railgun/railgun.md3", 
+		NULL, NULL, NULL},
+/* icon */		"icons/iconw_railgun",
+/* pickup */	"M200 Intervention",
+		7,
+		IT_WEAPON,
+		WP_INTERVENTION,
+/* precache */ "",
+/* sounds */ ""
+	},
+	
+/*QUAKED weapon_knife (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*/
+	{
+		"weapon_knife", 
+		"sound/misc/w_pkup.wav",
+        { "models/weapons2/gauntlet/gauntlet.md3",
+		NULL, NULL, NULL},
+/* icon */		"icons/iconw_gauntlet",
+/* pickup */	"K-Bar",
+		0,
+		IT_WEAPON,
+		WP_KNIFE,
+/* precache */ "",
+/* sounds */ ""
+	},
+
+/*QUAKED weapon_crossbow (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*/
+	{
+		"weapon_crossbow", 
+		"sound/misc/w_pkup.wav",
+        { "models/weapons2/railgun/railgun.md3", 
+		NULL, NULL, NULL},
+/* icon */		"icons/iconw_railgun",
+/* pickup */	"Crossbow",
+		10,
+		IT_WEAPON,
+		WP_CROSSBOW,
+/* precache */ "",
+/* sounds */ ""
+	},
+
+/*QUAKED weapon_he (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*/
+	{
+		"weapon_he",
+		"sound/misc/w_pkup.wav",
+        { "models/weapons2/grenadel/grenadel.md3", 
+		NULL, NULL, NULL},
+/* icon */		"icons/iconw_grenade",
+/* pickup */	"HE Grenade",
+		2,
+		IT_WEAPON,
+		WP_HE,
+/* precache */ "",
+/* sounds */ "sound/weapons/grenade/hgrenb1a.wav sound/weapons/grenade/hgrenb2a.wav"
+	},
+
 	//
 	// AMMO ITEMS
 	//
@@ -764,9 +844,6 @@ This needs to be the same for client side prediction and server use.
 */
 qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps ) {
 	gitem_t	*item;
-#ifdef MISSIONPACK
-	int		upperBound;
-#endif
 
 	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems ) {
 		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: index out of range" );

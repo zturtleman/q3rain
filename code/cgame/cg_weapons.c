@@ -680,6 +680,47 @@ void CG_RegisterWeapon( int weaponNum ) {
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/weaphits/bfg.md3" );
 		weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
 		break;
+		
+		// RAIN WEAPONS
+		
+	case WP_KNIFE:
+		weaponInfo->firingSound = trap_S_RegisterSound( "sound/weapons/melee/fstrun.wav", qfalse );
+		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/melee/fstatck.wav", qfalse );
+		break;
+
+	case WP_BARRETT:
+		MAKERGB( weaponInfo->flashDlightColor, 1, 0.5f, 0 );
+		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/railgun/railgf1a.wav", qfalse );
+		cgs.media.railExplosionShader = trap_R_RegisterShader( "railExplosion" );
+		cgs.media.railRingsShader = trap_R_RegisterShader( "railDisc" );
+		cgs.media.railCoreShader = trap_R_RegisterShader( "railCore" );
+		break;
+
+	case WP_INTERVENTION:
+		MAKERGB( weaponInfo->flashDlightColor, 1, 0.5f, 0 );
+		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/railgun/railgf1a.wav", qfalse );
+		cgs.media.railExplosionShader = trap_R_RegisterShader( "railExplosion" );
+		cgs.media.railRingsShader = trap_R_RegisterShader( "railDisc" );
+		cgs.media.railCoreShader = trap_R_RegisterShader( "railCore" );
+		break;
+
+	case WP_CROSSBOW:
+		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/railgun/railgf1a.wav", qfalse );
+		cgs.media.railExplosionShader = trap_R_RegisterShader( "railExplosion" );
+		cgs.media.railRingsShader = trap_R_RegisterShader( "railDisc" );
+		cgs.media.railCoreShader = trap_R_RegisterShader( "railCore" );
+		break;
+
+	case WP_HE:
+		weaponInfo->missileModel = trap_R_RegisterModel( "models/ammo/grenade1.md3" );
+		weaponInfo->missileTrailFunc = CG_GrenadeTrail;
+		weaponInfo->wiTrailTime = 700;
+		weaponInfo->trailRadius = 32;
+		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/grenade/grenlf1a.wav", qfalse );
+		cgs.media.grenadeExplosionShader = trap_R_RegisterShader( "grenadeExplosion" );
+		break;
+		
+	// end rain weapons
 
 	 default:
 		MAKERGB( weaponInfo->flashDlightColor, 1, 1, 1 );
@@ -1591,9 +1632,9 @@ void CG_FireWeapon( centity_t *cent ) {
 	}
 
 	// play quad sound if needed
-	if ( cent->currentState.powerups & ( 1 << PW_QUAD ) ) {
+	/*if ( cent->currentState.powerups & ( 1 << PW_QUAD ) ) {
 		trap_S_StartSound (NULL, cent->currentState.number, CHAN_ITEM, cgs.media.quadSound );
-	}
+	}*/
 
 	// play a sound
 	for ( c = 0 ; c < 4 ; c++ ) {
@@ -1740,6 +1781,29 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		sfx = cgs.media.sfx_rockexp;
 		mark = cgs.media.burnMarkShader;
 		radius = 32;
+		isSprite = qtrue;
+		break;
+	case WP_BARRETT:
+		mod = cgs.media.bulletFlashModel;
+		shader = cgs.media.bulletExplosionShader;
+		sfx = cgs.media.sfx_plasmaexp;
+		mark = cgs.media.bulletMarkShader;
+		radius = 8;
+		break;
+	case WP_INTERVENTION:
+		mod = cgs.media.bulletFlashModel;
+		shader = cgs.media.bulletExplosionShader;
+		sfx = cgs.media.sfx_plasmaexp;
+		mark = cgs.media.bulletMarkShader;
+		radius = 8;
+		break;
+	case WP_HE:
+		mod = cgs.media.dishFlashModel;
+		shader = cgs.media.grenadeExplosionShader;
+		sfx = cgs.media.sfx_rockexp;
+		mark = cgs.media.burnMarkShader;
+		radius = 64;
+		light = 300;
 		isSprite = qtrue;
 		break;
 	}

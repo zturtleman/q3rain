@@ -1120,36 +1120,30 @@ void ClientSpawn(gentity_t *ent) {
 	VectorCopy (playerMaxs, ent->r.maxs);
 
 	client->ps.clientNum = index;
+	
+	// EXAMPLE
+	//client->ps.stats[STAT_WEAPONS] |= ( 1 << WEAPON );
+	//client->clipammo[WEAPON] = <size of clip>;
+	//client->ps.ammo[WEAPON] = <additional ammo>;
 
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_KNIFE );
 	client->ps.ammo[WP_KNIFE] = -1;
-
-	/*client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_GAUNTLET );
-	client->ps.ammo[WP_GAUNTLET] = -1;*/
-	
-	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_MACHINEGUN );
-	client->clipammo[WP_MACHINEGUN] = 30;
-	client->ps.ammo[WP_MACHINEGUN] = 60;
-	
-	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_SHOTGUN );
-	client->clipammo[WP_SHOTGUN] = 8;
-	client->ps.ammo[WP_SHOTGUN] = 8;
-	
-	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_GRENADE_LAUNCHER );
-	client->clipammo[WP_GRENADE_LAUNCHER] = 2;
-	client->ps.ammo[WP_GRENADE_LAUNCHER] = 0;
-	
-	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_RAILGUN );
-	client->clipammo[WP_RAILGUN] = 7;
-	client->ps.ammo[WP_RAILGUN] = 7;
 	
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_BARRETT );
-	client->clipammo[WP_BARRETT] = 7;
-	client->ps.ammo[WP_BARRETT] = 7;
+	client->clipammo[WP_BARRETT] = 10;
+	client->ps.ammo[WP_BARRETT] = 10;
 	
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_INTERVENTION );
 	client->clipammo[WP_INTERVENTION] = 7;
 	client->ps.ammo[WP_INTERVENTION] = 7;
+	
+	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_HE );
+	client->clipammo[WP_HE] = 2;
+	client->ps.ammo[WP_HE] = 0;
+	
+	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_CROSSBOW );
+	client->clipammo[WP_CROSSBOW] = 1;
+	client->ps.ammo[WP_CROSSBOW] = 10;
 
 	// health will count down towards max_health
 	//ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] + 25;

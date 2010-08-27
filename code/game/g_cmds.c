@@ -1589,7 +1589,7 @@ void Cmd_Reload( gentity_t *ent )	{
 
 	weapon = ent->client->ps.weapon;
 	
-	if (weapon == WP_GRENADE_LAUNCHER) return; // f00king cant reload grenades :X
+	if (weapon == WP_HE) return; // f00king cant reload grenades :X
 	
 	amt = ClipAmountForWeapon(weapon);
 	ammotoadd = amt;
@@ -1635,10 +1635,15 @@ void Cmd_Reload( gentity_t *ent )	{
 ==================
 */
 int ClipAmountForWeapon( int w )	{
+	// TODO remove
 	if ( w == WP_MACHINEGUN )  return 30;
 	else if ( w == WP_GRENADE_LAUNCHER ) return 2;
 	else if ( w == WP_SHOTGUN )	return 8;
 	else if ( w == WP_RAILGUN )	return 7;
+	// end remove
+	else if ( w == WP_BARRETT )	return 10;
+	else if ( w == WP_INTERVENTION )	return 7;
+	else if ( w == WP_CROSSBOW )	return 1;
 	else return 0;
 }
 
