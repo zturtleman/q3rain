@@ -100,9 +100,7 @@ G_MissileDie
 Lancer - Destroy a missile
 ================
 */
-void G_MissileDie( gentity_t *self, gentity_t *inflictor,
-
-        gentity_t *attacker, int damage, int mod ) {
+void G_MissileDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod ) {
         if (inflictor == self)
                 return;
         self->takedamage = qfalse;
@@ -223,8 +221,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 	// splash damage (doesn't apply to person directly hit)
 	if ( ent->splashDamage ) {
-		if( G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius, 
-			other, ent->splashMethodOfDeath ) ) {
+		if( G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius, other, ent->splashMethodOfDeath ) ) {
 			if( !hitClient ) {
 				g_entities[ent->r.ownerNum].client->accuracy_hits++;
 			}

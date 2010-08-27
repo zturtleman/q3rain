@@ -650,8 +650,6 @@ void Weapon_Knife_Fire (gentity_t *ent) {
 	gentity_t	*tent;
 	gentity_t	*traceEnt;
 	int			damage;
-	
-	Com_Printf("knife fired\n");
 
 	// set aiming directions
 	AngleVectors (ent->client->ps.viewangles, forward, right, up);
@@ -664,8 +662,6 @@ void Weapon_Knife_Fire (gentity_t *ent) {
 	if ( tr.surfaceFlags & SURF_NOIMPACT ) {
 		return;
 	}
-	
-	Com_Printf("trace successfull\n");
 
 	traceEnt = &g_entities[ tr.entityNum ];
 
@@ -683,8 +679,6 @@ void Weapon_Knife_Fire (gentity_t *ent) {
 
 	damage = 50;
 	G_Damage(traceEnt, ent, ent, forward, tr.endpos, damage, 0, MOD_KNIFE);
-	
-	Com_Printf("entity damaged\n");
 }
 
 /*
@@ -695,7 +689,6 @@ Weapon_HE_Fire
 */
 void Weapon_HE_Fire (gentity_t *ent) {
 	// TODO stub
-	Com_Printf("TODO: Weapon_HE_Fire - STUB\n");
 	weapon_grenadelauncher_fire( ent );
 }
 
@@ -707,7 +700,6 @@ Weapon_Barrett_Fire
 */
 void Weapon_Barrett_Fire (gentity_t *ent) {
 	// TODO stub
-	Com_Printf("TODO: Weapon_Barrett_Fire - STUB\n");
 	weapon_railgun_fire( ent, 0 );
 }
 
@@ -719,7 +711,6 @@ Weapon_Intervention_Fire
 */
 void Weapon_Intervention_Fire (gentity_t *ent) {
 	// TODO stub
-	Com_Printf("TODO: Weapon_Intervention_Fire - STUB\n");
 	weapon_railgun_fire( ent, 0 );
 }
 
@@ -729,10 +720,8 @@ Weapon_Crossbow_Fire
 
 ===============
 */
-
 #define CROSSBOW_RANGE 4096
 #define CROSSBOW_DAMAGE 100
-
 void Weapon_Crossbow_Fire (gentity_t *ent) {
 	trace_t		tr;
 	vec3_t		end;
@@ -743,18 +732,13 @@ void Weapon_Crossbow_Fire (gentity_t *ent) {
 	int			i, passent;
 	
 	VectorMA (muzzle, CROSSBOW_RANGE, forward, end);
-
 	passent = ent->s.number;
-
 	trap_Trace (&tr, muzzle, NULL, NULL, end, ENTITYNUM_NONE, MASK_SHOT);
 	if ( tr.surfaceFlags & SURF_NOIMPACT ) {
 		return;
 	}
-
 	traceEnt = &g_entities[ tr.entityNum ];
-	
 	SnapVectorTowards( tr.endpos, muzzle );
-
 	// send bullet impact
 	if ( traceEnt->takedamage && traceEnt->client ) {
 		tent = G_TempEntity( tr.endpos, EV_BULLET_HIT_FLESH );
@@ -771,11 +755,9 @@ void Weapon_Crossbow_Fire (gentity_t *ent) {
 		tent->s.eventParm = DirToByte( tr.plane.normal );
 	}
 	tent->s.otherEntityNum = ent->s.number;
-
 	if ( traceEnt->takedamage) {
 			G_Damage(traceEnt, ent, ent, forward, tr.endpos,	CROSSBOW_DAMAGE, 0, MOD_CROSSBOW);
 	}
-	
 }
 
 /*
@@ -788,6 +770,12 @@ void FireWeapon( gentity_t *ent ) {
 	//Remove Ammo if not infinite
 	if ( ent->client->clipammo[ ent->client->ps.weapon ] != -1 ) {
 		ent->client->clipammo[ ent->client->ps.weapon ]--;
+	}
+
+	if (ent->client->ps.powerups[PW_QUAD] ) {
+		s_quadFactor = g_quadfactor.value;
+	} else {
+		s_quadFactor = 1;
 	}
 
 	// track shots taken for accuracy tracking.  Grapple is not a weapon and gauntet is just not tracked
@@ -804,7 +792,6 @@ void FireWeapon( gentity_t *ent ) {
 	switch( ent->s.weapon ) {
 	// rain weapons
 	case WP_KNIFE:
-		Com_Printf("case WP_KNIFE: true\n");
 		Weapon_Knife_Fire(ent);
 		break;
 	case WP_HE:
