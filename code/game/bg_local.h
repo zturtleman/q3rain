@@ -24,7 +24,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	MIN_WALK_NORMAL	0.7f		// can't walk on very steep slopes
 
-#define	STEPSIZE		18
+#define	STEPSIZE		18	// LEAVE THIS AS IT IS
+// it defines the maximum step height for stairs etc
 
 #define	JUMP_VELOCITY	270
 

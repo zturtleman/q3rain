@@ -804,6 +804,7 @@ void FireWeapon( gentity_t *ent ) {
 	switch( ent->s.weapon ) {
 	// rain weapons
 	case WP_KNIFE:
+		Com_Printf("case WP_KNIFE: true\n");
 		Weapon_Knife_Fire(ent);
 		break;
 	case WP_HE:
