@@ -413,6 +413,22 @@ gitem_t	bg_itemlist[] =
 /* sounds */ ""
 	},
 
+/*QUAKED weapon_acr (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*/
+	{
+		"weapon_acr", 
+		"sound/misc/w_pkup.wav",
+        { "models/weapons2/machinegun/machinegun.md3", 
+		NULL, NULL, NULL},
+/* icon */		"icons/iconw_machinegun",
+/* pickup */	"Remington ACR",
+		30,
+		IT_WEAPON,
+		WP_ACR,
+/* precache */ "",
+/* sounds */ ""
+	},
+
 /*QUAKED weapon_he (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{

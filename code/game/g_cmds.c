@@ -223,23 +223,19 @@ void Cmd_Give_f (gentity_t *ent)
 	else
 		give_all = qfalse;
 
-	if (give_all || Q_stricmp( name, "health") == 0)
-	{
+	if (give_all || Q_stricmp( name, "health") == 0) {
 		ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
 		if (!give_all)
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "weapons") == 0)
-	{
-		ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 - 
-			( 1 << WP_GRAPPLING_HOOK ) - ( 1 << WP_NONE );
+	if (give_all || Q_stricmp(name, "weapons") == 0) {
+		ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 -  ( 1 << WP_GRAPPLING_HOOK ) - ( 1 << WP_NONE );
 		if (!give_all)
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "ammo") == 0)
-	{
+	if (give_all || Q_stricmp(name, "ammo") == 0) {
 		for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
 			ent->client->ps.ammo[i] = 999;
 		}
@@ -247,10 +243,8 @@ void Cmd_Give_f (gentity_t *ent)
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "armor") == 0)
-	{
+	if (give_all || Q_stricmp(name, "armor") == 0) {
 		ent->client->ps.stats[STAT_ARMOR] = 200;
-
 		if (!give_all)
 			return;
 	}
@@ -316,9 +310,9 @@ void Cmd_God_f (gentity_t *ent)
 
 	ent->flags ^= FL_GODMODE;
 	if (!(ent->flags & FL_GODMODE) )
-		msg = "godmode OFF\n";
+		msg = "godmode ^1OFF\n";
 	else
-		msg = "godmode ON\n";
+		msg = "godmode ^2ON\n";
 
 	trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg));
 }
@@ -342,9 +336,9 @@ void Cmd_Notarget_f( gentity_t *ent ) {
 
 	ent->flags ^= FL_NOTARGET;
 	if (!(ent->flags & FL_NOTARGET) )
-		msg = "notarget OFF\n";
+		msg = "notarget ^1OFF\n";
 	else
-		msg = "notarget ON\n";
+		msg = "notarget ^2ON\n";
 
 	trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg));
 }
@@ -365,9 +359,9 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 	}
 
 	if ( ent->client->noclip ) {
-		msg = "noclip OFF\n";
+		msg = "noclip ^1OFF\n";
 	} else {
-		msg = "noclip ON\n";
+		msg = "noclip ^2ON\n";
 	}
 	ent->client->noclip = !ent->client->noclip;
 
@@ -607,8 +601,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 		// Kill him (makes sure he loses flags, etc)
 		ent->flags &= ~FL_GODMODE;
 		ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
-		player_die (ent, ent, ent, 100000, MOD_SUICIDE);
-
+		player_die (ent, ent, ent, 900, MOD_SUICIDE);
 	}
 	// they go to the end of the line for tournements
 	if ( team == TEAM_SPECTATOR ) {
@@ -966,12 +959,10 @@ static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *i
 	if (mode == SAY_TEAM) {
 		color = COLOR_CYAN;
 		cmd = "vtchat";
-	}
-	else if (mode == SAY_TELL) {
+	}	else if (mode == SAY_TELL) {
 		color = COLOR_MAGENTA;
 		cmd = "vtell";
-	}
-	else {
+	}	else {
 		color = COLOR_GREEN;
 		cmd = "vchat";
 	}
@@ -1118,7 +1109,7 @@ static void Cmd_VoiceTaunt_f( gentity_t *ent ) {
 
 	if (g_gametype.integer == GT_TEAMSURVIVOR) {
 		// praise a team mate who just got a reward
-		for(i = 0; i < MAX_CLIENTS; i++) {
+		for (i = 0; i < MAX_CLIENTS; i++) {
 			who = g_entities + i;
 			if (who->client && who != ent && who->client->sess.sessionTeam == ent->client->sess.sessionTeam) {
 				if (who->client->rewardTime > level.time) {
@@ -1210,10 +1201,10 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 		trap_SendServerCommand( ent-g_entities, "print \"You have called the maximum number of votes.\n\"" );
 		return;
 	}
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+	/*if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		trap_SendServerCommand( ent-g_entities, "print \"Not allowed to call a vote as spectator.\n\"" );
 		return;
-	}
+	}*/
 
 	// make sure it is a valid command to vote on
 	trap_Argv( 1, arg1, sizeof( arg1 ) );
@@ -1323,10 +1314,10 @@ void Cmd_Vote_f( gentity_t *ent ) {
 		trap_SendServerCommand( ent-g_entities, "print \"Vote already cast.\n\"" );
 		return;
 	}
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+	/*if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		trap_SendServerCommand( ent-g_entities, "print \"Not allowed to vote as spectator.\n\"" );
 		return;
-	}
+	}*/
 
 	trap_SendServerCommand( ent-g_entities, "print \"Vote cast.\n\"" );
 
@@ -1635,15 +1626,9 @@ void Cmd_Reload( gentity_t *ent )	{
 ==================
 */
 int ClipAmountForWeapon( int w )	{
-	// TODO remove
-	if ( w == WP_MACHINEGUN )  return 30;
-	else if ( w == WP_GRENADE_LAUNCHER ) return 2;
-	else if ( w == WP_SHOTGUN )	return 8;
-	else if ( w == WP_RAILGUN )	return 7;
-	// end remove
-	else if ( w == WP_BARRETT )	return 10;
+	     if ( w == WP_BARRETT )     	return 10;
 	else if ( w == WP_INTERVENTION )	return 7;
-	else if ( w == WP_CROSSBOW )	return 1;
+	else if ( w == WP_CROSSBOW )    	return 1;
 	else return 0;
 }
 

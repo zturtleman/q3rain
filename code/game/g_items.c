@@ -637,6 +637,7 @@ void ClearRegisteredItems( void ) {
 	RegisterItem( BG_FindItemForWeapon(WP_BARRETT));
 	RegisterItem( BG_FindItemForWeapon(WP_INTERVENTION));
 	RegisterItem( BG_FindItemForWeapon(WP_CROSSBOW));
+	RegisterItem( BG_FindItemForWeapon(WP_ACR));
 }
 
 /*

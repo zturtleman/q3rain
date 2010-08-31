@@ -716,6 +716,63 @@ void Weapon_Intervention_Fire (gentity_t *ent) {
 
 /*
 ===============
+Weapon_ACR_Fire
+
+===============
+*/
+#define ACR_SPREAD 300
+#define ACR_DAMAGE 10
+void Weapon_ACR_Fire (gentity_t *ent) {
+	trace_t		tr;
+	vec3_t		end;
+	float		r;
+	float		u;
+	gentity_t	*tent;
+	gentity_t	*traceEnt;
+	int			i, passent;
+
+	r = random() * M_PI * 2.0f;
+	u = sin(r) * crandom() * ACR_SPREAD * 16;
+	r = cos(r) * crandom() * ACR_SPREAD * 16;
+	VectorMA (muzzle, 8192*16, forward, end);
+	VectorMA (end, r, right, end);
+	VectorMA (end, u, up, end);
+
+	passent = ent->s.number;
+	for (i = 0; i < 10; i++) {
+
+		trap_Trace (&tr, muzzle, NULL, NULL, end, ENTITYNUM_NONE, MASK_SHOT);
+		if ( tr.surfaceFlags & SURF_NOIMPACT ) {
+			return;
+		}
+
+		traceEnt = &g_entities[ tr.entityNum ];
+
+		// snap the endpos to integers, but nudged towards the line
+		SnapVectorTowards( tr.endpos, muzzle );
+
+		// send bullet impact
+		if ( traceEnt->takedamage && traceEnt->client ) {
+			tent = G_TempEntity( tr.endpos, EV_BULLET_HIT_FLESH );
+			tent->s.eventParm = traceEnt->s.number;
+			if( LogAccuracyHit( traceEnt, ent ) ) {
+				ent->client->accuracy_hits++;
+			}
+		} else {
+			tent = G_TempEntity( tr.endpos, EV_BULLET_HIT_WALL );
+			tent->s.eventParm = DirToByte( tr.plane.normal );
+		}
+		tent->s.otherEntityNum = ent->s.number;
+
+		if ( traceEnt->takedamage) {
+				G_Damage( traceEnt, ent, ent, forward, tr.endpos, ACR_DAMAGE, 0, MOD_ACR);
+		}
+		break;
+	}
+}
+
+/*
+===============
 Weapon_Crossbow_Fire
 
 ===============
@@ -805,6 +862,9 @@ void FireWeapon( gentity_t *ent ) {
 		break;
 	case WP_CROSSBOW:
 		Weapon_Crossbow_Fire(ent);
+		break;
+	case WP_ACR:
+		Weapon_ACR_Fire(ent);
 		break;
 	// end rain weapons
 	// TODO remove

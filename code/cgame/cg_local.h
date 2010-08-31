@@ -425,15 +425,6 @@ typedef struct {
 	int				itemNum;
 } powerupInfo_t;
 
-
-#define MAX_SKULLTRAIL		10
-
-typedef struct {
-	vec3_t positions[MAX_SKULLTRAIL];
-	int numpositions;
-} skulltrail_t;
-
-
 #define MAX_REWARDSTACK		10
 #define MAX_SOUNDBUFFER		20
 
@@ -546,9 +537,6 @@ typedef struct {
 	int				spectatorPaintX2;										// current paint x
 	int				spectatorOffset;										// current offset from start
 	int				spectatorPaintLen; 									// current offset from start
-
-	// skull trails
-	skulltrail_t	skulltrails[MAX_CLIENTS];
 
 	// centerprinting
 	int			centerPrintTime;
@@ -932,6 +920,8 @@ typedef struct {
 	char			mapname[MAX_QPATH];
 	char			redTeam[MAX_QPATH];
 	char			blueTeam[MAX_QPATH];
+	char			civilTeam[MAX_QPATH];
+	char			targetTeam[MAX_QPATH];
 
 	int				voteTime;
 	int				voteYes;
@@ -1309,14 +1299,6 @@ localEntity_t *CG_SmokePuff( const vec3_t p,
 				   qhandle_t hShader );
 void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing );
 void CG_SpawnEffect( vec3_t org );
-#ifdef MISSIONPACK
-void CG_KamikazeEffect( vec3_t org );
-void CG_ObeliskExplode( vec3_t org, int entityNum );
-void CG_ObeliskPain( vec3_t org );
-void CG_InvulnerabilityImpact( vec3_t org, vec3_t angles );
-void CG_InvulnerabilityJuiced( vec3_t org );
-void CG_LightningBoltBeam( vec3_t start, vec3_t end );
-#endif
 void CG_ScorePlum( int client, vec3_t org, int score );
 
 void CG_GibPlayer( vec3_t playerOrigin );

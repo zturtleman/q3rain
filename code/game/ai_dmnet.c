@@ -62,7 +62,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 int numnodeswitches;
 char nodeswitch[MAX_NODESWITCHES+1][144];
 
-#define LOOKAHEAD_DISTANCE			300
+#define LOOKAHEAD_DISTANCE			512
 
 /*
 ==================
@@ -1009,28 +1009,16 @@ BotSelectActivateWeapon
 */
 int BotSelectActivateWeapon(bot_state_t *bs) {
 	//
-	if (bs->inventory[INVENTORY_MACHINEGUN] > 0 && bs->inventory[INVENTORY_BULLETS] > 0)
-		return WEAPONINDEX_MACHINEGUN;
-	else if (bs->inventory[INVENTORY_SHOTGUN] > 0 && bs->inventory[INVENTORY_SHELLS] > 0)
-		return WEAPONINDEX_SHOTGUN;
-	else if (bs->inventory[INVENTORY_PLASMAGUN] > 0 && bs->inventory[INVENTORY_CELLS] > 0)
-		return WEAPONINDEX_PLASMAGUN;
-	else if (bs->inventory[INVENTORY_LIGHTNING] > 0 && bs->inventory[INVENTORY_LIGHTNINGAMMO] > 0)
-		return WEAPONINDEX_LIGHTNING;
-#ifdef MISSIONPACK
-	else if (bs->inventory[INVENTORY_CHAINGUN] > 0 && bs->inventory[INVENTORY_BELT] > 0)
-		return WEAPONINDEX_CHAINGUN;
-	else if (bs->inventory[INVENTORY_NAILGUN] > 0 && bs->inventory[INVENTORY_NAILS] > 0)
-		return WEAPONINDEX_NAILGUN;
-#endif
-	else if (bs->inventory[INVENTORY_RAILGUN] > 0 && bs->inventory[INVENTORY_SLUGS] > 0)
-		return WEAPONINDEX_RAILGUN;
-	else if (bs->inventory[INVENTORY_ROCKETLAUNCHER] > 0 && bs->inventory[INVENTORY_ROCKETS] > 0)
-		return WEAPONINDEX_ROCKET_LAUNCHER;
-	else if (bs->inventory[INVENTORY_BFG10K] > 0 && bs->inventory[INVENTORY_BFGAMMO] > 0)
-		return WEAPONINDEX_BFG;
+	if (bs->inventory[INVENTORY_CROSSBOW] > 0 && bs->inventory[INVENTORY_CROSSBOW] > 0)
+		return WEAPONINDEX_CROSSBOW;
+	else if (bs->inventory[INVENTORY_BARRETT] > 0 && bs->inventory[INVENTORY_BARRETT] > 0)
+		return WEAPONINDEX_BARRETT;
+	else if (bs->inventory[INVENTORY_HE] > 0 && bs->inventory[INVENTORY_HE] > 0)
+		return WEAPONINDEX_HE;
+	else if (bs->inventory[INVENTORY_INTERVENTION] > 0 && bs->inventory[INVENTORY_INTERVENTION] > 0)
+		return WEAPONINDEX_INTERVENTION;
 	else {
-		return -1;
+		return 1;
 	}
 }
 
@@ -1112,12 +1100,8 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			VectorSubtract(target, bs->eye, dir);
 			vectoangles(dir, moveresult->ideal_viewangles);
 			// if the bot has a weapon that does splash damage
-			if (bs->inventory[INVENTORY_PLASMAGUN] > 0 && bs->inventory[INVENTORY_CELLS] > 0)
-				moveresult->weapon = WEAPONINDEX_PLASMAGUN;
-			else if (bs->inventory[INVENTORY_ROCKETLAUNCHER] > 0 && bs->inventory[INVENTORY_ROCKETS] > 0)
-				moveresult->weapon = WEAPONINDEX_ROCKET_LAUNCHER;
-			else if (bs->inventory[INVENTORY_BFG10K] > 0 && bs->inventory[INVENTORY_BFGAMMO] > 0)
-				moveresult->weapon = WEAPONINDEX_BFG;
+			if (bs->inventory[INVENTORY_HE] > 0 && bs->inventory[INVENTORY_HE] > 0)
+				moveresult->weapon = WEAPONINDEX_HE;
 			else {
 				moveresult->weapon = 0;
 			}

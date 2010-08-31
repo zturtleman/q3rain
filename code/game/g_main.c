@@ -761,7 +761,14 @@ void CalculateRanks( void ) {
 		sizeof(level.sortedClients[0]), SortRanks );
 
 	// set the rank value for all clients that are connected and not spectators
-	if ( g_gametype.integer == GT_TEAMSURVIVOR ) {
+	if ( g_gametype.integer == GT_ASSASSINS ) {
+		// in team games, rank is just the order of the teams, 0=red, 1=blue, 2=tied
+		//cl->ps.persistant[PERS_RANK] = ;
+		//level.teamScores[TEAM_]
+		for ( i = 0;  i < level.numConnectedClients; i++ ) {
+			cl = &level.clients[ level.sortedClients[i] ];
+		}
+	} else if ( g_gametype.integer == GT_TEAMSURVIVOR ) {
 		// in team games, rank is just the order of the teams, 0=red, 1=blue, 2=tied
 		for ( i = 0;  i < level.numConnectedClients; i++ ) {
 			cl = &level.clients[ level.sortedClients[i] ];
@@ -1279,8 +1286,8 @@ void CheckExitRules( void ) {
 				return;
 			}
 		}
-	} else if (g_gametype.integer == GT_ASSASSINS && g_fraglimit.integer) {
-		if ( level.teamScores[TEAM_RED] >= g_fraglimit.integer ) {
+	} else if (g_gametype.integer == GT_ASSASSINS) {
+		if ( level.teamScores[TEAM_RED] >= 1 ) {
 			trap_SendServerCommand( -1, "print \"Rain accomplished the mission.\n\"" );
 			LogExit( "Fraglimit hit." );
 			return;
@@ -1686,9 +1693,9 @@ int start, end;
 
 		G_RunThink( ent );
 	}
-end = trap_Milliseconds();
+	end = trap_Milliseconds();
 
-start = trap_Milliseconds();
+	start = trap_Milliseconds();
 	// perform final fixups on the players
 	ent = &g_entities[0];
 	for (i=0 ; i < level.maxclients ; i++, ent++ ) {
@@ -1696,10 +1703,7 @@ start = trap_Milliseconds();
 			ClientEndFrame( ent );
 		}
 	}
-end = trap_Milliseconds();
-
-	// see if it is time to do a tournement restart
-	CheckTournament();
+	end = trap_Milliseconds();
 
 	// see if it is time to end the level
 	CheckExitRules();
@@ -1713,6 +1717,8 @@ end = trap_Milliseconds();
 	// check team votes
 	CheckTeamVote( TEAM_RED );
 	CheckTeamVote( TEAM_BLUE );
+	CheckTeamVote( TEAM_CIVIL );
+	CheckTeamVote( TEAM_TARGET );
 
 	// for tracking changes
 	CheckCvars();

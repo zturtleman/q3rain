@@ -294,6 +294,9 @@ static void CG_Obituary( entityState_t *ent ) {
 		case MOD_KNIFE:
 			message = "was sliced by";
 			break;
+		case MOD_ACR:
+			message = "was pinned down by";
+			break;
 		// end rain weapon
 		default:
 			message = "was killed by";

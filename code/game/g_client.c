@@ -582,6 +582,8 @@ team_t PickTeam( int ignoreClientNum ) {
 
 	counts[TEAM_BLUE] = TeamCount( ignoreClientNum, TEAM_BLUE );
 	counts[TEAM_RED] = TeamCount( ignoreClientNum, TEAM_RED );
+	counts[TEAM_CIVIL] = TeamCount( ignoreClientNum, TEAM_CIVIL );
+	counts[TEAM_TARGET] = TeamCount( ignoreClientNum, TEAM_TARGET );
 
 	if ( counts[TEAM_BLUE] > counts[TEAM_RED] ) {
 		return TEAM_RED;
@@ -589,8 +591,20 @@ team_t PickTeam( int ignoreClientNum ) {
 	if ( counts[TEAM_RED] > counts[TEAM_BLUE] ) {
 		return TEAM_BLUE;
 	}
+	if ( counts[TEAM_CIVIL] > counts[TEAM_CIVIL] ) {
+		return TEAM_CIVIL;
+	}
+	if ( counts[TEAM_TARGET] > counts[TEAM_TARGET] ) {
+		return TEAM_TARGET;
+	}
 	// equal team count, so join the team with the lowest score
 	if ( level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED] ) {
+		if ( level.teamScores[TEAM_CIVIL] > level.teamScores[TEAM_RED] ) {
+			return TEAM_CIVIL;
+		}
+		if ( level.teamScores[TEAM_TARGET] > level.teamScores[TEAM_RED] ) {
+			return TEAM_TARGET;
+		}
 		return TEAM_RED;
 	}
 	return TEAM_BLUE;
@@ -1144,6 +1158,10 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_CROSSBOW );
 	client->clipammo[WP_CROSSBOW] = 1;
 	client->ps.ammo[WP_CROSSBOW] = 10;
+	
+	/*client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_ACR );
+	client->clipammo[WP_ACR] = 30;
+	client->ps.ammo[WP_ACR] = 30;*/
 
 	// health will count down towards max_health
 	//ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] + 25;

@@ -294,6 +294,13 @@ typedef enum {
 typedef enum {
 	WP_NONE,
 
+	WP_KNIFE,
+	WP_HE,
+	WP_BARRETT,
+	WP_INTERVENTION,
+	WP_CROSSBOW,
+	WP_ACR,
+	
 	// TODO remove
 	WP_GAUNTLET,
 	WP_MACHINEGUN,
@@ -305,12 +312,6 @@ typedef enum {
 	WP_PLASMAGUN,
 	WP_BFG,
 	WP_GRAPPLING_HOOK,
-	
-	WP_KNIFE,
-	WP_HE,
-	WP_BARRETT,
-	WP_INTERVENTION,
-	WP_CROSSBOW,
 
 	WP_NUM_WEAPONS
 } weapon_t;
@@ -580,6 +581,7 @@ typedef enum {
 	MOD_BARRETT,
 	MOD_INTERVENTION,
 	MOD_CROSSBOW,
+	MOD_ACR,
 	// env
 	MOD_WATER,
 	MOD_SLIME,

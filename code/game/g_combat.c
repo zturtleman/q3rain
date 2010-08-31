@@ -207,6 +207,7 @@ char	*modNames[] = {
 	"MOD_BARRETT",
 	"MOD_INTERVENTION",
 	"MOD_CROSSBOW",
+	"MOD_ACR",
 	// env
 	"MOD_WATER",
 	"MOD_SLIME",
@@ -313,7 +314,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		} else {
 			AddScore( attacker, self->r.currentOrigin, 1 );
 
-			if( meansOfDeath == MOD_GAUNTLET ) {
+			if( meansOfDeath == MOD_KNIFE ) {
 				// play humiliation on player
 				attacker->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT]++;
 				// add the sprite over the player's head
