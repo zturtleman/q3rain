@@ -375,8 +375,8 @@ CG_GibPlayer
 Generated a bunch of gibs launching out from the bodies location
 ===================
 */
-#define	GIB_VELOCITY	50
-#define	GIB_JUMP		150
+#define	GIB_VELOCITY	200
+#define	GIB_JUMP		350
 void CG_GibPlayer( vec3_t playerOrigin ) {
 	vec3_t	origin, velocity;
 
@@ -485,8 +485,8 @@ void CG_LaunchExplode( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
 	le->leMarkType = LEMT_NONE;
 }
 
-#define	EXP_VELOCITY	100
-#define	EXP_JUMP		150
+#define	EXP_VELOCITY	300
+#define	EXP_JUMP		450
 /*
 ===================
 CG_GibPlayer

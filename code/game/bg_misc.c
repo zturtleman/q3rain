@@ -402,11 +402,11 @@ gitem_t	bg_itemlist[] =
 	{
 		"weapon_crossbow", 
 		"sound/misc/w_pkup.wav",
-        { "models/weapons2/railgun/railgun.md3", 
+        { "models/weapons2/crossbow/crossbow.md3", 
 		NULL, NULL, NULL},
 /* icon */		"icons/iconw_railgun",
 /* pickup */	"Crossbow",
-		10,
+		3,
 		IT_WEAPON,
 		WP_CROSSBOW,
 /* precache */ "",

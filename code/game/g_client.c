@@ -1157,7 +1157,7 @@ void ClientSpawn(gentity_t *ent) {
 	
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_CROSSBOW );
 	client->clipammo[WP_CROSSBOW] = 1;
-	client->ps.ammo[WP_CROSSBOW] = 10;
+	client->ps.ammo[WP_CROSSBOW] = 3;
 	
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_ACR );
 	client->clipammo[WP_ACR] = 30;
@@ -1184,7 +1184,7 @@ void ClientSpawn(gentity_t *ent) {
 		G_KillBox( ent );
 		trap_LinkEntity (ent);
 		// force the base weapon up
-		client->ps.weapon = WP_GAUNTLET;
+		client->ps.weapon = WP_KNIFE;
 		client->ps.weaponstate = WEAPON_READY;
 	}
 

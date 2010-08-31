@@ -684,7 +684,6 @@ void CG_RegisterWeapon( int weaponNum ) {
 		// RAIN WEAPONS
 		
 	case WP_KNIFE:
-		weaponInfo->firingSound = trap_S_RegisterSound( "sound/weapons/melee/fstrun.wav", qfalse );
 		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/melee/fstatck.wav", qfalse );
 		break;
 

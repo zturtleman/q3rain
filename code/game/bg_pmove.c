@@ -1690,7 +1690,7 @@ PM_TorsoAnimation
 */
 static void PM_TorsoAnimation( void ) {
 	if ( pm->ps->weaponstate == WEAPON_READY ) {
-		if ( pm->ps->weapon == WP_GAUNTLET ) {
+		if ( pm->ps->weapon == WP_KNIFE ) {
 			PM_ContinueTorsoAnim( TORSO_STAND2 );
 		} else {
 			PM_ContinueTorsoAnim( TORSO_STAND );
@@ -1763,16 +1763,6 @@ static void PM_Weapon( void ) {
 		return;
 	}
 
-	if ( pm->ps->weaponstate == WEAPON_RAISING ) {
-		pm->ps->weaponstate = WEAPON_READY;
-		if ( pm->ps->weapon == WP_KNIFE ) {
-			PM_StartTorsoAnim( TORSO_STAND2 );
-		} else {
-			PM_StartTorsoAnim( TORSO_STAND );
-		}
-		return;
-	}
-
 	// COOKING inolen.com
 
 	// check for fire
@@ -1794,60 +1784,26 @@ static void PM_Weapon( void ) {
 			return;
 		}
 	}
-
-	// start the animation even if out of ammo
-	/*if ( pm->ps->weapon == WP_KNIFE ) {
-		// the guantlet only "fires" when it actually hits something
-		if ( !pm->gauntletHit ) {
-			pm->ps->weaponTime = 0;
-			pm->ps->weaponstate = WEAPON_READY;
-			return;
-		}
-		PM_StartTorsoAnim( TORSO_ATTACK2 );
-	} else {*/
-		PM_StartTorsoAnim( TORSO_ATTACK );
-	//}
+	
+	PM_StartTorsoAnim( TORSO_ATTACK );
 
 	pm->ps->weaponstate = WEAPON_FIRING;
 
 	// check for out of ammo
-// modified for changing ammo from ps->ammo to client->clipammo updated to ps->stats[STAT_AMMO]
-	if ( ! /*pm->ps->ammo[ pm->ps->weapon ]*/ pm->ps->stats[STAT_AMMO] ) {
+	// modified for changing ammo from ps->ammo to client->clipammo updated to ps->stats[STAT_AMMO]
+	if ( ! pm->ps->stats[STAT_AMMO] && pm->ps->weapon != WP_KNIFE ) {
 		PM_AddEvent( EV_NOAMMO );
 		pm->ps->weaponTime += 500;
 		return;
 	}
-
-	// take an ammo away if not infinite
-	// This will go within "game" in g_weapon.c because
-	// ammo is stored in gclient_t
-	/*if ( pm->ps->ammo[ pm->ps->weapon ] != -1 ) {
-		pm->ps->ammo[ pm->ps->weapon ]--;
-	}*/
 
 	// fire weapon
 	PM_AddEvent( EV_FIRE_WEAPON );
 
 	switch( pm->ps->weapon ) {
 	default:
-	// TODO remove
-	case WP_GAUNTLET:
-		addTime = 400;
+		addTime = 100;
 		break;
-	case WP_RAILGUN:
-		addTime = 3500;
-		break;
-	case WP_SHOTGUN:
-		addTime = 1000;
-		break;
-	case WP_MACHINEGUN:
-		addTime = 150;
-		break;
-	case WP_GRENADE_LAUNCHER:
-		addTime = 800;
-		break;
-	// end remove
-	// RAIN WEAPONS
 	case WP_KNIFE:
 		addTime = 200;
 		break;
@@ -1866,7 +1822,6 @@ static void PM_Weapon( void ) {
 	case WP_ACR:
 		addTime = 125;
 		break;
-	// end rain weapons
 	}
 
 	pm->ps->weaponTime += addTime;

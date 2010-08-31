@@ -157,6 +157,7 @@ GibEntity
 ==================
 */
 void GibEntity( gentity_t *self, int killer ) {
+	gentity_t *ent;
 	G_AddEvent( self, EV_GIB_PLAYER, killer );
 	self->takedamage = qfalse;
 	self->s.eType = ET_INVISIBLE;
@@ -392,9 +393,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	memset( self->client->ps.powerups, 0, sizeof(self->client->ps.powerups) );
 
 	// never gib in a nodrop
-	//if ( (self->health <= GIB_HEALTH && !(contents & CONTENTS_NODROP) && g_blood.integer) || meansOfDeath == MOD_SUICIDE) {
-	if ( meansOfDeath == MOD_ADMIN) { // :D :D
-		self->s.eType = ET_INVISIBLE;
+	if ( self->health <= GIB_HEALTH || meansOfDeath == MOD_ADMIN) {
 		GibEntity( self, killer );
 	} else {
 		// normal death
@@ -419,9 +418,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			( ( self->client->ps.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | anim;
 
 		G_AddEvent( self, EV_DEATH1 + i, killer );
-
-		// the body can still be gibbed
-		self->die = body_die;
+		
+		self->die = NULL;
 
 		// globally cycle through the different death animations
 		i = ( i + 1 ) % 3;
