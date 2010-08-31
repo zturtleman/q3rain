@@ -1863,6 +1863,9 @@ static void PM_Weapon( void ) {
 	case WP_HE:
 		addTime = 800;
 		break;
+	case WP_ACR:
+		addTime = 150;
+		break;
 	// end rain weapons
 	}
 

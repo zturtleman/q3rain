@@ -1580,7 +1580,7 @@ void Cmd_Reload( gentity_t *ent )	{
 
 	weapon = ent->client->ps.weapon;
 	
-	if (weapon == WP_HE) return; // f00king cant reload grenades :X
+	if (weapon == WP_HE || weapon == WP_KNIFE) return;
 	
 	amt = ClipAmountForWeapon(weapon);
 	ammotoadd = amt;
@@ -1592,13 +1592,9 @@ void Cmd_Reload( gentity_t *ent )	{
 	ent->client->ps.torsoAnim = ( ( ent->client->ps.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT )	| TORSO_DROP;
 	
 	
-	if (ent->client->ps.ammo[weapon] == 0) {
-		trap_SendServerCommand(ent-g_entities, "cp \"Out of ammo\n\"");
-		return;
-	}
-	if (ent->client->clipammo[weapon] > 0)	{
+	/*if (ent->client->clipammo[weapon] > 0)	{
 			ammotoadd -= ent->client->clipammo[weapon];
-	}
+	}*/
 	
 	// RELOADINGTIME
 	switch (weapon) {
@@ -1610,14 +1606,20 @@ void Cmd_Reload( gentity_t *ent )	{
 			ent->client->ps.weaponTime += 2000;
 	}
 	
-	//We can only remove (from bag) what ammo we have
-	if (ent->client->ps.ammo[weapon] < ammotoadd)	{
-		ammotoadd = ent->client->ps.ammo[weapon];
+	if (ent->client->ps.ammo[weapon] < ClipAmountForWeapon(weapon)) {
+		trap_SendServerCommand(ent-g_entities, "cp \"Out of ammo\n\"");
+		ent->client->ps.weaponTime = 0;
+		return;
 	}
+	
+	if (ammotoadd > ClipAmountForWeapon(weapon)) {
+		ammotoadd = ClipAmountForWeapon(weapon) - ent->client->clipammo[weapon];
+	}
+	
 	//Remove the ammo from bag
-	ent->client->ps.ammo[weapon] -= ammotoadd;
+	ent->client->ps.ammo[weapon] -= ClipAmountForWeapon(weapon);
 	//Add the ammo to weapon
-	ent->client->clipammo[weapon] += ammotoadd;
+	ent->client->clipammo[weapon] = ClipAmountForWeapon(weapon);
 }
 
 /*
@@ -1629,6 +1631,7 @@ int ClipAmountForWeapon( int w )	{
 	     if ( w == WP_BARRETT )     	return 10;
 	else if ( w == WP_INTERVENTION )	return 7;
 	else if ( w == WP_CROSSBOW )    	return 1;
+	else if ( w == WP_ACR )   			 	return 30;
 	else return 0;
 }
 

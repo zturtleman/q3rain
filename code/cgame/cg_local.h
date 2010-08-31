@@ -37,10 +37,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	FADE_TIME			200
 #define	PULSE_TIME			200
 #define	DAMAGE_DEFLECT_TIME	100
-#define	DAMAGE_RETURN_TIME	400
-#define DAMAGE_TIME			500
+#define	DAMAGE_RETURN_TIME	1000
+#define DAMAGE_TIME			750
 #define	LAND_DEFLECT_TIME	150
-#define	LAND_RETURN_TIME	300
+#define	LAND_RETURN_TIME	500
 #define	STEP_TIME			200
 #define	DUCK_TIME			100
 #define	PAIN_TWITCH_TIME	200
@@ -83,13 +83,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
 
 #define	DEFAULT_MODEL			"sarge"
-#ifdef MISSIONPACK
-#define	DEFAULT_TEAM_MODEL		"james"
-#define	DEFAULT_TEAM_HEAD		"*james"
-#else
 #define	DEFAULT_TEAM_MODEL		"sarge"
 #define	DEFAULT_TEAM_HEAD		"sarge"
-#endif
 
 #define DEFAULT_REDTEAM_NAME		"Stroggs"
 #define DEFAULT_BLUETEAM_NAME		"Pagans"

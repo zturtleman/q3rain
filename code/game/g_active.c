@@ -547,6 +547,7 @@ void ThrowWeapon( gentity_t *ent )
 	if( client->ps.weapon == WP_GAUNTLET
 		|| client->ps.weapon == WP_GRAPPLING_HOOK
 		|| client->ps.weapon == WP_KNIFE
+		|| client->ps.weapon == WP_NONE
 		|| ( ucmd->buttons & BUTTON_ATTACK ))
 		return;
 
@@ -554,7 +555,7 @@ void ThrowWeapon( gentity_t *ent )
 	xr_item = BG_FindItemForWeapon( client->ps.weapon );
 
 	amount = client->ps.ammo[ client->ps.weapon ]; // XRAY save amount
-	client->ps.ammo[ client->ps.weapon ] = 0;
+	client->ps.ammo[client->ps.weapon] = 0;
 
 	client->ps.stats[STAT_WEAPONS] &= ~( 1 << client->ps.weapon );
 	client->ps.weapon = WP_NONE;
@@ -725,13 +726,6 @@ void ClientThink_real( gentity_t *ent ) {
 	oldEventSequence = client->ps.eventSequence;
 
 	memset (&pm, 0, sizeof(pm));
-
-	// check for the hit-scan gauntlet, don't let the action
-	// go through as an attack unless it actually hits something
-	if ( client->ps.weapon == WP_GAUNTLET && !( ucmd->buttons & BUTTON_TALK ) &&
-		( ucmd->buttons & BUTTON_ATTACK ) && client->ps.weaponTime <= 0 ) {
-		pm.gauntletHit = CheckGauntletAttack( ent );
-	}
 
 	if ( ent->flags & FL_FORCE_GESTURE ) {
 		ent->flags &= ~FL_FORCE_GESTURE;

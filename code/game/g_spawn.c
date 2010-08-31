@@ -281,6 +281,10 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 	if (Q_stricmp(ent->classname, "weapon_lightning") == 0) { return qfalse; }
 	if (Q_stricmp(ent->classname, "weapon_plasmagun") == 0) { return qfalse; }
 	if (Q_stricmp(ent->classname, "weapon_bfg") == 0) { return qfalse; }
+	if (Q_stricmp(ent->classname, "weapon_shotgun") == 0) { return qfalse; }
+	if (Q_stricmp(ent->classname, "weapon_railgun") == 0) { return qfalse; }
+	if (Q_stricmp(ent->classname, "weapon_machinegun") == 0) { return qfalse; }
+	if (Q_stricmp(ent->classname, "weapon_gauntlet") == 0) { return qfalse; }
 	if (Q_stricmp(ent->classname, "item_armor_shard") == 0) { return qfalse; }
 	if (Q_stricmp(ent->classname, "item_armor_combat") == 0) { return qfalse; }
 	if (Q_stricmp(ent->classname, "item_armor_body") == 0) { return qfalse; }
@@ -300,7 +304,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 	if (Q_stricmp(ent->classname, "ammo_lightning") == 0) { return qfalse; }
 	if (Q_stricmp(ent->classname, "ammo_rockets") == 0) { return qfalse; }
 	if (Q_stricmp(ent->classname, "ammo_bfg") == 0) { return qfalse; }
-	if (Q_stricmp(ent->classname, "ammo_") == 0) { return qfalse; }
+	if (Q_stricmp(ent->classname, "ammo_shells") == 0) { return qfalse; }
 
 	// check item spawn functions
 	for ( item=bg_itemlist+1 ; item->classname ; item++ ) {

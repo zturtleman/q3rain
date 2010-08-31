@@ -411,6 +411,17 @@ static void CG_DrawStatusBar( void ) {
 	if ( cent->currentState.weapon ) {
 		value = ps->ammo[cent->currentState.weapon];
 		if ( value > -1 ) {
+			switch (cent->currentState.weapon) {
+				case WP_ACR:
+					value = value/30;
+					break;
+				case WP_BARRETT:
+					value = value/10;
+					break;
+				case WP_INTERVENTION:
+					value = value/7;
+					break;
+			}
 			if ( cg.predictedPlayerState.weaponstate == WEAPON_FIRING
 				&& cg.predictedPlayerState.weaponTime > 100 ) {
 				// draw as dark grey when reloading
@@ -485,7 +496,7 @@ if (value > 0 ) {
 	origin[1] = 0;
 	origin[2] = 0;
 	CG_Draw3DModel( CHAR_WIDTH*3 + TEXT_ICON_SPACE, 360, 96,
-		96, cg_weapons[ cent->currentState.weapon ].weaponModel,
+		96, cg_weapons[cent->currentState.weapon].weaponModel,
 		0, origin, angles );
 
 	//Draw the Text

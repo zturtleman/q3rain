@@ -346,7 +346,7 @@ static void CG_OffsetFirstPersonView( void ) {
 			angles[PITCH] += ratio * cg.v_dmg_pitch;
 			angles[ROLL] += ratio * cg.v_dmg_roll;
 		} else {
-			ratio = 1.0 - ( ratio - DAMAGE_DEFLECT_TIME ) / DAMAGE_RETURN_TIME;
+			ratio = 0.75 - ( ratio - DAMAGE_DEFLECT_TIME ) / DAMAGE_RETURN_TIME;
 			if ( ratio > 0 ) {
 				angles[PITCH] += ratio * cg.v_dmg_pitch;
 				angles[ROLL] += ratio * cg.v_dmg_roll;
@@ -575,7 +575,7 @@ static void CG_DamageBlendBlob( void ) {
 
 	maxTime = DAMAGE_TIME;
 	t = cg.time - cg.damageTime;
-	if ( t <= 0 || t >= maxTime ) {
+	if ( t <= 0 || t >= maxTime*2 ) {
 		return;
 	}
 
@@ -583,6 +583,8 @@ static void CG_DamageBlendBlob( void ) {
 	memset( &ent, 0, sizeof( ent ) );
 	ent.reType = RT_SPRITE;
 	ent.renderfx = RF_FIRST_PERSON;
+	
+	maxTime *= 2;
 
 	VectorMA( cg.refdef.vieworg, 8, cg.refdef.viewaxis[0], ent.origin );
 	VectorMA( ent.origin, cg.damageX * -8, cg.refdef.viewaxis[1], ent.origin );

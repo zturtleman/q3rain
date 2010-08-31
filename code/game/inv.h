@@ -72,6 +72,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_BARRETT 47
 #define INVENTORY_INTERVENTION 48
 #define INVENTORY_CROSSBOW 49
+#define INVENTORY_ACR 50
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200
 #define ENEMY_HEIGHT				201
@@ -126,4 +127,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define WEAPONINDEX_BARRETT 3
 #define WEAPONINDEX_INTERVENTION 4
 #define WEAPONINDEX_CROSSBOW 5
+#define WEAPONINDEX_ACR 6
 
