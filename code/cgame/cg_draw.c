@@ -421,6 +421,9 @@ static void CG_DrawStatusBar( void ) {
 				case WP_INTERVENTION:
 					value = value/7;
 					break;
+				case WP_CROSSBOW:
+					value = value/1;
+					break;
 			}
 			if ( cg.predictedPlayerState.weaponstate == WEAPON_FIRING
 				&& cg.predictedPlayerState.weaponTime > 100 ) {
