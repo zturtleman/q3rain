@@ -1021,6 +1021,9 @@ typedef struct playerState_s {
 	int			bobCycle;		// for view bobbing and footstep generation
 	int			pm_flags;		// ducked, jump_held, etc
 	int			pm_time;
+	
+	// RAIN wallclimbs
+	int wallclimbs;
 
 	vec3_t		origin;
 	vec3_t		velocity;

@@ -1146,6 +1146,7 @@ netField_t	playerStateFields[] =
 { PSF(velocity[2]), 0 },
 { PSF(legsTimer), 8 },
 { PSF(pm_time), -16 },
+{ PSF(wallclimbs), 8 },
 { PSF(eventSequence), 16 },
 { PSF(torsoAnim), 8 },
 { PSF(movementDir), 4 },

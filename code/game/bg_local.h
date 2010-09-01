@@ -50,6 +50,8 @@ typedef struct {
 	qboolean ladder; //LADDER
 	
 	qboolean moor; // MOOR
+	
+	int wallclimbs;
 
 	float		impactSpeed;
 

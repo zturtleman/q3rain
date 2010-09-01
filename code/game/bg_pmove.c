@@ -43,7 +43,7 @@ float	pm_accelerate = 10.0f;
 float	pm_airaccelerate = 1.0f;
 float	pm_wateraccelerate = 4.0f;
 float	pm_flyaccelerate = 8.0f;
-float	pm_ladderaccelerate = 4000.0f;
+float	pm_ladderaccelerate = 5000.0f;
 
 float pm_mooraccelerate = 3.0f;
 
@@ -51,12 +51,13 @@ float	pm_friction = 6.0f;
 float	pm_waterfriction = 1.0f;
 float	pm_flightfriction = 3.0f;
 float	pm_spectatorfriction = 5.0f;
-float	pm_ladderfriction = 4000.0f;
+float	pm_ladderfriction = 5000.0f;
 
 int		c_pmove = 0;
 
 #define WALLJUMP_BOOST 300
-
+#define WALLCLIMB_BOOST 400
+#define MAX_WALLCLIMBS 1
 
 /*
 ===============
@@ -282,7 +283,6 @@ Handles user intended acceleration
 ==============
 */
 static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
-#if 1
 	// q2 style
 	int			i;
 	float		addspeed, accelspeed, currentspeed;
@@ -300,24 +300,6 @@ static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
 	for (i=0 ; i<3 ; i++) {
 		pm->ps->velocity[i] += accelspeed*wishdir[i];	
 	}
-#else
-	// proper way (avoids strafe jump maxspeed bug), but feels bad
-	vec3_t		wishVelocity;
-	vec3_t		pushDir;
-	float		pushLen;
-	float		canPush;
-
-	VectorScale( wishdir, wishspeed, wishVelocity );
-	VectorSubtract( wishVelocity, pm->ps->velocity, pushDir );
-	pushLen = VectorNormalize( pushDir );
-
-	canPush = accel*pml.frametime*wishspeed;
-	if (canPush > pushLen) {
-		canPush = pushLen;
-	}
-
-	VectorMA( pm->ps->velocity, canPush, pushDir, pm->ps->velocity );
-#endif
 }
 
 // LADDER
@@ -440,43 +422,6 @@ static void PM_SetMovementDir( void ) {
 		} 
 	}
 }
-
-
-/*
-=============
-PM_CheckWallJump
-=============
-*/
-static qboolean PM_CheckWallJump( void ) {
-	if ( pm->ps->pm_flags & PMF_RESPAWNED ) {
-		return qfalse;		// don't allow jump until all buttons are up
-	}
-
-	if ( pm->cmd.upmove < 10 ) {
-		// not holding jump
-		return qfalse;
-	}
-	
-	if (pml.groundPlane == qtrue) {
-		return qfalse; // no walljumping if on ground :O
-	}
-	
-	pm->ps->pm_flags |= PMF_JUMP_HELD;
-
-	pm->ps->velocity[2] = WALLJUMP_BOOST;
-	PM_AddEvent( EV_WALLJUMP );
-
-	if ( pm->cmd.forwardmove >= 0 ) {
-		PM_ForceLegsAnim( LEGS_JUMP );
-		pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
-	} else {
-		PM_ForceLegsAnim( LEGS_JUMPB );
-		pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
-	}
-
-	return qtrue;
-}
-
 
 /*
 =============
@@ -717,46 +662,66 @@ static void PM_WaterMove( void ) {
 }
 
 /*
-===================
-PM_FlyMove
-
-Only with the flight powerup
-===================
+=============
+PM_CheckWallClimb
+=============
 */
-static void PM_FlyMove( void ) {
-	int		i;
-	vec3_t	wishvel;
-	float	wishspeed;
-	vec3_t	wishdir;
-	float	scale;
-
-	// normal slowdown
-	PM_Friction ();
-
-	scale = PM_CmdScale( &pm->cmd );
-	//
-	// user intentions
-	//
-	if ( !scale ) {
-		wishvel[0] = 0;
-		wishvel[1] = 0;
-		wishvel[2] = 0;
-	} else {
-		for (i=0 ; i<3 ; i++) {
-			wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
-		}
-
-		wishvel[2] += scale * pm->cmd.upmove;
+static qboolean PM_CheckWallClimb( void ) {
+	vec3_t flatforward,spot;
+	trace_t trace;
+	
+	if ( pm->ps->pm_flags & PMF_RESPAWNED ) {
+		return qfalse;		// don't allow jump until all buttons are up
 	}
 
-	VectorCopy (wishvel, wishdir);
-	wishspeed = VectorNormalize(wishdir);
+	if ( pm->cmd.upmove < 10 ) {
+		// not holding jump
+		return qfalse;
+	}
 
-	PM_Accelerate (wishdir, wishspeed, pm_flyaccelerate);
+	// must wait for jump to be released
+	if ( pm->ps->pm_flags & PMF_JUMP_HELD ) {
+		// clear upmove so cmdscale doesn't lower running speed
+		pm->cmd.upmove = 0;
+		return qfalse;
+	}
+	
+	flatforward[0] = pml.forward[0];
+	flatforward[1] = pml.forward[1];
+	flatforward[2] = 0;
+	VectorNormalize (flatforward);
+	VectorMA (pm->ps->origin, 1, flatforward, spot);
+	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, spot, pm->ps->clientNum, MASK_PLAYERSOLID);
+	if ((trace.fraction >= 1.0) || (trace.contents != CONTENTS_SOLID)) {
+		return qfalse;
+	}
 
-	PM_StepSlideMove( qfalse );
+	return qtrue;
 }
 
+/*
+=============
+PM_WallClimb
+=============
+*/
+static void PM_WallClimb( void ) {
+
+	pml.groundPlane = qfalse;
+	pml.walking = qfalse;
+	pm->ps->pm_flags |= PMF_JUMP_HELD;
+
+	pm->ps->groundEntityNum = ENTITYNUM_NONE;
+	pm->ps->velocity[2] = WALLCLIMB_BOOST;
+	PM_AddEvent( EV_JUMP );
+
+	if ( pm->cmd.forwardmove >= 0 ) {
+		PM_ForceLegsAnim( LEGS_JUMP );
+		pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
+	} else {
+		PM_ForceLegsAnim( LEGS_JUMPB );
+		pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
+	}
+}
 
 /*
 ===================
@@ -764,7 +729,7 @@ PM_AirMove
 
 ===================
 */
-static void PM_AirMove( void ) {
+static void PM_AirMove( pmove_t *pmove ) {
 	int			i;
 	vec3_t		wishvel;
 	float		fmove, smove;
@@ -809,16 +774,15 @@ static void PM_AirMove( void ) {
 		PM_ClipVelocity (pm->ps->velocity, pml.groundTrace.plane.normal, 
 			pm->ps->velocity, OVERCLIP );
 	}
+	
 
-#if 0
-	//ZOID:  If we are on the grapple, try stair-stepping
-	//this allows a player to use the grapple to pull himself
-	//over a ledge
-	if (pm->ps->pm_flags & PMF_GRAPPLE_PULL)
-		PM_StepSlideMove ( qtrue );
-	else
-		PM_SlideMove ( qtrue );
-#endif
+	if (pmove->ps->wallclimbs < MAX_WALLCLIMBS ) {
+		if (PM_CheckWallClimb()) {
+			PM_WallClimb();
+			pmove->ps->wallclimbs++;
+			return;
+		}
+	}
 
 	PM_StepSlideMove ( qtrue );
 }
@@ -854,7 +818,7 @@ static void PM_GrappleMove( void ) {
 PM_WalkMove
 ===================
 */
-static void PM_WalkMove( void ) {
+static void PM_WalkMove( pmove_t *pmove ) {
 	int			i;
 	vec3_t		wishvel;
 	float		fmove, smove;
@@ -864,28 +828,26 @@ static void PM_WalkMove( void ) {
 	usercmd_t	cmd;
 	float		accelerate;
 	float		vel;
-
+	
+	pmove->ps->wallclimbs = 0;
+	
 	if ( pm->waterlevel > 2 && DotProduct( pml.forward, pml.groundTrace.plane.normal ) > 0 ) {
 		// begin swimming
 		PM_WaterMove();
 		return;
 	}
 
-
 	if ( PM_CheckJump () ) {
 		// jumped away
 		if ( pm->waterlevel > 1 ) {
 			PM_WaterMove();
 		} else {
-			PM_AirMove();
+			PM_AirMove(pmove);
 		}
 		return;
 	}
 	
-	if (PM_CheckWallJump()) {
-		PM_AirMove();
-		return;
-	}
+	//pml.wallclimbs = 0;
 
 	PM_Friction ();
 
@@ -978,6 +940,46 @@ static void PM_WalkMove( void ) {
 
 }
 
+/*
+===================
+PM_FlyMove
+
+Only with the flight powerup
+===================
+*/
+static void PM_FlyMove( void ) {
+        int             i;
+        vec3_t  wishvel;
+        float   wishspeed;
+        vec3_t  wishdir;
+        float   scale;
+
+        // normal slowdown
+        PM_Friction ();
+
+        scale = PM_CmdScale( &pm->cmd );
+        //
+        // user intentions
+        //
+        if ( !scale ) {
+                wishvel[0] = 0;
+                wishvel[1] = 0;
+                wishvel[2] = 0;
+        } else {
+                for (i=0 ; i<3 ; i++) {
+                        wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
+                }
+
+                wishvel[2] += scale * pm->cmd.upmove;
+        }
+
+        VectorCopy (wishvel, wishdir);
+        wishspeed = VectorNormalize(wishdir);
+
+        PM_Accelerate (wishdir, wishspeed, pm_flyaccelerate);
+
+        PM_StepSlideMove( qfalse );
+}
 
 /*
 ==============
@@ -2061,29 +2063,18 @@ void PmoveSingle (pmove_t *pmove) {
 	CheckLadder(); //LADDER
 	CheckMoor(); // MOOR
 	
-	if ( pm->ps->powerups[PW_FLIGHT] ) {
-		// flight powerup doesn't allow jump and has different friction
-		PM_FlyMove();
-	} else if (pm->ps->pm_flags & PMF_GRAPPLE_PULL) {
-		PM_GrappleMove();
-		// We can wiggle a bit
-		PM_AirMove();
-	} else if (pm->ps->pm_flags & PMF_TIME_WATERJUMP) {
+	if (pm->ps->pm_flags & PMF_TIME_WATERJUMP) {
 		PM_WaterJumpMove();
 	} else if ( pm->waterlevel > 1 ) {
-		// swimming
 		PM_WaterMove();
 	} else if (pml.ladder) {       
 		PM_LadderMove();
 	} else if ( pml.walking ) {
-		// walking on ground
-		PM_WalkMove();
+		PM_WalkMove(pmove);
 	} else if ( pml.moor ) {
-		// drowning :D
 		PM_MoorMove();
 	} else {
-		// airborne
-		PM_AirMove();
+		PM_AirMove( pmove );
 	}
 
 	PM_Animate();
