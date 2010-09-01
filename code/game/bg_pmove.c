@@ -56,7 +56,7 @@ float	pm_ladderfriction = 5000.0f;
 int		c_pmove = 0;
 
 #define WALLJUMP_BOOST 300
-#define WALLCLIMB_BOOST 400
+#define WALLCLIMB_BOOST 450
 #define MAX_WALLCLIMBS 1
 
 /*
@@ -711,7 +711,12 @@ static void PM_WallClimb( void ) {
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
 
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
-	pm->ps->velocity[2] = WALLCLIMB_BOOST;
+	pm->ps->velocity[2] += WALLCLIMB_BOOST;
+	if (pm->ps->velocity[2] > WALLCLIMB_BOOST) {
+		pm->ps->velocity[2] = WALLCLIMB_BOOST;
+	} else if (pm->ps->velocity[2] < WALLCLIMB_BOOST/1.5) {
+		pm->ps->velocity[2] = WALLCLIMB_BOOST/1.5;
+	}
 	PM_AddEvent( EV_JUMP );
 
 	if ( pm->cmd.forwardmove >= 0 ) {
@@ -846,8 +851,6 @@ static void PM_WalkMove( pmove_t *pmove ) {
 		}
 		return;
 	}
-	
-	//pml.wallclimbs = 0;
 
 	PM_Friction ();
 
