@@ -378,6 +378,54 @@ gentity_t *fire_grenade (gentity_t *self, vec3_t start, vec3_t dir) {
 
 	return bolt;
 }
+/*
+=================
+fire_he
+=================
+*/
+gentity_t *fire_he (gentity_t *self, vec3_t start, vec3_t dir) {
+	gentity_t	*bolt;
+
+	VectorNormalize (dir);
+
+	bolt = G_Spawn();
+	bolt->classname = "grenade";
+	bolt->nextthink = level.time + 3000;
+	bolt->think = G_ExplodeMissile;
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weapon = WP_HE;
+	bolt->s.eFlags = EF_BOUNCE_HALF;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent = self;
+	bolt->damage = 150;
+	bolt->splashDamage = 250;
+	bolt->splashRadius = 300;
+	bolt->methodOfDeath = MOD_HE;
+	bolt->splashMethodOfDeath = MOD_HE_SPLASH;
+	bolt->clipmask = MASK_SHOT;
+	bolt->target_ent = NULL;
+	
+	// Lancer SHOOTNADES
+  bolt->health = 2; // dont use 1, else it will die if collided with other nade :D
+  bolt->takedamage = qtrue;
+  bolt->die = G_MissileDie;
+  bolt->r.contents = CONTENTS_BODY;
+  VectorSet(bolt->r.mins, -10, -5, 0);
+  VectorCopy(bolt->r.mins, bolt->r.absmin);
+  VectorSet(bolt->r.maxs, 10, 5, 6);
+  VectorCopy(bolt->r.maxs, bolt->r.absmax);
+
+	bolt->s.pos.trType = TR_GRAVITY;
+	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorScale( dir, 800, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+
+	VectorCopy (start, bolt->r.currentOrigin);
+
+	return bolt;
+}
 
 //=============================================================================
 

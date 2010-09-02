@@ -146,7 +146,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		message = "was in the wrong place";
 		break;
 	case MOD_MOOR:
-		message = "turned into mud.";
+		message = "turned into mud";
 		break;
 	case MOD_ADMIN:
 		message = "wasn't nice to the admin";

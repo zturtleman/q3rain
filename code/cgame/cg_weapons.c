@@ -498,6 +498,121 @@ static void CG_GrenadeTrail( centity_t *ent, const weaponInfo_t *wi ) {
 	CG_RocketTrail( ent, wi );
 }
 
+/*
+==========================
+CG_ExplosionParticles
+SPARK
+==========================
+*/
+void CG_ExplosionParticles( int weapon, vec3_t origin ) {
+	int number; // number of particles
+	int jump; // amount to nudge the particles trajectory vector up by
+	int speed; // speed of particles
+	int light; // amount of light for each particle
+	vec4_t lColor; // color of light for each particle
+	qhandle_t shader; // shader to use for the particles
+	int index;
+	vec3_t randVec, tempVec;
+
+	// set defaults
+	number = 32;
+	jump = 50;
+	speed = 300;
+	light = 50;
+	lColor[0] = 1.0f;
+	lColor[1] = 1.0f;
+	lColor[2] = 1.0f;
+	lColor[3] = 1.0f; // alpha
+
+	switch( weapon ) {
+		case WP_HE:
+			number = 64;
+			jump = 200;
+			light = 200;
+			lColor[0] = 1.0f;
+			lColor[1] = 0.56f;
+			lColor[2] = 0.0f;
+			shader = cgs.media.sparkShader;
+			break;
+		default:
+			return;
+	}
+	
+	for (index = 0; index < number/2; index++) {
+		localEntity_t *le;
+		refEntity_t *re;
+
+		le = CG_AllocLocalEntity(); //allocate a local entity
+		re = &le->refEntity;
+		le->leFlags = LEF_PUFF_DONT_SCALE; //don't change the particle size
+		le->leType = LE_MOVE_SCALE_FADE; // particle should fade over time
+		le->startTime = cg.time; // set the start time of the particle to the current time
+		le->endTime = cg.time + 3000 + random() * 250; //set the end time
+		le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+		re = &le->refEntity;
+		re->shaderTime = cg.time / 1000.0f;
+		re->reType = RT_SPRITE;
+		re->rotation = 0;
+		re->radius = 3;
+		re->customShader = shader;
+		re->shaderRGBA[0] = 0xff;
+		re->shaderRGBA[1] = 0xff;
+		re->shaderRGBA[2] = 0xff;
+		re->shaderRGBA[3] = 0xff;
+		le->light = light;
+		VectorCopy( lColor, le->lightColor );
+		le->color[3] = 1.0;
+		le->pos.trType = TR_GRAVITY; // moves in a gravity affected arc
+		le->pos.trTime = cg.time;
+		VectorCopy( origin, le->pos.trBase );
+
+		tempVec[0] = crandom(); //between 1 and -1
+		tempVec[1] = crandom();
+		tempVec[2] = crandom();
+		VectorNormalize(tempVec);
+		VectorScale(tempVec, speed, randVec);
+		randVec[2] += jump; //nudge the particles up a bit
+		VectorCopy( randVec, le->pos.trDelta ); 
+	}
+	
+	for (index = 0; index < number/2; index++) {
+		localEntity_t *le;
+		refEntity_t *re;
+
+		le = CG_AllocLocalEntity(); //allocate a local entity
+		re = &le->refEntity;
+		le->leFlags = LEF_PUFF_DONT_SCALE; //don't change the particle size
+		le->leType = LE_MOVE_SCALE_FADE; // particle should fade over time
+		le->startTime = cg.time; // set the start time of the particle to the current time
+		le->endTime = cg.time + 1000 + random() * 250; //set the end time
+		le->lifeRate = 0.75 / ( le->endTime - le->startTime );
+		re = &le->refEntity;
+		re->shaderTime = cg.time / 1000.0f;
+		re->reType = RT_SPRITE;
+		re->rotation = 0;
+		re->radius = 3;
+		re->customShader = shader;
+		re->shaderRGBA[0] = 0xff;
+		re->shaderRGBA[1] = 0xff;
+		re->shaderRGBA[2] = 0xff;
+		re->shaderRGBA[3] = 0xff;
+		le->light = light;
+		VectorCopy( lColor, le->lightColor );
+		le->color[3] = 1.0;
+		le->pos.trType = TR_LINEAR;
+		le->pos.trTime = cg.time;
+		VectorCopy( origin, le->pos.trBase );
+
+		tempVec[0] = crandom(); //between 1 and -1
+		tempVec[1] = crandom();
+		tempVec[2] = crandom();
+		VectorNormalize(tempVec);
+		VectorScale(tempVec, speed, randVec);
+		randVec[2] += jump*2; //nudge the particles up a bit
+		VectorCopy( randVec, le->pos.trDelta ); 
+	}
+	
+}
 
 /*
 =================
@@ -628,21 +743,6 @@ void CG_RegisterWeapon( int weaponNum ) {
 		weaponInfo->ejectBrassFunc = CG_ShotgunEjectBrass;
 		break;
 
-	case WP_ROCKET_LAUNCHER:
-		weaponInfo->missileModel = trap_R_RegisterModel( "models/ammo/rocket/rocket.md3" );
-		weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
-		weaponInfo->missileTrailFunc = CG_RocketTrail;
-		weaponInfo->missileDlight = 200;
-		weaponInfo->wiTrailTime = 2000;
-		weaponInfo->trailRadius = 64;
-		
-		MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
-		MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
-
-		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
-		cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
-		break;
-
 	case WP_GRENADE_LAUNCHER:
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/ammo/grenade1.md3" );
 		weaponInfo->missileTrailFunc = CG_GrenadeTrail;
@@ -652,16 +752,6 @@ void CG_RegisterWeapon( int weaponNum ) {
 		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/grenade/grenlf1a.wav", qfalse );
 		cgs.media.grenadeExplosionShader = trap_R_RegisterShader( "grenadeExplosion" );
 		break;
-		
-	case WP_PLASMAGUN:
-//		weaponInfo->missileModel = cgs.media.invulnerabilityPowerupModel;
-		weaponInfo->missileTrailFunc = CG_PlasmaTrail;
-		weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/plasma/lasfly.wav", qfalse );
-		MAKERGB( weaponInfo->flashDlightColor, 0.6f, 0.6f, 1.0f );
-		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/plasma/hyprbf1a.wav", qfalse );
-		cgs.media.plasmaExplosionShader = trap_R_RegisterShader( "plasmaExplosion" );
-		cgs.media.railRingsShader = trap_R_RegisterShader( "railDisc" );
-		break;
 
 	case WP_RAILGUN:
 		weaponInfo->readySound = trap_S_RegisterSound( "sound/weapons/railgun/rg_hum.wav", qfalse );
@@ -670,15 +760,6 @@ void CG_RegisterWeapon( int weaponNum ) {
 		cgs.media.railExplosionShader = trap_R_RegisterShader( "railExplosion" );
 		cgs.media.railRingsShader = trap_R_RegisterShader( "railDisc" );
 		cgs.media.railCoreShader = trap_R_RegisterShader( "railCore" );
-		break;
-
-	case WP_BFG:
-		weaponInfo->readySound = trap_S_RegisterSound( "sound/weapons/bfg/bfg_hum.wav", qfalse );
-		MAKERGB( weaponInfo->flashDlightColor, 1, 0.7f, 1 );
-		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/bfg/bfg_fire.wav", qfalse );
-		cgs.media.bfgExplosionShader = trap_R_RegisterShader( "bfgExplosion" );
-		weaponInfo->missileModel = trap_R_RegisterModel( "models/weaphits/bfg.md3" );
-		weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
 		break;
 		
 		// RAIN WEAPONS
@@ -1868,6 +1949,9 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	} else {*/
 		CG_ImpactMark( mark, origin, dir, random()*360, 1,1,1,1, alphaFade, radius, qfalse );
 	//}
+	
+	CG_ExplosionParticles( weapon, origin );
+	
 }
 
 
@@ -1889,6 +1973,8 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 	default:
 		break;
 	}
+	
+	CG_ExplosionParticles( weapon, origin );
 }
 
 

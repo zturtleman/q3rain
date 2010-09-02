@@ -687,9 +687,19 @@ Weapon_HE_Fire
 
 ===============
 */
+#define HE_DAMAGE 150
+#define HE_SPLASHDAMAGE 250
+#define HE_RADIUS 300
 void Weapon_HE_Fire (gentity_t *ent) {
-	// TODO stub
-	weapon_grenadelauncher_fire( ent );
+	gentity_t	*m;
+	
+	forward[2] += 0.2f;
+	VectorNormalize( forward );
+	
+	m = fire_he(ent, muzzle, forward);
+	m->damage = HE_DAMAGE;
+	m->splashDamage = HE_SPLASHDAMAGE;
+	m->splashRadius = HE_RADIUS;
 }
 
 /*

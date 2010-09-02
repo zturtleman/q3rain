@@ -33,6 +33,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CONTENTS_WATER			32
 #define	CONTENTS_FOG			64
 
+#define CONTENTS_MOOR 128
+
 #define CONTENTS_NOTTEAM1		0x0080
 #define CONTENTS_NOTTEAM2		0x0100
 #define CONTENTS_NOBOTCLIP		0x0200
@@ -58,8 +60,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CONTENTS_TRANSLUCENT	0x20000000	// don't consume surface fragments inside
 #define	CONTENTS_TRIGGER		0x40000000
 #define	CONTENTS_NODROP			0x80000000	// don't leave bodies or items (death fog, lava)
-
-#define	CONTENTS_MOOR			0x1000
 
 #define	SURF_NODAMAGE			0x1		// never give falling damage
 #define	SURF_SLICK				0x2		// effects game physics

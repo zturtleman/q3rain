@@ -553,12 +553,11 @@ void CheckMoor( void )
 	flatforward[2] = 0;
 	VectorNormalize(flatforward);
 
-	VectorMA(pm->ps->origin, 30, flatforward, spot);
-	spot[2] += 4;
+	VectorMA(pm->ps->origin, 1, flatforward, spot);
 	cont = pm->pointcontents(spot, pm->ps->clientNum);
 	if (cont & MASK_MOOR) {
 		pml.moor = qtrue;
-		Com_Printf("MOOR\n");
+		pm->ps->wallclimbs = MAX_WALLCLIMBS; // avoid glitching
 		return;
 	}
 }
@@ -576,15 +575,10 @@ static void PM_MoorMove( void ) {
 	
 	PM_Friction ();
 	
-	velvec[0] = 0;
-	velvec[1] = 0;
-	velvec[2] = -40;		// sink towards bottom
-
-	VectorCopy (velvec, wishdir);
-	wishspeed = VectorNormalize(wishdir);
-
-	PM_Accelerate (wishdir, wishspeed, pm_mooraccelerate);
-
+	pm->ps->velocity[0] = 0;
+	pm->ps->velocity[1] = 0;
+	pm->ps->velocity[2] = -5;
+	
 	PM_SlideMove( qfalse );
 }
 
@@ -671,17 +665,18 @@ static qboolean PM_CheckWallClimb( void ) {
 	trace_t trace;
 	
 	if ( pm->ps->pm_flags & PMF_RESPAWNED ) {
-		return qfalse;		// don't allow jump until all buttons are up
-	}
-
-	if ( pm->cmd.upmove < 10 ) {
-		// not holding jump
 		return qfalse;
 	}
-
-	// must wait for jump to be released
+	
+	if ( pm->cmd.upmove < 10 ) {
+		return qfalse;
+	}
+	
+	if (pm->waterlevel >= 2) {
+		return qfalse;
+	}
+	
 	if ( pm->ps->pm_flags & PMF_JUMP_HELD ) {
-		// clear upmove so cmdscale doesn't lower running speed
 		pm->cmd.upmove = 0;
 		return qfalse;
 	}
@@ -2068,14 +2063,14 @@ void PmoveSingle (pmove_t *pmove) {
 	
 	if (pm->ps->pm_flags & PMF_TIME_WATERJUMP) {
 		PM_WaterJumpMove();
+	} else if (pml.moor) {       
+		PM_MoorMove();
 	} else if ( pm->waterlevel > 1 ) {
 		PM_WaterMove();
 	} else if (pml.ladder) {       
 		PM_LadderMove();
 	} else if ( pml.walking ) {
 		PM_WalkMove(pmove);
-	} else if ( pml.moor ) {
-		PM_MoorMove();
 	} else {
 		PM_AirMove( pmove );
 	}

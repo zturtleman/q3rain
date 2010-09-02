@@ -140,8 +140,11 @@ void P_WorldEffects( gentity_t *ent ) {
 
 				// don't play a normal pain sound
 				ent->pain_debounce_time = level.time + 200;
-
-				G_Damage(ent, NULL, NULL, NULL, NULL, ent->damage, DAMAGE_NO_ARMOR, MOD_WATER);
+				if (ent->watertype & (CONTENTS_MOOR) && ent->health > 0) {
+					G_Damage(ent, NULL, NULL, NULL, NULL, ent->damage, DAMAGE_NO_ARMOR, MOD_MOOR);
+				} else if (ent->watertype & (CONTENTS_WATER) && ent->health > 0) {
+					G_Damage(ent, NULL, NULL, NULL, NULL, ent->damage, DAMAGE_NO_ARMOR, MOD_WATER);
+				}
 			}
 		}
 	} else {
@@ -152,17 +155,13 @@ void P_WorldEffects( gentity_t *ent ) {
 	//
 	// check for sizzle damage (move to pmove?)
 	//
-	if (waterlevel && 
-		(ent->watertype&(CONTENTS_LAVA|CONTENTS_SLIME|CONTENTS_MOOR)) ) {
+	if (waterlevel && (ent->watertype&(CONTENTS_LAVA|CONTENTS_SLIME)) ) {
 		if (ent->health > 0 && ent->pain_debounce_time <= level.time	) {
 			if (ent->watertype & CONTENTS_LAVA) {
 				G_Damage (ent, NULL, NULL, NULL, NULL, 30*waterlevel, 0, MOD_LAVA);
 			}
 			if (ent->watertype & CONTENTS_SLIME) {
 				G_Damage (ent, NULL, NULL, NULL, NULL, 10*waterlevel, 0, MOD_SLIME);
-			}
-			if (ent->watertype & CONTENTS_MOOR) {
-				G_Damage (ent, NULL, NULL, NULL, NULL, 10*waterlevel, 0, MOD_MOOR);
 			}
 		}
 	}

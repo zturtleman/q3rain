@@ -138,9 +138,11 @@ int BotValidWeaponNumber(int weaponnum)
 {
 	if (weaponnum <= 0 || weaponnum > weaponconfig->numweapons)
 	{
-		botimport.Print(PRT_ERROR, "weapon number out of range, is %i\n", weaponnum);
-		return qfalse;
-	} //end if
+		//botimport.Print(PRT_ERROR, "weapon number out of range, is %i\n", weaponnum);
+		botimport.Print(PRT_WARNING, "weapon number out of range, is %i\n", weaponnum);
+		weaponnum++;
+		//return qfalse;
+	}
 	return qtrue;
 } //end of the function BotValidWeaponNumber
 //========================================================================

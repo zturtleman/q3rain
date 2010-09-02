@@ -137,6 +137,70 @@ void CG_LoadingClient( int clientNum ) {
 	CG_LoadingString( personality );
 }
 
+/*
+====================
+CG_ParseMapData
+
+Parse stuff
+====================
+*/
+void CG_ParseMapData(const char *mapstring) {
+  char		*text_p;
+  int			len;
+  char		*token;
+  int			skip;
+  char		text[20000];
+  char		filename[128];
+  fileHandle_t	f;
+  
+  Com_sprintf(filename, sizeof(filename), "maps/%s.data", mapstring );
+  
+  len = trap_FS_FOpenFile( filename, &f, FS_READ );
+  if ( len <= 0 ) {
+    Com_Printf("^1CG_ParseMapData: File empty/missing!\n");
+    return;
+  }
+  if ( len >= sizeof(text) - 1 ) {
+    CG_Printf( "File %s (%i>%i)too long\n", text, len, sizeof( text) );
+    return;
+  }
+  trap_FS_Read( text, len, f );
+  text[len] = 0;
+  trap_FS_FCloseFile( f );
+  
+  Com_Printf("%i\n", text);
+  
+  text_p = text;
+  skip = 0;
+  
+  
+  while (qtrue) {
+    token = COM_Parse( &text_p );
+    
+    if ( !token ) {
+      break;
+    }
+    
+    if (!Q_stricmp(token, "$EOF")) {
+      break;
+    }
+    
+    if ( !Q_stricmp( token, "$environment" ) ){
+      Com_Printf("^1CG_ParseMapData: Entered Environment\n");
+      token = COM_Parse(&text_p);
+      if (!token){
+        CG_Error("Found '$environment' string but no following string");
+        return;
+      }
+      if ( !Q_stricmp( token, "{" ) ){
+        Com_Printf("^3CG_ParseMapData: Parsing Environment...\n");
+        CG_EnvironmentParse(text_p);
+      }
+      Com_Printf("CG_ParseMapData: %i\n", token);
+    }
+  }
+  Com_Printf("^2CG_ParseMapData: OK\n");
+}
 
 /*
 ====================
@@ -169,6 +233,7 @@ void CG_DrawInformation( void ) {
 	// blend a detail texture over it
 	detail = trap_R_RegisterShader( "levelShotDetail" );
 	trap_R_DrawStretchPic( 0, 0, cgs.glconfig.vidWidth, cgs.glconfig.vidHeight, 0, 0, 2.5, 2, detail );
+	
 
 	// draw the icons of things as they are loaded
 	CG_DrawLoadingIcons();
@@ -182,6 +247,8 @@ void CG_DrawInformation( void ) {
 		UI_DrawProportionalString( 320, 128-32, "Awaiting snapshot...",
 			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
+	
+	CG_ParseMapData(s);
 
 	// draw info string information
 
@@ -228,7 +295,7 @@ void CG_DrawInformation( void ) {
 	// cheats warning
 	s = Info_ValueForKey( sysInfo, "sv_cheats" );
 	if ( s[0] == '1' ) {
-		UI_DrawProportionalString( 320, y, "CHEATS ARE ENABLED",
+		UI_DrawProportionalString( 320, y, "Cheats are enabled",
 			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 		y += PROP_HEIGHT;
 	}

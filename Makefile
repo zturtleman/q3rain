@@ -1108,12 +1108,6 @@ makedirs:
 	@if [ ! -d $(B)/baseq3/ui ];then $(MKDIR) $(B)/baseq3/ui;fi
 	@if [ ! -d $(B)/baseq3/qcommon ];then $(MKDIR) $(B)/baseq3/qcommon;fi
 	@if [ ! -d $(B)/baseq3/vm ];then $(MKDIR) $(B)/baseq3/vm;fi
-	#@if [ ! -d $(B)/missionpack ];then $(MKDIR) $(B)/missionpack;fi
-	#@if [ ! -d $(B)/missionpack/cgame ];then $(MKDIR) $(B)/missionpack/cgame;fi
-	#@if [ ! -d $(B)/missionpack/game ];then $(MKDIR) $(B)/missionpack/game;fi
-	#@if [ ! -d $(B)/missionpack/ui ];then $(MKDIR) $(B)/missionpack/ui;fi
-	#@if [ ! -d $(B)/missionpack/qcommon ];then $(MKDIR) $(B)/missionpack/qcommon;fi
-	#@if [ ! -d $(B)/missionpack/vm ];then $(MKDIR) $(B)/missionpack/vm;fi
 	@if [ ! -d $(B)/tools ];then $(MKDIR) $(B)/tools;fi
 	@if [ ! -d $(B)/tools/asm ];then $(MKDIR) $(B)/tools/asm;fi
 	@if [ ! -d $(B)/tools/etc ];then $(MKDIR) $(B)/tools/etc;fi
@@ -1770,6 +1764,7 @@ Q3CGOBJ_ = \
   $(B)/baseq3/cgame/cg_drawtools.o \
   $(B)/baseq3/cgame/cg_effects.o \
   $(B)/baseq3/cgame/cg_ents.o \
+  $(B)/baseq3/cgame/cg_environment.o \
   $(B)/baseq3/cgame/cg_event.o \
   $(B)/baseq3/cgame/cg_info.o \
   $(B)/baseq3/cgame/cg_localents.o \
@@ -1796,51 +1791,6 @@ $(B)/baseq3/cgame$(SHLIBNAME): $(Q3CGOBJ)
 $(B)/baseq3/vm/cgame.qvm: $(Q3CGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(Q3CGVMOBJ) $(CGDIR)/cg_syscalls.asm
-
-#############################################################################
-## MISSIONPACK CGAME
-#############################################################################
-
-#MPCGOBJ_ = \
-#  $(B)/missionpack/cgame/cg_main.o \
-#  $(B)/missionpack/cgame/bg_misc.o \
-#  $(B)/missionpack/cgame/bg_pmove.o \
-#  $(B)/missionpack/cgame/bg_slidemove.o \
-#  $(B)/missionpack/cgame/bg_lib.o \
-#  $(B)/missionpack/cgame/cg_consolecmds.o \
-#  $(B)/missionpack/cgame/cg_newdraw.o \
-#  $(B)/missionpack/cgame/cg_draw.o \
-#  $(B)/missionpack/cgame/cg_drawtools.o \
-#  $(B)/missionpack/cgame/cg_effects.o \
-#  $(B)/missionpack/cgame/cg_ents.o \
-#  $(B)/missionpack/cgame/cg_event.o \
-#  $(B)/missionpack/cgame/cg_info.o \
-#  $(B)/missionpack/cgame/cg_localents.o \
-#  $(B)/missionpack/cgame/cg_marks.o \
-#  $(B)/missionpack/cgame/cg_players.o \
-#  $(B)/missionpack/cgame/cg_playerstate.o \
-#  $(B)/missionpack/cgame/cg_predict.o \
-#  $(B)/missionpack/cgame/cg_scoreboard.o \
-#  $(B)/missionpack/cgame/cg_servercmds.o \
-#  $(B)/missionpack/cgame/cg_snapshot.o \
-#  $(B)/missionpack/cgame/cg_view.o \
-#  $(B)/missionpack/cgame/cg_weapons.o \
-#  $(B)/missionpack/ui/ui_shared.o \
-#  \
-#  $(B)/missionpack/qcommon/q_math.o \
-#  $(B)/missionpack/qcommon/q_shared.o
-#
-#MPCGOBJ = $(MPCGOBJ_) $(B)/missionpack/cgame/cg_syscalls.o
-#MPCGVMOBJ = $(MPCGOBJ_:%.o=%.asm)
-#
-#$(B)/missionpack/cgame$(SHLIBNAME): $(MPCGOBJ)
-#	$(echo_cmd) "LD $@"
-#	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(MPCGOBJ)
-#
-#$(B)/missionpack/vm/cgame.qvm: $(MPCGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
-#	$(echo_cmd) "Q3ASM $@"
-#	$(Q)$(Q3ASM) -o $@ $(MPCGVMOBJ) $(CGDIR)/cg_syscalls.asm
-#
 
 
 #############################################################################
@@ -2136,30 +2086,12 @@ $(B)/baseq3/cgame/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
 $(B)/baseq3/cgame/%.asm: $(CGDIR)/%.c $(Q3LCC)
 	$(DO_CGAME_Q3LCC)
 
-#$(B)/missionpack/cgame/bg_%.o: $(GDIR)/bg_%.c
-#	$(DO_CGAME_CC_MISSIONPACK)
-#
-#$(B)/missionpack/cgame/%.o: $(CGDIR)/%.c
-#	$(DO_CGAME_CC_MISSIONPACK)
-#
-#$(B)/missionpack/cgame/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
-#	$(DO_CGAME_Q3LCC_MISSIONPACK)
-#
-#$(B)/missionpack/cgame/%.asm: $(CGDIR)/%.c $(Q3LCC)
-#	$(DO_CGAME_Q3LCC_MISSIONPACK)
-
 
 $(B)/baseq3/game/%.o: $(GDIR)/%.c
 	$(DO_GAME_CC)
 
 $(B)/baseq3/game/%.asm: $(GDIR)/%.c $(Q3LCC)
 	$(DO_GAME_Q3LCC)
-
-#$(B)/missionpack/game/%.o: $(GDIR)/%.c
-#	$(DO_GAME_CC_MISSIONPACK)
-#
-#$(B)/missionpack/game/%.asm: $(GDIR)/%.c $(Q3LCC)
-#	$(DO_GAME_Q3LCC_MISSIONPACK)
 
 
 $(B)/baseq3/ui/bg_%.o: $(GDIR)/bg_%.c
@@ -2174,30 +2106,12 @@ $(B)/baseq3/ui/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
 $(B)/baseq3/ui/%.asm: $(Q3UIDIR)/%.c $(Q3LCC)
 	$(DO_UI_Q3LCC)
 
-#$(B)/missionpack/ui/bg_%.o: $(GDIR)/bg_%.c
-#	$(DO_UI_CC_MISSIONPACK)
-#
-#$(B)/missionpack/ui/%.o: $(UIDIR)/%.c
-#	$(DO_UI_CC_MISSIONPACK)
-#
-#$(B)/missionpack/ui/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
-#	$(DO_UI_Q3LCC_MISSIONPACK)
-#
-#$(B)/missionpack/ui/%.asm: $(UIDIR)/%.c $(Q3LCC)
-#	$(DO_UI_Q3LCC_MISSIONPACK)
-
 
 $(B)/baseq3/qcommon/%.o: $(CMDIR)/%.c
 	$(DO_SHLIB_CC)
 
 $(B)/baseq3/qcommon/%.asm: $(CMDIR)/%.c $(Q3LCC)
 	$(DO_Q3LCC)
-
-#$(B)/missionpack/qcommon/%.o: $(CMDIR)/%.c
-#	$(DO_SHLIB_CC_MISSIONPACK)
-#
-#$(B)/missionpack/qcommon/%.asm: $(CMDIR)/%.c $(Q3LCC)
-#	$(DO_Q3LCC_MISSIONPACK)
 
 
 #############################################################################

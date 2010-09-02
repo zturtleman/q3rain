@@ -766,6 +766,9 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.shadowMarkShader = trap_R_RegisterShader( "markShadow" );
 	cgs.media.wakeMarkShader = trap_R_RegisterShader( "wake" );
 	cgs.media.bloodMarkShader = trap_R_RegisterShader( "bloodMark" );
+	
+	// explosion SPARKs
+	cgs.media.sparkShader = trap_R_RegisterShader("spark");
 
 	// register the inline models
 	cgs.numInlineModels = trap_CM_NumInlineModels();
