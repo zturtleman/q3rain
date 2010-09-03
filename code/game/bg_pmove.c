@@ -331,10 +331,15 @@ static void PM_LadderMove( void ) {
 		wishvel[1] = 0;
 		wishvel[2] = 0;
 	} else {   // if they're trying to move... lets calculate it
-		for (i=0 ; i<3 ; i++)
+		for (i=0 ; i<3 ; i++) {
 			//wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
 			wishvel[i] = pml.right[i]*pm->cmd.rightmove;
-		wishvel[2] += scale * pm->cmd.upmove;
+		}
+		if (pm->cmd.upmove) {
+		  wishvel[2] = scale * pm->cmd.upmove;
+	  } else if (pm->cmd.forwardmove) {
+	    wishvel[2] = scale * pm->cmd.forwardmove;
+	  }
 	}
 
 	VectorCopy (wishvel, wishdir);

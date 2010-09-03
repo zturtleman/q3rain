@@ -159,26 +159,11 @@ static void CG_Obituary( entityState_t *ent ) {
 	if (attacker == target) {
 		gender = ci->gender;
 		switch (mod) {
-		case MOD_GRENADE_SPLASH:
-			if ( gender == GENDER_FEMALE )
-				message = "doesn't know how to use grenades";
-			else
-				message = "doesn't know how to use grenades";
+		case MOD_HE:
+			message = "was - ^1WTF DID JUST HAPPEN?";
 			break;
-		case MOD_ROCKET_SPLASH:
-			if ( gender == GENDER_FEMALE )
-				message = "blew herself up";
-			else
-				message = "blew himself up";
-			break;
-		case MOD_PLASMA_SPLASH:
-			if ( gender == GENDER_FEMALE )
-				message = "melted herself";
-			else
-				message = "melted himself";
-			break;
-		case MOD_BFG_SPLASH:
-			message = "should have used a smaller gun";
+		case MOD_HE_SPLASH:
+			message = "doesn't know how to use grenades";
 			break;
 		default:
 			if ( gender == GENDER_FEMALE )
@@ -197,7 +182,6 @@ static void CG_Obituary( entityState_t *ent ) {
 	// check for kill messages from the current clientNum
 	if ( attacker == cg.snap->ps.clientNum ) {
 		char	*s;
-
 		s = va("You killed %s\n%s place with %i", targetName, 
 			CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
 			cg.snap->ps.persistant[PERS_SCORE] );
@@ -221,72 +205,15 @@ static void CG_Obituary( entityState_t *ent ) {
 
 	if ( attacker != ENTITYNUM_WORLD ) {
 		switch (mod) {
-		case MOD_GRAPPLE:
-			message = "was caught by";
-			break;
-		case MOD_GAUNTLET:
-			message = "was humiliated by";
-			break;
-		case MOD_MACHINEGUN:
-			message = "was pinned down by";
-			break;
-		case MOD_SHOTGUN:
-			message = "was blasted by";
-			message2 = "'s shotgun";
-			break;
-		case MOD_GRENADE:
-			message = "was epicly pwnt by";
-			message2 = "'s grenade";
-			break;
-		case MOD_GRENADE_SPLASH:
-			message = "was pulverized by";
-			message2 = "'s grenade";
-			break;
-		case MOD_ROCKET:
-			message = "ate";
-			message2 = "'s rocket";
-			break;
-		case MOD_ROCKET_SPLASH:
-			message = "almost dodged";
-			message2 = "'s rocket";
-			break;
-		case MOD_PLASMA:
-			message = "was melted by";
-			message2 = "'s plasmagun";
-			break;
-		case MOD_PLASMA_SPLASH:
-			message = "was melted by";
-			message2 = "'s plasmagun";
-			break;
-		case MOD_RAILGUN:
-			message = "was sniped down by";
-			break;
-		case MOD_LIGHTNING:
-			message = "was electrocuted by";
-			break;
-		case MOD_BFG:
-		case MOD_BFG_SPLASH:
-			message = "was blasted by";
-			message2 = "'s BFG";
-			break;
 		case MOD_TELEFRAG:
 			message = "tried to invade";
 			message2 = "'s personal space";
 			break;
-		// RAIN WEAPONS
 		case MOD_BARRETT:
 			message = "was sniped down by";
 			break;
 		case MOD_INTERVENTION:
 			message = "was sniped down by";
-			break;
-		case MOD_HE:
-			message = "was epicly pwnt by";
-			message2 = "'s grenade";
-			break;
-		case MOD_HE_SPLASH:
-			message = "was pulverized by";
-			message2 = "'s grenade";
 			break;
 		case MOD_CROSSBOW:
 			message = "was sniped down by";
@@ -297,7 +224,6 @@ static void CG_Obituary( entityState_t *ent ) {
 		case MOD_ACR:
 			message = "was pinned down by";
 			break;
-		// end rain weapon
 		default:
 			message = "was killed by";
 			break;

@@ -481,6 +481,9 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				damage = 100;
 			} else {
 				damage = 60;
+				if ( ent->flags & FL_GODMODE ) {
+			    return;
+		    }
 				ent->client->ps.speed = 180;
 			}
 			VectorSet (dir, 0, 0, 1);

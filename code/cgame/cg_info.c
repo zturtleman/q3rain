@@ -152,6 +152,7 @@ void CG_ParseMapData(const char *mapstring) {
   char		text[20000];
   char		filename[128];
   fileHandle_t	f;
+  qboolean env = qfalse;
   
   Com_sprintf(filename, sizeof(filename), "maps/%s.data", mapstring );
   
@@ -194,12 +195,12 @@ void CG_ParseMapData(const char *mapstring) {
       }
       if ( !Q_stricmp( token, "{" ) ){
         Com_Printf("^3CG_ParseMapData: Parsing Environment...\n");
-        CG_EnvironmentParse(text_p);
+        //CG_EnvironmentParse(text_p);
+        env = qtrue;
       }
       Com_Printf("CG_ParseMapData: %i\n", token);
     }
   }
-  Com_Printf("^2CG_ParseMapData: OK\n");
 }
 
 /*
@@ -236,6 +237,7 @@ void CG_DrawInformation( void ) {
 	
 
 	// draw the icons of things as they are loaded
+	CG_SetupWeather();
 	CG_DrawLoadingIcons();
 
 	// the first 150 rows are reserved for the client connection
@@ -248,7 +250,7 @@ void CG_DrawInformation( void ) {
 			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
 	
-	CG_ParseMapData(s);
+	//CG_ParseMapData(s);
 
 	// draw info string information
 

@@ -230,7 +230,7 @@ void Cmd_Give_f (gentity_t *ent)
 	}
 
 	if (give_all || Q_stricmp(name, "weapons") == 0) {
-		ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 -  ( 1 << WP_GRAPPLING_HOOK ) - ( 1 << WP_NONE );
+		ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 -  ( 1 << WP_NONE );
 		if (!give_all)
 			return;
 	}
@@ -238,6 +238,7 @@ void Cmd_Give_f (gentity_t *ent)
 	if (give_all || Q_stricmp(name, "ammo") == 0) {
 		for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
 			ent->client->ps.ammo[i] = 999;
+			ent->client->clipammo[i] = 999;
 		}
 		if (!give_all)
 			return;
