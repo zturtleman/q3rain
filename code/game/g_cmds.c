@@ -1581,7 +1581,7 @@ void Cmd_Reload( gentity_t *ent )	{
 
 	weapon = ent->client->ps.weapon;
 	
-	if (weapon == WP_HE || weapon == WP_KNIFE) return;
+	if (weapon == WP_HE || weapon == WP_KNIFE || weapon == WP_BOMB) return;
 	
 	amt = ClipAmountForWeapon(weapon);
 	ammotoadd = amt;
@@ -1633,6 +1633,7 @@ int ClipAmountForWeapon( int w )	{
 	else if ( w == WP_INTERVENTION )	return 7;
 	else if ( w == WP_CROSSBOW )    	return 1;
 	else if ( w == WP_ACR )   			 	return 30;
+	//else if ( w == WP_WALTHER )   	 	return 10;
 	else return 0;
 }
 

@@ -1162,6 +1162,14 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_ACR );
 	client->clipammo[WP_ACR] = 30;
 	client->ps.ammo[WP_ACR] = 30;
+	
+	/*client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_BOMB );
+	client->clipammo[WP_BOMB] = 1;
+	client->ps.ammo[WP_BOMB] = 0;*/
+	
+	/*client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_WALTHER );
+	client->clipammo[WP_WALTHER] = 10;
+	client->ps.ammo[WP_WALTHER] = 20;*/
 
 	// health will count down towards max_health
 	//ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] + 25;

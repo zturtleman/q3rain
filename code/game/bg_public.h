@@ -192,7 +192,6 @@ void Pmove (pmove_t *pmove);
 
 //===================================================================================
 
-
 // player_state->stats[] indexes
 // NOTE: may not have more than 16
 typedef enum {
@@ -293,6 +292,8 @@ typedef enum {
 
 typedef enum {
 	WP_NONE,
+	
+	WP_BOMB,
 
 	WP_KNIFE,
 	WP_HE,
@@ -300,6 +301,8 @@ typedef enum {
 	WP_INTERVENTION,
 	WP_CROSSBOW,
 	WP_ACR,
+	//WP_WALTHER,
+	
 	
 	// TODO remove
 	WP_GAUNTLET,
@@ -413,10 +416,8 @@ typedef enum {
 	EV_DEATH2,
 	EV_DEATH3,
 	EV_OBITUARY,
-
-	EV_POWERUP_QUAD,
-	EV_POWERUP_BATTLESUIT,
-	EV_POWERUP_REGEN,
+	
+	EV_POWERUP_DIVESUIT,
 
 	EV_GIB_PLAYER,			// gib a previously living player
 	EV_SCOREPLUM,			// score plum
@@ -582,6 +583,7 @@ typedef enum {
 	MOD_INTERVENTION,
 	MOD_CROSSBOW,
 	MOD_ACR,
+	MOD_WALTHER,
 	// env
 	MOD_WATER,
 	MOD_SLIME,
@@ -686,8 +688,6 @@ typedef enum {
 							// by setting eType to ET_EVENTS + eventNum
 							// this avoids having to set eFlags and eventNum
 } entityType_t;
-
-
 
 void	BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result );
 void	BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result );

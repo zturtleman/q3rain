@@ -224,14 +224,16 @@ static void CG_Obituary( entityState_t *ent ) {
 		case MOD_ACR:
 			message = "was pinned down by";
 			break;
+		case MOD_WALTHER:
+			message = "was shot by";
+			break;
 		default:
 			message = "was killed by";
 			break;
 		}
 
 		if (message) {
-			CG_Printf( "%s %s %s%s\n", 
-				targetName, message, attackerName, message2);
+			CG_Printf( "%s %s %s%s\n", targetName, message, attackerName, message2);
 			return;
 		}
 	}
@@ -279,6 +281,7 @@ static void CG_UseItem( centity_t *cent ) {
 	case HI_BOMB:
 		clientNum = cent->currentState.clientNum;
 		if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
+		  // boom goes here
 		}
 		break;
 	}
@@ -296,10 +299,8 @@ static void CG_ItemPickup( int itemNum ) {
 	cg.itemPickup = itemNum;
 	cg.itemPickupTime = cg.time;
 	cg.itemPickupBlendTime = cg.time;
-	// see if it should be the grabbed weapon
 	if ( bg_itemlist[itemNum].giType == IT_WEAPON ) {
-		// select it immediately
-		if ( cg_autoswitch.integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN ) {
+		if (cg_autoswitch.integer) {
 			cg.weaponSelectTime = cg.time;
 			cg.weaponSelect = bg_itemlist[itemNum].giTag;
 		}
@@ -423,7 +424,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landSound );
 		if ( clientNum == cg.predictedPlayerState.clientNum ) {
 			// smooth landing z changes
-			cg.landChange = -8;
+			cg.landChange = -16;
 			cg.landTime = cg.time;
 		}
 		break;
@@ -433,7 +434,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound( NULL, es->number, CHAN_VOICE, CG_CustomSound( es->number, "*pain100_1.wav" ) );
 		if ( clientNum == cg.predictedPlayerState.clientNum ) {
 			// smooth landing z changes
-			cg.landChange = -16;
+			cg.landChange = -24;
 			cg.landTime = cg.time;
 		}
 		break;
@@ -443,7 +444,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		cent->pe.painTime = cg.time;	// don't play a pain sound right after this
 		if ( clientNum == cg.predictedPlayerState.clientNum ) {
 			// smooth landing z changes
-			cg.landChange = -24;
+			cg.landChange = -32;
 			cg.landTime = cg.time;
 		}
 		break;
@@ -728,7 +729,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_RAILTRAIL");
 		cent->currentState.weapon = WP_RAILGUN;
 		
-		if(es->clientNum == cg.snap->ps.clientNum && !cg.renderingThirdPerson)
+		if (es->clientNum == cg.snap->ps.clientNum && !cg.renderingThirdPerson)
 		{
 			if(cg_drawGun.integer == 2)
 				VectorMA(es->origin2, 8, cg.refdef.viewaxis[1], es->origin2);
@@ -748,7 +749,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_BULLET_HIT_WALL:
 		DEBUGNAME("EV_BULLET_HIT_WALL");
 		ByteToDir( es->eventParm, dir );
-		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD );
+		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD);
 		break;
 
 	case EV_BULLET_HIT_FLESH:
@@ -813,29 +814,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	//
 	// powerup events
 	//
-	case EV_POWERUP_QUAD:
-		DEBUGNAME("EV_POWERUP_QUAD");
-		if ( es->number == cg.snap->ps.clientNum ) {
-			cg.powerupActive = PW_QUAD;
-			cg.powerupTime = cg.time;
-		}
-		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.quadSound );
-		break;
-	case EV_POWERUP_BATTLESUIT:
-		DEBUGNAME("EV_POWERUP_BATTLESUIT");
-		if ( es->number == cg.snap->ps.clientNum ) {
-			cg.powerupActive = PW_BATTLESUIT;
-			cg.powerupTime = cg.time;
-		}
-		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.protectSound );
-		break;
-	case EV_POWERUP_REGEN:
-		DEBUGNAME("EV_POWERUP_REGEN");
-		if ( es->number == cg.snap->ps.clientNum ) {
-			cg.powerupActive = PW_REGEN;
-			cg.powerupTime = cg.time;
-		}
-		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.regenSound );
+	case EV_POWERUP_DIVESUIT:
+		DEBUGNAME("EV_POWERUP_DIVESUIT");
 		break;
 
 	case EV_GIB_PLAYER:

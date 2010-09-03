@@ -428,6 +428,21 @@ gitem_t	bg_itemlist[] =
 /* sounds */ ""
 	},
 
+/*QUAKED weapon_walther (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*//*
+	{
+		"weapon_walther", 
+		"sound/misc/w_pkup.wav",
+    { "models/weapons2/railgun/railgun.md3", NULL, NULL, NULL},
+    "icons/iconw_machinegun",
+    "Walther P22",
+		10,
+		IT_WEAPON,
+		WP_WALTHER,
+    "",
+    ""
+	},*/
+
 /*QUAKED weapon_he (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -440,6 +455,22 @@ gitem_t	bg_itemlist[] =
 		2,
 		IT_WEAPON,
 		WP_HE,
+/* precache */ "",
+/* sounds */ "sound/weapons/grenade/hgrenb1a.wav sound/weapons/grenade/hgrenb2a.wav"
+	},
+
+/*QUAKED weapon_bomb (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*/
+	{
+		"weapon_bomb",
+		"sound/misc/w_pkup.wav",
+        { "models/weapons2/grenadel/grenadel.md3", 
+		NULL, NULL, NULL},
+/* icon */		"icons/iconw_grenade",
+/* pickup */	"C4",
+		1,
+		IT_WEAPON,
+		WP_BOMB,
 /* precache */ "",
 /* sounds */ "sound/weapons/grenade/hgrenb1a.wav sound/weapons/grenade/hgrenb2a.wav"
 	},

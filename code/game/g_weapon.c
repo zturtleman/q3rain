@@ -101,13 +101,6 @@ qboolean CheckGauntletAttack( gentity_t *ent ) {
 		return qfalse;
 	}
 
-	if (ent->client->ps.powerups[PW_QUAD] ) {
-		G_AddEvent( ent, EV_POWERUP_QUAD, 0 );
-		s_quadFactor = g_quadfactor.value;
-	} else {
-		s_quadFactor = 1;
-	}
-
 	damage = 50;
 	G_Damage( traceEnt, ent, ent, forward, tr.endpos,
 		damage, 0, MOD_GAUNTLET );
@@ -829,6 +822,95 @@ void Weapon_Crossbow_Fire (gentity_t *ent) {
 
 /*
 ===============
+Weapon_Walther_Fire
+
+===============
+*/
+#define WALTHER_RANGE 8192
+#define WALTHER_DAMAGE 40
+void Weapon_Walther_Fire (gentity_t *ent) {
+	trace_t		tr;
+	vec3_t		end;
+	float		r;
+	float		u;
+	gentity_t	*tent;
+	gentity_t	*traceEnt;
+	int			i, passent;
+	
+	VectorMA (muzzle, WALTHER_RANGE, forward, end);
+	passent = ent->s.number;
+	trap_Trace (&tr, muzzle, NULL, NULL, end, ENTITYNUM_NONE, MASK_SHOT);
+	if ( tr.surfaceFlags & SURF_NOIMPACT ) {
+		return;
+	}
+	traceEnt = &g_entities[ tr.entityNum ];
+	SnapVectorTowards( tr.endpos, muzzle );
+	// send bullet impact
+	if ( traceEnt->takedamage && traceEnt->client ) {
+		tent = G_TempEntity( tr.endpos, EV_BULLET_HIT_FLESH );
+		tent->s.eventParm = traceEnt->s.number;
+		if ( LogAccuracyHit(traceEnt, ent)) {
+			ent->client->accuracy_hits++;
+		}
+	} else {
+		// if we didnt hit anything, dont show hit animation
+		if (tr.fraction >= 1.0f) {
+			return;
+		}
+		tent = G_TempEntity( tr.endpos, EV_BULLET_HIT_WALL);
+		tent->s.eventParm = DirToByte( tr.plane.normal );
+	}
+	tent->s.otherEntityNum = ent->s.number;
+	if ( traceEnt->takedamage) {
+			G_Damage(traceEnt, ent, ent, forward, tr.endpos,	WALTHER_DAMAGE, 0, MOD_WALTHER);
+	}
+}
+
+/*
+===============
+Weapon_Bomb_Explode
+
+===============
+*/
+void Weapon_Bomb_Explode( gentity_t *ent) {
+  trap_SendServerCommand(ent-g_entities, va("print \"^1boom. ._.\n\""));
+  Com_Printf("^1bomb explode\n");
+}
+
+/*
+===============
+Weapon_Bomb_Fire
+
+===============
+*/
+#define BOMB_EXPLODETIME 4000
+
+static vec3_t bombpos;
+
+void Weapon_Bomb_Fire(gentity_t *ent) {
+  gentity_t *bomb;
+  
+  bomb = G_Spawn();
+  bomb->parent = ent;
+  
+  bomb->classname = "bomb";
+  
+  bomb->s.modelindex = G_ModelIndex("models/weapons2/machinegun/machinegun.md3");
+  bomb->model = "models/weapons2/machinegun/machinegun.md3";
+  bomb->s.modelindex2 = G_ModelIndex("models/weapons2/machinegun/machinegun.md3");
+  
+  VectorSet(bomb->r.mins, -15, -15, -15 );
+  VectorSet(bomb->r.maxs, 30, 30, 30);
+  
+  bomb->think = Weapon_Bomb_Explode;
+  bomb->nextthink = level.time + BOMB_EXPLODETIME;
+  G_SetOrigin(bomb, bombpos ); // sets where the bomb is
+  trap_LinkEntity(bomb);
+  trap_SendServerCommand(ent-g_entities, va("print \"Bomb planted at %f %f %f \n\"",ent->r.currentOrigin[0],ent->r.currentOrigin[1],ent->r.currentOrigin[2]));
+}
+
+/*
+===============
 FireWeapon
 ===============
 */
@@ -876,6 +958,12 @@ void FireWeapon( gentity_t *ent ) {
 	case WP_ACR:
 		Weapon_ACR_Fire(ent);
 		break;
+	case WP_BOMB:
+		Weapon_Bomb_Fire(ent);
+		break;
+	/*case WP_WALTHER:
+		Weapon_Walther_Fire(ent);
+		break;*/
 	// end rain weapons
 	// TODO remove
 	/*case WP_GAUNTLET:
