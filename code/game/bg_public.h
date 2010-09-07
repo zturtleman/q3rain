@@ -94,6 +94,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
 #endif
 
+#define PLAYERSPEED 360
+
 typedef enum {
 	GT_FFA,				// free for all
 	GT_SINGLE_PLAYER,	// single player
@@ -192,6 +194,7 @@ void Pmove (pmove_t *pmove);
 
 //===================================================================================
 
+
 // player_state->stats[] indexes
 // NOTE: may not have more than 16
 typedef enum {
@@ -252,6 +255,8 @@ typedef enum {
 #define EF_AWARD_DENIED		0x00040000		// denied
 #define EF_TEAMVOTED		0x00080000		// already cast a team vote
 
+#define ADRENALINE_TIME 5000
+
 // NOTE: may not have more than 16
 typedef enum {
 	PW_NONE,
@@ -276,6 +281,7 @@ typedef enum {
 	// end remove
 	
 	PW_DIVESUIT,
+	PW_ADRENALINE,
 
 	PW_NUM_POWERUPS
 
@@ -292,8 +298,6 @@ typedef enum {
 
 typedef enum {
 	WP_NONE,
-	
-	WP_BOMB,
 
 	WP_KNIFE,
 	WP_HE,
@@ -301,8 +305,8 @@ typedef enum {
 	WP_INTERVENTION,
 	WP_CROSSBOW,
 	WP_ACR,
-	//WP_WALTHER,
-	
+	WP_WALTHER,
+	WP_BOMB,
 	
 	// TODO remove
 	WP_GAUNTLET,
@@ -416,8 +420,10 @@ typedef enum {
 	EV_DEATH2,
 	EV_DEATH3,
 	EV_OBITUARY,
-	
-	EV_POWERUP_DIVESUIT,
+
+	EV_POWERUP_QUAD,
+	EV_POWERUP_BATTLESUIT,
+	EV_POWERUP_REGEN,
 
 	EV_GIB_PLAYER,			// gib a previously living player
 	EV_SCOREPLUM,			// score plum
@@ -688,6 +694,8 @@ typedef enum {
 							// by setting eType to ET_EVENTS + eventNum
 							// this avoids having to set eFlags and eventNum
 } entityType_t;
+
+
 
 void	BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result );
 void	BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result );

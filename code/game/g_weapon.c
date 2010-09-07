@@ -101,6 +101,13 @@ qboolean CheckGauntletAttack( gentity_t *ent ) {
 		return qfalse;
 	}
 
+	if (ent->client->ps.powerups[PW_QUAD] ) {
+		G_AddEvent( ent, EV_POWERUP_QUAD, 0 );
+		s_quadFactor = g_quadfactor.value;
+	} else {
+		s_quadFactor = 1;
+	}
+
 	damage = 50;
 	G_Damage( traceEnt, ent, ent, forward, tr.endpos,
 		damage, 0, MOD_GAUNTLET );
@@ -823,7 +830,6 @@ void Weapon_Crossbow_Fire (gentity_t *ent) {
 /*
 ===============
 Weapon_Walther_Fire
-
 ===============
 */
 #define WALTHER_RANGE 8192
@@ -868,49 +874,6 @@ void Weapon_Walther_Fire (gentity_t *ent) {
 
 /*
 ===============
-Weapon_Bomb_Explode
-
-===============
-*/
-void Weapon_Bomb_Explode( gentity_t *ent) {
-  trap_SendServerCommand(ent-g_entities, va("print \"^1boom. ._.\n\""));
-  Com_Printf("^1bomb explode\n");
-}
-
-/*
-===============
-Weapon_Bomb_Fire
-
-===============
-*/
-#define BOMB_EXPLODETIME 4000
-
-static vec3_t bombpos;
-
-void Weapon_Bomb_Fire(gentity_t *ent) {
-  gentity_t *bomb;
-  
-  bomb = G_Spawn();
-  bomb->parent = ent;
-  
-  bomb->classname = "bomb";
-  
-  bomb->s.modelindex = G_ModelIndex("models/weapons2/machinegun/machinegun.md3");
-  bomb->model = "models/weapons2/machinegun/machinegun.md3";
-  bomb->s.modelindex2 = G_ModelIndex("models/weapons2/machinegun/machinegun.md3");
-  
-  VectorSet(bomb->r.mins, -15, -15, -15 );
-  VectorSet(bomb->r.maxs, 30, 30, 30);
-  
-  bomb->think = Weapon_Bomb_Explode;
-  bomb->nextthink = level.time + BOMB_EXPLODETIME;
-  G_SetOrigin(bomb, bombpos ); // sets where the bomb is
-  trap_LinkEntity(bomb);
-  trap_SendServerCommand(ent-g_entities, va("print \"Bomb planted at %f %f %f \n\"",ent->r.currentOrigin[0],ent->r.currentOrigin[1],ent->r.currentOrigin[2]));
-}
-
-/*
-===============
 FireWeapon
 ===============
 */
@@ -939,7 +902,6 @@ void FireWeapon( gentity_t *ent ) {
 
 	// fire the specific weapon
 	switch( ent->s.weapon ) {
-	// rain weapons
 	case WP_KNIFE:
 		Weapon_Knife_Fire(ent);
 		break;
@@ -958,44 +920,15 @@ void FireWeapon( gentity_t *ent ) {
 	case WP_ACR:
 		Weapon_ACR_Fire(ent);
 		break;
-	case WP_BOMB:
-		Weapon_Bomb_Fire(ent);
-		break;
-	/*case WP_WALTHER:
+	case WP_WALTHER:
 		Weapon_Walther_Fire(ent);
-		break;*/
-	// end rain weapons
-	// TODO remove
-	/*case WP_GAUNTLET:
-		Weapon_Gauntlet( ent );
+		ent->client->ps.weaponstate = WEAPON_READY;
+		ent->client->fireHeld = qfalse;
+		ent->client->pers.cmd.buttons |= BUTTON_ATTACK;
 		break;
-	case WP_LIGHTNING:
-		Weapon_LightningFire( ent );
+	case WP_BOMB:
+	  Com_Printf("^3FireWeapon: ent->s.weapon == WP_BOMB: ^1STUB!\n");
 		break;
-	case WP_SHOTGUN:
-		weapon_supershotgun_fire( ent );
-		break;
-	case WP_MACHINEGUN:
-		Bullet_Fire( ent, MACHINEGUN_SPREAD, MACHINEGUN_DAMAGE );
-		break;
-	case WP_GRENADE_LAUNCHER:
-		weapon_grenadelauncher_fire( ent );
-		break;
-	case WP_ROCKET_LAUNCHER:
-		Weapon_RocketLauncher_Fire( ent );
-		break;
-	case WP_PLASMAGUN:
-		Weapon_Plasmagun_Fire( ent );
-		break;
-	case WP_RAILGUN:
-		weapon_railgun_fire( ent, 0 ); // added parameter WALLSHOTS
-		break;
-	case WP_BFG:
-		BFG_Fire( ent );
-		break;
-	case WP_GRAPPLING_HOOK:
-		Weapon_GrapplingHook_Fire( ent );
-		break;*/
 	default:
 // FIXME		G_Error( "Bad ent->s.weapon" );
 		break;

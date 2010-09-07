@@ -331,7 +331,8 @@ static void PM_LadderMove( void ) {
 		wishvel[1] = 0;
 		wishvel[2] = 0;
 	} else {   // if they're trying to move... lets calculate it
-		for (i = 0 ; i < 3 ; i++) {
+		for (i=0 ; i<3 ; i++) {
+			//wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
 			wishvel[i] = pml.right[i]*pm->cmd.rightmove;
 		}
 		if (pm->cmd.upmove) {
@@ -392,7 +393,7 @@ void CheckLadder( void )
 ================
 PM_SetMovementDir
 
-Determine the rotation of the legs relative
+Determine the rotation of the legs reletive
 to the facing dir
 ================
 */
@@ -704,17 +705,25 @@ PM_WallClimb
 =============
 */
 static void PM_WallClimb( void ) {
+  int boost;
 
 	pml.groundPlane = qfalse;
 	pml.walking = qfalse;
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
+	
+	boost = WALLCLIMB_BOOST;
+	if (pm->ps->speed < PLAYERSPEED) {
+	  boost /= 2;
+	}
 
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
-	pm->ps->velocity[2] += WALLCLIMB_BOOST;
-	if (pm->ps->velocity[2] > WALLCLIMB_BOOST) {
-		pm->ps->velocity[2] = WALLCLIMB_BOOST;
-	} else if (pm->ps->velocity[2] < WALLCLIMB_BOOST/1.5) {
-		pm->ps->velocity[2] = WALLCLIMB_BOOST/1.5;
+	pm->ps->velocity[2] += boost;
+	if (pm->ps->velocity[2] > boost) {
+		pm->ps->velocity[2] = boost;
+	} else if (pm->ps->velocity[2] < boost/2) {
+	  if (pm->ps->velocity[2] >= boost/4) {
+		  pm->ps->velocity[2] = boost/2;
+    }
 	}
 	PM_AddEvent( EV_JUMP );
 
@@ -1154,18 +1163,22 @@ static void PM_CrashLand( void ) {
 	if ( delta < 1 ) {
 		return;
 	}
-	
-  if ( !(pml.groundTrace.surfaceFlags & SURF_NODAMAGE))  {
-    if ( delta > 50 ) {
-      PM_AddEvent( EV_FALL_FAR );
-    } else if ( delta > 30 ) {
-      PM_AddEvent( EV_FALL_MEDIUM );
-    } else if ( delta > 10 ) {
-      PM_AddEvent( EV_FALL_SHORT );
-    } else {
-      PM_AddEvent( PM_FootstepForSurface() );
-    }
-  }
+
+	// create a local entity event to play the sound
+
+	// SURF_NODAMAGE is used for bounce pads where you don't ever
+	// want to take damage or play a crunch sound
+	if ( !(pml.groundTrace.surfaceFlags & SURF_NODAMAGE) )  {
+		if ( delta > 50 ) {
+			PM_AddEvent( EV_FALL_FAR );
+		} else if ( delta > 30 ) {
+			PM_AddEvent( EV_FALL_MEDIUM );
+		} else if ( delta > 10 ) {
+			PM_AddEvent( EV_FALL_SHORT );
+		} else {
+			PM_AddEvent( PM_FootstepForSurface() );
+		}
+	}
 
 	// start footstep cycle over
 	pm->ps->bobCycle = 0;
@@ -1337,7 +1350,8 @@ static void PM_GroundTrace( void ) {
 	pml.walking = qtrue;
 
 	// hitting solid ground will end a waterjump
-	if (pm->ps->pm_flags & PMF_TIME_WATERJUMP) {
+	if (pm->ps->pm_flags & PMF_TIME_WATERJUMP)
+	{
 		pm->ps->pm_flags &= ~(PMF_TIME_WATERJUMP | PMF_TIME_LAND);
 		pm->ps->pm_time = 0;
 	}
@@ -1821,9 +1835,9 @@ static void PM_Weapon( void ) {
 	case WP_ACR:
 		addTime = 125;
 		break;
-	/*case WP_WALTHER:
+	case WP_WALTHER:
 		addTime = 100;
-		break;*/
+		break;
 	}
 
 	pm->ps->weaponTime += addTime;

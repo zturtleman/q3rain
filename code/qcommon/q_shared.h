@@ -1024,6 +1024,8 @@ typedef struct playerState_s {
 	
 	// RAIN wallclimbs
 	int wallclimbs;
+	
+	int legsfactor;
 
 	vec3_t		origin;
 	vec3_t		velocity;

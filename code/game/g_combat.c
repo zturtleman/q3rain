@@ -618,11 +618,11 @@ int G_LocationDamage(vec3_t point, gentity_t* targ, gentity_t* attacker, int tak
 			break;
 		case LOCATION_LEG:
 			take *= 0.7;
-			targ->client->ps.speed = 180; //LEGSHOTS
+			targ->client->ps.legsfactor = 2.5; //LEGSHOTS
 			break;
 		case LOCATION_FOOT:
 			take *= 0.5;
-			targ->client->ps.speed = 180;
+			targ->client->ps.legsfactor = 2.3;
 			break;
 
 		}

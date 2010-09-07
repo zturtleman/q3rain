@@ -270,6 +270,10 @@ void Cmd_Give_f (gentity_t *ent)
 		ent->client->ps.persistant[PERS_ASSIST_COUNT]++;
 		return;
 	}
+	if (Q_stricmp(name, "adrenaline") == 0) {
+		ent->client->ps.powerups[PW_ADRENALINE] = level.time + ADRENALINE_TIME;
+		return;
+	}
 
 	// spawn a specific item right on the player
 	if ( !give_all ) {
@@ -1592,17 +1596,12 @@ void Cmd_Reload( gentity_t *ent )	{
 	ent->client->ps.weaponstate = WEAPON_RELOADING;
 	ent->client->ps.torsoAnim = ( ( ent->client->ps.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT )	| TORSO_DROP;
 	
-	
-	/*if (ent->client->clipammo[weapon] > 0)	{
-			ammotoadd -= ent->client->clipammo[weapon];
-	}*/
-	
 	// RELOADINGTIME
 	switch (weapon) {
-		case WP_SHOTGUN:
+		/*case WP_SHOTGUN:
 			ent->client->ps.weaponTime += 500;//*ammotoadd;
 			ammotoadd = 1;
-			break;
+			break;*/
 		default:
 			ent->client->ps.weaponTime += 2000;
 	}
@@ -1633,7 +1632,7 @@ int ClipAmountForWeapon( int w )	{
 	else if ( w == WP_INTERVENTION )	return 7;
 	else if ( w == WP_CROSSBOW )    	return 1;
 	else if ( w == WP_ACR )   			 	return 30;
-	//else if ( w == WP_WALTHER )   	 	return 10;
+	else if ( w == WP_WALTHER )   		return 10;
 	else return 0;
 }
 

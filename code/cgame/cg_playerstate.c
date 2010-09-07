@@ -35,15 +35,15 @@ If the ammo has gone low enough to generate the warning, play a sound
 ==============
 */
 void CG_CheckAmmo( void ) {
-	int		i;
+	/*int		i;
 	int		total;
 	int		previous;
-	int		weapons;
+	int		weapons;*/
 	
 	return; // annoying warning :)
 
 	// see about how many seconds of ammo we have remaining
-	weapons = cg.snap->ps.stats[ STAT_WEAPONS ];
+	/*weapons = cg.snap->ps.stats[ STAT_WEAPONS ];
 	total = 0;
 	for ( i = WP_MACHINEGUN ; i < WP_NUM_WEAPONS ; i++ ) {
 		if ( ! ( weapons & ( 1 << i ) ) ) {
@@ -77,7 +77,7 @@ void CG_CheckAmmo( void ) {
 	// play a sound on transitions
 	if ( cg.lowAmmoWarning != previous ) {
 		trap_S_StartLocalSound( cgs.media.noAmmoSound, CHAN_LOCAL_SOUND );
-	}
+	}*/
 }
 
 /*

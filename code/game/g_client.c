@@ -1051,14 +1051,11 @@ void ClientSpawn(gentity_t *ent) {
 						spawn_origin, spawn_angles);
 	}	else {
 		// the first spawn should be at a good looking spot
-		if ( !client->pers.initialSpawn && client->pers.localClient )
-		{
+		if ( !client->pers.initialSpawn && client->pers.localClient ) {
 			client->pers.initialSpawn = qtrue;
 			spawnPoint = SelectInitialSpawnPoint(spawn_origin, spawn_angles,
 							     !!(ent->r.svFlags & SVF_BOT));
-		}
-		else
-		{
+		} else {
 			// don't spawn near existing origin if possible
 			spawnPoint = SelectSpawnPoint ( 
 				client->ps.origin, 
@@ -1136,9 +1133,9 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.clientNum = index;
 	
 	// EXAMPLE
-	//client->ps.stats[STAT_WEAPONS] |= ( 1 << WEAPON );
-	//client->clipammo[WEAPON] = <size of clip>;
-	//client->ps.ammo[WEAPON] = <additional ammo>;
+	//client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_ );
+	//client->clipammo[WP_] = <size of clip>;
+	//client->ps.ammo[WP_] = <additional ammo>;
 
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_KNIFE );
 	client->ps.ammo[WP_KNIFE] = -1;
@@ -1163,20 +1160,17 @@ void ClientSpawn(gentity_t *ent) {
 	client->clipammo[WP_ACR] = 30;
 	client->ps.ammo[WP_ACR] = 30;
 	
-	/*client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_BOMB );
-	client->clipammo[WP_BOMB] = 1;
-	client->ps.ammo[WP_BOMB] = 0;*/
-	
-	/*client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_WALTHER );
+	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_WALTHER );
 	client->clipammo[WP_WALTHER] = 10;
-	client->ps.ammo[WP_WALTHER] = 20;*/
+	client->ps.ammo[WP_WALTHER] = 20;
 
 	// health will count down towards max_health
 	//ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] + 25;
 	ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH];
 	
 	// restore legshot speed
-	client->ps.speed = g_speed.value;
+	client->ps.speed = PLAYERSPEED;
+	client->ps.legsfactor = 1;
 
 	G_SetOrigin( ent, spawn_origin );
 	VectorCopy( spawn_origin, client->ps.origin );
@@ -1299,7 +1293,7 @@ void ClientDisconnect( int clientNum ) {
 	trap_UnlinkEntity (ent);
 	ent->s.modelindex = 0;
 	ent->inuse = qfalse;
-	ent->classname = "ragequitted :)";
+	ent->classname = "disconnected";
 	ent->client->pers.connected = CON_DISCONNECTED;
 	ent->client->ps.persistant[PERS_TEAM] = TEAM_FREE;
 	ent->client->sess.sessionTeam = TEAM_FREE;

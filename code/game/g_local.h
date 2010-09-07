@@ -411,6 +411,7 @@ typedef struct {
 void ThrowWeapon( gentity_t *ent );
 gentity_t *dropWeapon( gentity_t *ent, gitem_t *item, float angle, int xr_flags );  // XRAY FMJ
 
+
 //
 // g_spawn.c
 //

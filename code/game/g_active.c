@@ -392,9 +392,27 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 	while ( client->timeResidual >= 1000 ) {
 		client->timeResidual -= 1000;
-		if ( ent->health > client->ps.stats[STAT_MAX_HEALTH] ) {
-			ent->health = 100;
+
+		if ( client->ps.powerups[PW_REGEN] ) {
+			if ( ent->health < client->ps.stats[STAT_MAX_HEALTH]) {
+				ent->health += 15;
+				if ( ent->health > client->ps.stats[STAT_MAX_HEALTH] * 1.1 ) {
+					ent->health = client->ps.stats[STAT_MAX_HEALTH] * 1.1;
+				}
+				G_AddEvent( ent, EV_POWERUP_REGEN, 0 );
+			} else if ( ent->health < client->ps.stats[STAT_MAX_HEALTH] * 2) {
+				ent->health += 5;
+				if ( ent->health > client->ps.stats[STAT_MAX_HEALTH] * 2 ) {
+					ent->health = client->ps.stats[STAT_MAX_HEALTH] * 2;
+				}
+				G_AddEvent( ent, EV_POWERUP_REGEN, 0 );
+			}
+		} else {
+			if ( ent->health > client->ps.stats[STAT_MAX_HEALTH] ) {
+				ent->health = 100;
+			}
 		}
+		
 		if ( client->ps.stats[STAT_ARMOR] > client->ps.stats[STAT_MAX_HEALTH] ) {
 			client->ps.stats[STAT_ARMOR] = 100;
 		}
@@ -435,6 +453,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 	int		event;
 	gclient_t *client;
 	int		damage;
+	int adrenaline;
 	vec3_t	dir;
 	vec3_t	origin, angles;
 //	qboolean	fired;
@@ -446,6 +465,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 	if ( oldEventSequence < client->ps.eventSequence - MAX_PS_EVENTS ) {
 		oldEventSequence = client->ps.eventSequence - MAX_PS_EVENTS;
 	}
+	
 	for ( i = oldEventSequence ; i < client->ps.eventSequence ; i++ ) {
 		event = client->ps.events[ i & (MAX_PS_EVENTS-1) ];
 
@@ -466,7 +486,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				if ( ent->flags & FL_GODMODE ) {
 			    return;
 		    }
-				ent->client->ps.speed = 180;
+				ent->client->ps.legsfactor = 2.5;
 			}
 			VectorSet (dir, 0, 0, 1);
 			ent->pain_debounce_time = level.time + 200;	// no normal pain sound
@@ -528,9 +548,7 @@ void ThrowWeapon( gentity_t *ent )
 	client = ent->client;
 	ucmd = &ent->client->pers.cmd;
 
-	if( client->ps.weapon == WP_GAUNTLET
-		|| client->ps.weapon == WP_GRAPPLING_HOOK
-		|| client->ps.weapon == WP_KNIFE
+	if (client->ps.weapon == WP_KNIFE
 		|| client->ps.weapon == WP_NONE
 		|| ( ucmd->buttons & BUTTON_ATTACK ))
 		return;
@@ -610,6 +628,7 @@ void ClientThink_real( gentity_t *ent ) {
 	pmove_t		pm;
 	int			oldEventSequence;
 	int			msec;
+	int adrenaline;
 	usercmd_t	*ucmd;
 
 	client = ent->client;
@@ -695,15 +714,13 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// set speed
 	//client->ps.speed = g_speed.value; // LEGSHOTS
-
-	if ( client->ps.powerups[PW_HASTE] ) {
-		client->ps.speed *= 1.3;
-	}
-
-	// Let go of the hook if we aren't firing
-	if ( client->ps.weapon == WP_GRAPPLING_HOOK &&
-		client->hook && !( ucmd->buttons & BUTTON_ATTACK ) ) {
-		Weapon_HookFree(client->hook);
+	
+	adrenaline = client->ps.powerups[PW_ADRENALINE] > level.time;
+	
+	if ( adrenaline ) {
+		client->ps.speed = PLAYERSPEED*1.3;
+	} else {
+	  client->ps.speed = PLAYERSPEED/client->ps.legsfactor;
 	}
 
 	// set up for pmove

@@ -224,9 +224,9 @@ static void CG_Obituary( entityState_t *ent ) {
 		case MOD_ACR:
 			message = "was pinned down by";
 			break;
-		case MOD_WALTHER:
+		/*case MOD_WALTHER:
 			message = "was shot by";
-			break;
+			break;*/
 		default:
 			message = "was killed by";
 			break;
@@ -727,7 +727,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_RAILTRAIL:
 		DEBUGNAME("EV_RAILTRAIL");
-		cent->currentState.weapon = WP_RAILGUN;
+		cent->currentState.weapon = WP_NONE;
 		
 		if (es->clientNum == cg.snap->ps.clientNum && !cg.renderingThirdPerson)
 		{
@@ -814,9 +814,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	//
 	// powerup events
 	//
-	case EV_POWERUP_DIVESUIT:
+	/*case EV_POWERUP_DIVESUIT:
 		DEBUGNAME("EV_POWERUP_DIVESUIT");
-		break;
+		break;*/
 
 	case EV_GIB_PLAYER:
 		DEBUGNAME("EV_GIB_PLAYER");
