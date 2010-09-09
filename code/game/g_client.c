@@ -182,7 +182,7 @@ SelectRandomFurthestSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot ) {
+gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot, qboolean istarget, qboolean ispolice, qboolean iscivil) {
 	gentity_t	*spot;
 	vec3_t		delta;
 	float		dist;
@@ -193,30 +193,37 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 	numSpots = 0;
 	spot = NULL;
 
-	while((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
-	{
-		if(SpotWouldTelefrag(spot))
-			continue;
-
-		if(((spot->flags & FL_NO_BOTS) && isbot) ||
-		   ((spot->flags & FL_NO_HUMANS) && !isbot))
-		{
-			// spot is not for this human/bot player
+	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
+		if (SpotWouldTelefrag(spot)) {
 			continue;
 		}
+
+		if (((spot->flags & FL_NO_BOTS) && isbot) || ((spot->flags & FL_NO_HUMANS) && !isbot)) {
+			continue;
+		}
+		
+		if (g_gametype.integer == GT_ASSASSINS) {
+		  if (spot->flags & FL_TARGET_SPAWN &! istarget) {
+		    continue;
+	    }
+		  if (spot->flags & FL_POLICE_SPAWN &! ispolice) {
+		    continue;
+	    }
+		  if (spot->flags & FL_CIVIL_SPAWN &! iscivil) {
+		    continue;
+	    }
+	  }
 
 		VectorSubtract( spot->s.origin, avoidPoint, delta );
 		dist = VectorLength( delta );
 
-		for (i = 0; i < numSpots; i++)
-		{
-			if(dist > list_dist[i])
-			{
-				if (numSpots >= MAX_SPAWN_POINTS)
+		for (i = 0; i < numSpots; i++) {
+			if (dist > list_dist[i]) {
+				if (numSpots >= MAX_SPAWN_POINTS) {
 					numSpots = MAX_SPAWN_POINTS - 1;
+				}
 					
-				for(j = numSpots; j > i; j--)
-				{
+				for (j = numSpots; j > i; j--) {
 					list_dist[j] = list_dist[j-1];
 					list_spot[j] = list_spot[j-1];
 				}
@@ -229,16 +236,14 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 			}
 		}
 		
-		if(i >= numSpots && numSpots < MAX_SPAWN_POINTS)
-		{
+		if (i >= numSpots && numSpots < MAX_SPAWN_POINTS) {
 			list_dist[numSpots] = dist;
 			list_spot[numSpots] = spot;
 			numSpots++;
 		}
 	}
 	
-	if(!numSpots)
-	{
+	if (!numSpots) {
 		spot = G_Find(NULL, FOFS(classname), "info_player_deathmatch");
 
 		if (!spot)
@@ -267,8 +272,8 @@ SelectSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot ) {
-	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, isbot );
+gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot, qboolean istarget, qboolean ispolice, qboolean iscivil) {
+	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, isbot, istarget, ispolice, iscivil);
 
 	/*
 	gentity_t	*spot;
@@ -307,7 +312,7 @@ Try to find a spawn point marked 'initial', otherwise
 use normal spawn selection.
 ============
 */
-gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, qboolean isbot ) {
+gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, qboolean isbot, qboolean istarget, qboolean ispolice, qboolean iscivil) {
 	gentity_t	*spot;
 
 	spot = NULL;
@@ -325,7 +330,7 @@ gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, qboolean isbot
 	}
 
 	if (!spot || SpotWouldTelefrag(spot))
-		return SelectSpawnPoint(vec3_origin, origin, angles, isbot);
+		return SelectSpawnPoint(vec3_origin, origin, angles, isbot, istarget, ispolice, iscivil);
 
 	VectorCopy (spot->s.origin, origin);
 	origin[2] += 9;
@@ -1054,12 +1059,18 @@ void ClientSpawn(gentity_t *ent) {
 		if ( !client->pers.initialSpawn && client->pers.localClient ) {
 			client->pers.initialSpawn = qtrue;
 			spawnPoint = SelectInitialSpawnPoint(spawn_origin, spawn_angles,
-							     !!(ent->r.svFlags & SVF_BOT));
+							     !!(ent->r.svFlags & SVF_BOT),
+							     !!(ent->r.svFlags & SVF_TARGET),
+							     !!(ent->r.svFlags & SVF_POLICE),
+							     !!(ent->r.svFlags & SVF_CIVIL));
 		} else {
 			// don't spawn near existing origin if possible
 			spawnPoint = SelectSpawnPoint ( 
 				client->ps.origin, 
-				spawn_origin, spawn_angles, !!(ent->r.svFlags & SVF_BOT));
+				spawn_origin, spawn_angles, !!(ent->r.svFlags & SVF_BOT),
+						                        !!(ent->r.svFlags & SVF_TARGET),
+						                        !!(ent->r.svFlags & SVF_POLICE),
+						                        !!(ent->r.svFlags & SVF_CIVIL));
 		}
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;

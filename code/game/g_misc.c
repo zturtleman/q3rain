@@ -270,17 +270,17 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 
 	VectorNormalize( dir );
 
-	/*switch ( ent->s.weapon ) {
-	case WP_GRENADE_LAUNCHER:
-		fire_grenade( ent, ent->s.origin, dir );
+	switch ( ent->s.weapon ) {
+	case WP_HE:
+		fire_he( ent, ent->s.origin, dir );
 		break;
-	case WP_ROCKET_LAUNCHER:
+	/*case WP_ROCKET_LAUNCHER:
 		fire_rocket( ent, ent->s.origin, dir );
 		break;
 	case WP_PLASMAGUN:
 		fire_plasma( ent, ent->s.origin, dir );
-		break;
-	}*/
+		break;*/
+	}
 
 	G_AddEvent( ent, EV_FIRE_WEAPON, 0 );
 }

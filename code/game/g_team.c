@@ -895,13 +895,13 @@ SelectCTFSpawnPoint
 
 ============
 */
-gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot ) {
+gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot, qboolean istarget, qboolean ispolice, qboolean iscivil) {
 	gentity_t	*spot;
 
 	spot = SelectRandomTeamSpawnPoint ( teamstate, team );
 
 	if (!spot) {
-		return SelectSpawnPoint( vec3_origin, origin, angles, isbot );
+		return SelectSpawnPoint( vec3_origin, origin, angles, isbot, istarget, ispolice, iscivil);
 	}
 
 	VectorCopy (spot->s.origin, origin);

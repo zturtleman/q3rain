@@ -47,6 +47,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define SVF_CAPSULE				0x00000400	// use capsule for collision detection instead of bbox
 #define SVF_NOTSINGLECLIENT		0x00000800	// send entity to everyone but one client
 											// (entityShared_t->singleClient)
+#define SVF_TARGET 0x00001600
+#define SVF_POLICE 0x00003200
+#define SVF_CIVIL  0x00006400
 
 
 

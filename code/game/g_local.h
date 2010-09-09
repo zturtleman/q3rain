@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	BASEGAME
 
-#define BODY_QUEUE_SIZE		8
+#define BODY_QUEUE_SIZE		64
 
 #define INFINITE			1000000
 
@@ -52,6 +52,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define FL_NO_HUMANS			0x00004000	// spawn point just for bots
 #define FL_FORCE_GESTURE		0x00008000	// force gesture on client
 #define FL_THROWN_ITEM		0x00016000  // XRAY FMJ weapon throwing WEAPONDROP
+#define FL_TARGET_SPAWN   0x00032000
+#define FL_POLICE_SPAWN   0x00064000
+#define FL_CIVIL_SPAWN   0x00128000
 
 // movers are things like doors, plats, buttons, etc
 typedef enum {
@@ -555,7 +558,7 @@ team_t TeamCount( int ignoreClientNum, int team );
 int TeamLeader( int team );
 team_t PickTeam( int ignoreClientNum );
 void SetClientViewAngle( gentity_t *ent, vec3_t angle );
-gentity_t *SelectSpawnPoint (vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot);
+gentity_t *SelectSpawnPoint (vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot, qboolean istarget, qboolean ispolice, qboolean iscivil);
 void CopyToBodyQue( gentity_t *ent );
 void respawn (gentity_t *ent);
 void BeginIntermission (void);
