@@ -209,6 +209,14 @@ static void CG_Obituary(entityState_t *ent) {
                 message = "tried to invade";
                 message2 = "'s personal space";
                 break;
+            case MOD_HE:
+                message = "was ^1EPICLY PWNT ^7by";
+                message2 = "'s grenade";
+                break;
+            case MOD_HE_SPLASH:
+                message = "didn't see";
+                message2 = "'s grenade";
+                break;
             case MOD_BARRETT:
                 message = "was sniped down by";
                 break;
