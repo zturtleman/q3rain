@@ -140,7 +140,7 @@ int BotValidWeaponNumber(int weaponnum)
 	{
 		//botimport.Print(PRT_ERROR, "weapon number out of range, is %i\n", weaponnum);
 		botimport.Print(PRT_WARNING, "weapon number out of range, is %i\n", weaponnum);
-		weaponnum++;
+		weaponnum = 1;
 		//return qfalse;
 	}
 	return qtrue;

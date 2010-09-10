@@ -133,7 +133,8 @@ typedef enum {
 	WEAPON_DROPPING,
 	WEAPON_FIRING,
 	WEAPON_RELOADING,
-	WEAPON_COCKED
+	WEAPON_COCKED,
+	WEAPON_SEMI,
 } weaponstate_t;
 
 // pmove->pm_flags

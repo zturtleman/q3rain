@@ -1780,11 +1780,13 @@ static void PM_Weapon( void ) {
 
 	// check for fire
 	// if they are pressing attack and their current weapon is the nade launcher
-	if ((pm->cmd.buttons & 1) && (pm->ps->weapon == WP_HE)) {
-		pm->ps->weaponTime = 0;
-		// put it in the "cocked" position
-		pm->ps->weaponstate = WEAPON_COCKED;
-		return;
+	if (pm->cmd.buttons & 1) {
+	  if (pm->ps->weapon == WP_HE) {
+		  pm->ps->weaponTime = 0;
+		  // put it in the "cocked" position
+		  pm->ps->weaponstate = WEAPON_COCKED;
+		  return;
+	  }
 	}
 	// check for fire release
 	// if they aren't pressing attack
@@ -1798,17 +1800,22 @@ static void PM_Weapon( void ) {
 		}
 	}
 	
+	if (pm->ps->weaponstate == WEAPON_SEMI) {
+	  return;
+  }
+	
 	PM_StartTorsoAnim( TORSO_ATTACK );
-
+	
 	pm->ps->weaponstate = WEAPON_FIRING;
 
 	// check for out of ammo
 	// modified for changing ammo from ps->ammo to client->clipammo updated to ps->stats[STAT_AMMO]
-	if ( ! pm->ps->stats[STAT_AMMO] && pm->ps->weapon != WP_KNIFE ) {
+	if (! pm->ps->stats[STAT_AMMO] && pm->ps->weapon != WP_KNIFE) {
 		PM_AddEvent( EV_NOAMMO );
-		pm->ps->weaponTime += 500;
+		pm->ps->weaponTime += 200;
 		return;
 	}
+	
 
 	// fire weapon
 	PM_AddEvent( EV_FIRE_WEAPON );
@@ -1818,7 +1825,7 @@ static void PM_Weapon( void ) {
 		addTime = 100;
 		break;
 	case WP_KNIFE:
-		addTime = 200;
+		addTime = 300;
 		break;
 	case WP_BARRETT:
 		addTime = 4000;
@@ -1836,7 +1843,8 @@ static void PM_Weapon( void ) {
 		addTime = 125;
 		break;
 	case WP_WALTHER:
-		addTime = 100;
+		addTime = 0;
+		pm->ps->weaponstate = WEAPON_SEMI;
 		break;
 	}
 
