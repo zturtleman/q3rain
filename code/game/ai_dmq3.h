@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
-*/
+ */
 //
 
 /*****************************************************************************
@@ -166,8 +166,8 @@ void BotMapScripts(bot_state_t *bs);
 #define SKIN_CIVILTEAM	"civil"
 #define SKIN_TARGETTEAM	"target"
 
-extern int gametype;		//game type
-extern int maxclients;		//maximum number of clients
+extern int gametype; //game type
+extern int maxclients; //maximum number of clients
 
 extern vmCvar_t bot_grapple;
 extern vmCvar_t bot_rocketjump;

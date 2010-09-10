@@ -283,7 +283,7 @@ typedef struct {
 
 // If you want to enable support for Raven's .mdr / md4 format, uncomment the next
 // line.
-//#define RAVENMD4
+#define RAVENMD4
 
 #ifdef RAVENMD4
 
@@ -421,7 +421,7 @@ typedef struct {
 #define	MAX_MAP_BRUSHSIDES	0x20000
 #define	MAX_MAP_LEAFS		0x20000
 #define	MAX_MAP_LEAFFACES	0x20000
-#define	MAX_MAP_LEAFBRUSHES 0x40000
+#define	MAX_MAP_LEAFBRUSHES     0x40000
 #define	MAX_MAP_PORTALS		0x20000
 #define	MAX_MAP_LIGHTING	0x800000
 #define	MAX_MAP_LIGHTGRID	0x800000

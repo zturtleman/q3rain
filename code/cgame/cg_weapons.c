@@ -924,7 +924,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 	vec3_t   forward;
 	vec3_t   muzzlePoint, endPoint;
 	
-	return;
+	return;/*
 
 	memset( &beam, 0, sizeof( beam ) );
 
@@ -1002,7 +1002,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 		angles[2] = rand() % 360;
 		AnglesToAxis( angles, beam.axis );
 		trap_R_AddRefEntityToScene( &beam );
-	}
+	}*/
 }
 /*
 
