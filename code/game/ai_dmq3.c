@@ -426,7 +426,7 @@ void BotCTFSeekGoals(bot_state_t *bs) {
             }
         }
         return;
-    }        //if the enemy has our flag
+    }//if the enemy has our flag
     else if (flagstatus == 2) {
         //
         if (bs->owndecision_time < FloatTime()) {
@@ -466,7 +466,7 @@ void BotCTFSeekGoals(bot_state_t *bs) {
             }
         }
         return;
-    }        //if both flags Not at their bases
+    }//if both flags Not at their bases
     else if (flagstatus == 3) {
         //
         if (bs->owndecision_time < FloatTime()) {
@@ -1527,7 +1527,7 @@ bot_moveresult_t BotAttackMove(bot_state_t *bs, int tfl) {
     if (bs->attackcrouch_time < FloatTime() - 1) {
         if (random() < jumper) {
             movetype = MOVE_JUMP;
-        }            //wait at least one second before crouching again
+        }//wait at least one second before crouching again
         else if (bs->attackcrouch_time < FloatTime() - 1 && random() < croucher) {
             bs->attackcrouch_time = FloatTime() + croucher * 5;
         }
@@ -2165,7 +2165,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
                             dist * 10 / wi.speed, 0.1f, 0, 0, qfalse);
                     VectorCopy(move.endpos, bestorigin);
                     //BotAI_Print(PRT_MESSAGE, "%1.1f predicted speed = %f, frames = %f\n", FloatTime(), VectorLength(dir), dist * 10 / wi.speed);
-                }                    //if not that skilled do linear prediction
+                }//if not that skilled do linear prediction
                 else if (aim_skill > 0.4) {
                     VectorSubtract(entinfo.origin, bs->origin, dir);
                     //distance towards the enemy
@@ -3019,7 +3019,7 @@ int BotGetActivateGoal(bot_state_t *bs, int entitynum, bot_activategoal_t *activ
                 activategoal->time = FloatTime() + t * 0.01 + 5;
             }
             return ent;
-        }            // invisible trigger multiple box
+        }// invisible trigger multiple box
         else if (!strcmp(classname, "trigger_multiple")) {
             //
             if (!BotTriggerMultipleActivateGoal(bs, ent, activategoal))
@@ -3046,7 +3046,7 @@ int BotGetActivateGoal(bot_state_t *bs, int entitynum, bot_activategoal_t *activ
         } else if (!strcmp(classname, "func_timer")) {
             // just skip the func_timer
             continue;
-        }            // the actual button or trigger might be linked through a target_relay or target_delay
+        }// the actual button or trigger might be linked through a target_relay or target_delay
         else if (!strcmp(classname, "target_relay") || !strcmp(classname, "target_delay")) {
             if (trap_AAS_ValueForBSPEpairKey(ent, "targetname", targetname[i + 1], sizeof (targetname[0]))) {
                 i++;
@@ -3388,7 +3388,7 @@ void BotCheckConsoleMessages(bot_state_t *bs) {
                     } else {
                         BotAI_Print(PRT_MESSAGE, "**** no valid reply ****\n");
                     }
-                }                    //if at a valid chat position and not chatting already and not in teamplay
+                }//if at a valid chat position and not chatting already and not in teamplay
                 else if (bs->ainode != AINode_Stand && BotValidChatPosition(bs) && !TeamPlayIsOn()) {
                     chat_reply = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_REPLY, 0, 1);
                     if (random() < 1.5 / (NumBots() + 1) && random() < chat_reply) {
@@ -3469,7 +3469,7 @@ void BotCheckEvents(bot_state_t *bs, entityState_t *state) {
                 else bs->botsuicide = qfalse;
                 //
                 bs->num_deaths++;
-            }                //else if this client was killed by the bot
+            }//else if this client was killed by the bot
             else if (attacker == bs->client) {
                 bs->enemydeathtype = mod;
                 bs->lastkilledplayer = target;

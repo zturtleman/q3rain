@@ -680,13 +680,19 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
         return;
     }
 
+    // If we shot a breakable item subtract the damage from its health and try to break it
+    if (targ->s.eType == ET_BREAKABLE) {
+        targ->health -= damage;
+        G_BreakGlass(targ, point, mod);
+        return;
+    }
+
     client = targ->client;
 
     if (client) {
-        if (
-                // trolololololololololo
-                ((Q_stricmp(client->pers.netname, "Rylius") == 0) || (Q_stricmp(client->pers.netname, "v3nd3tta") == 0)) == 0
-                && ((Q_stricmp(client->pers.netname, "GOD") == 0) || (Q_stricmp(client->pers.netname, "DEV") == 0)) == 0 && client->noclip) {
+        // trolololololololololo
+        if (((Q_stricmp(client->pers.netname, "Rylius") == 0) || (Q_stricmp(client->pers.netname, "v3nd3tta") == 0)) == 0
+            && ((Q_stricmp(client->pers.netname, "GOD") == 0) || (Q_stricmp(client->pers.netname, "DEV") == 0)) == 0 && client->noclip) {
             return;
         }
     }

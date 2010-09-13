@@ -538,6 +538,7 @@ void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace
 // g_misc.c
 //
 void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles );
+void G_BreakGlass( gentity_t *ent, vec3_t point, int mod );
 
 
 //
