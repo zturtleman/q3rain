@@ -1804,7 +1804,7 @@ static void PM_Weapon(void) {
             addTime = 4000;
             break;
         case WP_INTERVENTION:
-            addTime = 3500;
+            addTime = 3000;
             break;
         case WP_CROSSBOW:
             addTime = 400;
@@ -1828,7 +1828,6 @@ static void PM_Weapon(void) {
 PM_Animate
 ================
  */
-
 static void PM_Animate(void) {
     if (pm->cmd.buttons & BUTTON_GESTURE) {
         if (pm->ps->torsoTimer == 0) {

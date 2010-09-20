@@ -73,6 +73,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_INTERVENTION 48
 #define INVENTORY_CROSSBOW 49
 #define INVENTORY_ACR 50
+#define INVENTORY_WALTHER 51
+#define INVENTORY_BOMB 52
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200
 #define ENEMY_HEIGHT				201
@@ -121,11 +123,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODELINDEX_BLUEFLAG			35
 
 // rain
-#define WEAPONINDEX_NONE 0
-#define WEAPONINDEX_KNIFE 1
-#define WEAPONINDEX_HE 2
-#define WEAPONINDEX_BARRETT 3
-#define WEAPONINDEX_INTERVENTION 4
-#define WEAPONINDEX_CROSSBOW 5
-#define WEAPONINDEX_ACR 6
-
+#define WEAPONINDEX_NONE          0
+#define WEAPONINDEX_KNIFE         1
+#define WEAPONINDEX_HE            2
+#define WEAPONINDEX_BARRETT       3
+#define WEAPONINDEX_INTERVENTION  4
+#define WEAPONINDEX_CROSSBOW      5
+#define WEAPONINDEX_ACR           6
+#define WEAPONINDEX_WALTHER       7
+#define WEAPONINDEX_BOMB          8

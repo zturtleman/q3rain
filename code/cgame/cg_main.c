@@ -720,7 +720,7 @@ static void CG_RegisterGraphics(void) {
     cgs.media.gibLeg = trap_R_RegisterModel("models/gibs/leg.md3");
     cgs.media.gibSkull = trap_R_RegisterModel("models/gibs/skull.md3");
     cgs.media.gibBrain = trap_R_RegisterModel("models/gibs/brain.md3");
-    
+
     cgs.media.glass01 = trap_R_RegisterModel("models/weaphits/glass01.md3");
     cgs.media.glass02 = trap_R_RegisterModel("models/weaphits/glass02.md3");
     cgs.media.glass03 = trap_R_RegisterModel("models/weaphits/glass03.md3");
