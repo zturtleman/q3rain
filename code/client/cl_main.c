@@ -2580,7 +2580,7 @@ void CL_Frame(int msec) {
         VM_Call(uivm, UI_SET_ACTIVE_MENU, UIMENU_NEED_CD);
     } else if (cls.authdialog) {
         cls.authdialog = qfalse;
-        VM_Call(uivm, UI_SET_ACTIVE_MENU, UIMENU_NEED_AUTH);
+        VM_Call(uivm, UI_SET_ACTIVE_MENU, UIMENU_AUTH);
     } else if (cls.state == CA_DISCONNECTED && !(Key_GetCatcher() & KEYCATCH_UI)
             && !com_sv_running->integer && uivm) {
         // if disconnected, bring up the menu

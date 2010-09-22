@@ -89,7 +89,8 @@ equ trap_LAN_CompareServers					-86
 equ trap_FS_Seek		-87
 equ trap_SetPbClStatus -88
 
-equ trap_SetAuthData -90
+equ trap_SetAuthNickname -90
+equ trap_SetAuthPassword -91
 
 equ	memset						-101
 equ	memcpy						-102

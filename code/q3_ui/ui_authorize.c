@@ -71,7 +71,9 @@ static void UI_AuthMenu_Event(void *ptr, int event) {
     switch (((menucommon_s*) ptr)->id) {
         case ID_ACCEPT:
             if (authMenuInfo.nickname.field.buffer[0] && authMenuInfo.password.field.buffer[0]) {
-                trap_SetAuthData(authMenuInfo.nickname.field.buffer);// TODO doo eeet
+                //trap_SetAuthNickname(authMenuInfo.nickname.field.buffer);
+                //trap_SetAuthPassword(authMenuInfo.password.field.buffer);
+                // FIXME causes FS errors
             }
             UI_PopMenu();
             break;
@@ -98,6 +100,8 @@ static int UI_AuthMenu_CheckNickname(const char *key) {
         switch (ch) {
             case '^':
                 return 2;
+            case ' ':
+                return 2;
             default:
                 continue;
         }
@@ -112,9 +116,27 @@ UI_AuthMenu_CheckPassword
 ===============
  */
 static int UI_AuthMenu_CheckPassword(const char *key) {
+    char ch;
+
     if (strlen(key) < 4) {
         return 1;
     }
+
+    while ((ch = *key++)) {
+        switch (ch) {
+            case '^':
+                return 2;
+            case '@':
+                return 2;
+            case '"':
+                return 2;
+            case ' ':
+                return 2;
+            default:
+                continue;
+        }
+    }
+
     return 0;
 }
 
@@ -123,6 +145,8 @@ static int UI_AuthMenu_CheckPassword(const char *key) {
 UI_AuthMenu_DrawNickname
 =================
  */
+#define AUTH_LEFT 320-128
+
 static void UI_AuthMenu_DrawNickname(void *self) {
     menufield_s *f;
     qboolean focus;
@@ -143,8 +167,8 @@ static void UI_AuthMenu_DrawNickname(void *self) {
         color = color_orange;
     }
 
-    x = 320 - 8 * BIGCHAR_WIDTH;
-    y = 240 - BIGCHAR_HEIGHT / 2;
+    x = AUTH_LEFT;
+    y = 240 - 16;
     UI_FillRect(x, y, 16 * BIGCHAR_WIDTH, BIGCHAR_HEIGHT, listbar_color);
     UI_DrawString(x, y, f->field.buffer, style, color);
 
@@ -163,17 +187,69 @@ static void UI_AuthMenu_DrawNickname(void *self) {
     }
 
     val = UI_AuthMenu_CheckNickname(f->field.buffer);
-    if (val == 1) {
-        UI_DrawProportionalString(320, 376, "Please enter your nickname", UI_CENTER | UI_SMALLFONT, color_yellow);
-    } else if (val == 0) {
+    if (val == 0) {
         UI_DrawProportionalString(320, 376, "Nickname valid", UI_CENTER | UI_SMALLFONT, color_yellow);
     } else if (val == 1) {
         UI_DrawProportionalString(320, 376, "Nickname too short", UI_CENTER | UI_SMALLFONT, color_red);
     } else if (val == 2) {
         UI_DrawProportionalString(320, 376, "Nickname contains invalid characters", UI_CENTER | UI_SMALLFONT, color_red);
-    } else {
-        UI_DrawProportionalString(320, 376, "Strange stuff is going on...", UI_CENTER | UI_SMALLFONT, color_red);
     }
+
+    UI_DrawProportionalString(320, 240-42, "Nickname:", UI_CENTER | UI_SMALLFONT, color_yellow);
+}
+
+/*
+=================
+UI_AuthMenu_DrawPassword
+=================
+ */
+static void UI_AuthMenu_DrawPassword(void *self) {
+    menufield_s *f;
+    qboolean focus;
+    int style;
+    char c;
+    float *color;
+    int x, y;
+    int val;
+
+    f = (menufield_s *) self;
+
+    focus = (f->generic.parent->cursor == f->generic.menuPosition);
+
+    style = UI_LEFT;
+    if (focus) {
+        color = color_yellow;
+    } else {
+        color = color_orange;
+    }
+
+    x = AUTH_LEFT;
+    y = 240 + 48 - 16;
+    UI_FillRect(x, y, 16 * BIGCHAR_WIDTH, BIGCHAR_HEIGHT, listbar_color);
+    UI_DrawString(x, y, f->field.buffer, style, color);
+
+    // draw cursor if we have focus
+    if (focus) {
+        if (trap_Key_GetOverstrikeMode()) {
+            c = 11;
+        } else {
+            c = 10;
+        }
+
+        style &= ~UI_PULSE;
+        style |= UI_BLINK;
+
+        UI_DrawChar(x + f->field.cursor * BIGCHAR_WIDTH, y, c, style, color_white);
+    }
+
+    val = UI_AuthMenu_CheckPassword(f->field.buffer);
+    if (val == 1) {
+        UI_DrawProportionalString(320, 376 + 32, "Password too short", UI_CENTER | UI_SMALLFONT, color_red);
+    } else if (val == 2) {
+        UI_DrawProportionalString(320, 376 + 32, "Password contains invalid characters", UI_CENTER | UI_SMALLFONT, color_red);
+    }
+
+    UI_DrawProportionalString(320, 248, "Password:", UI_CENTER | UI_SMALLFONT, color_yellow);
 }
 
 /*
@@ -218,21 +294,20 @@ static void UI_AuthMenu_Init(void) {
 
     authMenuInfo.nickname.generic.type = MTYPE_FIELD;
     authMenuInfo.nickname.generic.name = "Nickname:";
-    authMenuInfo.nickname.generic.flags = QMF_LOWERCASE;
-    authMenuInfo.nickname.generic.x = 320 - BIGCHAR_WIDTH * 2.5;
-    authMenuInfo.nickname.generic.y = 240 - BIGCHAR_HEIGHT / 2;
+    authMenuInfo.nickname.generic.x = AUTH_LEFT;
+    authMenuInfo.nickname.generic.y = 240 - 16;
     authMenuInfo.nickname.field.widthInChars = 16;
     authMenuInfo.nickname.field.maxchars = 16;
     authMenuInfo.nickname.generic.ownerdraw = UI_AuthMenu_DrawNickname;
 
     authMenuInfo.password.generic.type = MTYPE_FIELD;
     authMenuInfo.password.generic.name = "Password:";
-    authMenuInfo.password.generic.flags = QMF_LOWERCASE;
-    authMenuInfo.password.generic.x = 320 - BIGCHAR_WIDTH * 2.5;
-    authMenuInfo.password.generic.y = 240 - BIGCHAR_HEIGHT + BIGCHAR_HEIGHT/1.5;
+    authMenuInfo.password.generic.flags = QMF_SILENT;
+    authMenuInfo.password.generic.x = AUTH_LEFT;
+    authMenuInfo.password.generic.y = 240 + 32 - 16;
     authMenuInfo.password.field.widthInChars = 16;
     authMenuInfo.password.field.maxchars = 16;
-    authMenuInfo.password.generic.ownerdraw = UI_AuthMenu_DrawNickname;
+    authMenuInfo.password.generic.ownerdraw = UI_AuthMenu_DrawPassword;
 
     authMenuInfo.accept.generic.type = MTYPE_BITMAP;
     authMenuInfo.accept.generic.name = ART_ACCEPT0;
@@ -265,10 +340,10 @@ static void UI_AuthMenu_Init(void) {
         Menu_AddItem(&authMenuInfo.menu, &authMenuInfo.back);
     }
 
-    trap_GetCDKey(authMenuInfo.nickname.field.buffer, authMenuInfo.nickname.field.maxchars + 1);
+    /*trap_GetCDKey(authMenuInfo.nickname.field.buffer, authMenuInfo.nickname.field.maxchars + 1);
     if (trap_VerifyCDKey(authMenuInfo.nickname.field.buffer, NULL) == qfalse) {
         authMenuInfo.nickname.field.buffer[0] = 0;
-    }
+    }*/
 }
 
 /*

@@ -672,7 +672,8 @@ int trap_MemoryRemaining(void);
 void trap_GetCDKey(char *buf, int buflen);
 void trap_SetCDKey(char *buf);
 // RYLIUS AUTH
-void trap_SetAuthData(char*buf);
+void trap_SetAuthNickname(char*buf);
+void trap_SetAuthPassword(char*buf);
 
 qboolean trap_VerifyCDKey(const char *key, const char *chksum);
 

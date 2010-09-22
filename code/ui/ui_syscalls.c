@@ -406,6 +406,10 @@ void trap_SetPbClStatus(int status) {
 
 // RYLIUS AUTH
 
-void trap_SetAuthData(char *buf) {
-    syscall(UI_SET_AUTHDATA, buf);
+void trap_SetAuthNickname(char *buf) {
+    syscall(UI_SET_AUTHNICK, buf);
+}
+
+void trap_SetAuthPassword(char *buf) {
+    syscall(UI_SET_AUTHPASS, buf);
 }

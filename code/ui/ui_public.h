@@ -118,7 +118,9 @@ typedef enum {
     UI_R_REMAP_SHADER,
     UI_VERIFY_CDKEY,
     // RYLIUS AUTH
-    UI_SET_AUTHDATA,
+    UI_SET_AUTHNICK,
+    UI_SET_AUTHPASS,
+    UI_SENDAUTH,
     UI_LAN_SERVERSTATUS,
     UI_LAN_GETSERVERPING,
     UI_LAN_SERVERISVISIBLE,
@@ -146,14 +148,14 @@ typedef enum {
     UIMENU_BAD_CD_KEY,
     UIMENU_TEAM,
     UIMENU_POSTGAME,
-    UIMENU_NEED_AUTH
+    UIMENU_AUTH
 } uiMenuCommand_t;
 
-#define SORT_HOST			0
-#define SORT_MAP			1
+#define SORT_HOST		0
+#define SORT_MAP		1
 #define SORT_CLIENTS		2
-#define SORT_GAME			3
-#define SORT_PING			4
+#define SORT_GAME		3
+#define SORT_PING		4
 #define SORT_PUNKBUSTER		5
 
 typedef enum {
