@@ -308,19 +308,23 @@ void InitShooter(gentity_t *ent, int weapon) {
  */
 void SP_func_breakable(gentity_t *ent) {
     int health;
+    //int type;
+    char *type;
 
     // Make it appear as the brush
     trap_SetBrushModel(ent, ent->model);
     // Lets give it 5 health if the mapper did not set its health
-    G_SpawnInt("health", "0", &health);
+    G_SpawnInt("health", "5", &health);
     if (health <= 0)
         health = 5;
 
+    G_SpawnString("type", "glass", &type);
     ent->health = health;
     // Let it take damage
     ent->takedamage = qtrue;
     // Let it know it is a breakable object
     ent->s.eType = ET_BREAKABLE;
+    ent->message = type;
     // If the mapper gave it a model, use it
     if (ent->model2) {
         ent->s.modelindex2 = G_ModelIndex(ent->model2);
@@ -347,7 +351,6 @@ void G_BreakGlass(gentity_t *ent, vec3_t point, int mod) {
 
     // If the glass has no more life, BREAK IT
     if (ent->health <= 0) {
-        G_FreeEntity(ent);
         // Tell the program based on the gun if it has no splash dmg, no reason to ad ones with
         // splash dmg as qtrue as is that is the default
         splashdmg = qfalse;
@@ -360,12 +363,38 @@ void G_BreakGlass(gentity_t *ent, vec3_t point, int mod) {
         // so I just use the center of the glass
         switch (splashdmg) {
             case qtrue:
-                tent = G_TempEntity(center, EV_BREAK_GLASS);
+                if (!Q_stricmp(ent->message, "glass")) {
+                    tent = G_TempEntity(center, EV_BREAK_GLASS);
+                } else if (!Q_stricmp(ent->message, "flesh")) {
+                    tent = G_TempEntity(center, EV_BREAK_FLESH);
+                } else if (!Q_stricmp(ent->message, "wood")) {
+                    tent = G_TempEntity(center, EV_BREAK_WOOD);
+                } else if (!Q_stricmp(ent->message, "stone")) {
+                    tent = G_TempEntity(center, EV_BREAK_STONE);
+                } else if (!Q_stricmp(ent->message, "metal")) {
+                    tent = G_TempEntity(center, EV_BREAK_METAL);
+                } else {
+                    tent = G_TempEntity(center, EV_BREAK_GLASS);
+                }
                 break;
             case qfalse:
-                tent = G_TempEntity(point, EV_BREAK_GLASS);
+                if (!Q_stricmp(ent->message, "glass")) {
+                    tent = G_TempEntity(point, EV_BREAK_GLASS);
+                } else if (!Q_stricmp(ent->message, "flesh")) {
+                    tent = G_TempEntity(point, EV_BREAK_FLESH);
+                } else if (!Q_stricmp(ent->message, "wood")) {
+                    tent = G_TempEntity(point, EV_BREAK_WOOD);
+                } else if (!Q_stricmp(ent->message, "stone")) {
+                    tent = G_TempEntity(point, EV_BREAK_STONE);
+                } else if (!Q_stricmp(ent->message, "metal")) {
+                    tent = G_TempEntity(point, EV_BREAK_METAL);
+                } else {
+                    tent = G_TempEntity(point, EV_BREAK_GLASS);
+                }
+                break;
                 break;
         }
+        G_FreeEntity(ent);
         tent->s.eventParm = 0;
     }
 }

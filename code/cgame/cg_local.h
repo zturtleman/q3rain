@@ -685,6 +685,8 @@ typedef struct {
     qhandle_t glass02;
     qhandle_t glass03;
 
+    qhandle_t glass;
+
     qhandle_t smoke2;
 
     qhandle_t machinegunBrassModel;
@@ -1306,6 +1308,10 @@ void CG_ScorePlum(int client, vec3_t org, int score);
 
 void CG_GibPlayer(vec3_t playerOrigin);
 void CG_BreakGlass(vec3_t playerOrigin);
+void CG_BreakFlesh(vec3_t playerOrigin);
+void CG_BreakWood(vec3_t playerOrigin);
+void CG_BreakMetal(vec3_t playerOrigin);
+void CG_BreakStone(vec3_t playerOrigin);
 void CG_BigExplode(vec3_t playerOrigin);
 
 void CG_Bleed(vec3_t origin, int entityNum);

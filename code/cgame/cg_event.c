@@ -425,23 +425,26 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
                         cgs.media.footsteps[ FOOTSTEP_SPLASH ][rand()&3]);
             }
             break;
-
-
+        case EV_FALL_MINIMAL:
+            DEBUGNAME("EV_FALL_MINIMAL");
+            trap_S_StartSound(NULL, es->number, CHAN_AUTO, cgs.media.landSound);
+            if (clientNum == cg.predictedPlayerState.clientNum) {
+                cg.landChange = -16;
+                cg.landTime = cg.time;
+            }
+            break;
         case EV_FALL_SHORT:
             DEBUGNAME("EV_FALL_SHORT");
             trap_S_StartSound(NULL, es->number, CHAN_AUTO, cgs.media.landSound);
             if (clientNum == cg.predictedPlayerState.clientNum) {
-                // smooth landing z changes
                 cg.landChange = -16;
                 cg.landTime = cg.time;
             }
             break;
         case EV_FALL_MEDIUM:
             DEBUGNAME("EV_FALL_MEDIUM");
-            // use normal pain sound
-            trap_S_StartSound(NULL, es->number, CHAN_VOICE, CG_CustomSound(es->number, "*pain100_1.wav"));
+            trap_S_StartSound(NULL, es->number, CHAN_AUTO, cgs.media.landSound);
             if (clientNum == cg.predictedPlayerState.clientNum) {
-                // smooth landing z changes
                 cg.landChange = -24;
                 cg.landTime = cg.time;
             }
@@ -449,9 +452,8 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
         case EV_FALL_FAR:
             DEBUGNAME("EV_FALL_FAR");
             trap_S_StartSound(NULL, es->number, CHAN_AUTO, CG_CustomSound(es->number, "*fall1.wav"));
-            cent->pe.painTime = cg.time; // don't play a pain sound right after this
+            cent->pe.painTime = cg.time;
             if (clientNum == cg.predictedPlayerState.clientNum) {
-                // smooth landing z changes
                 cg.landChange = -32;
                 cg.landTime = cg.time;
             }
@@ -836,6 +838,30 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
             // I think the gib sound sounds pretty good
             trap_S_StartSound(NULL, es->number, CHAN_BODY, cgs.media.gibSound);
             CG_BreakGlass(cent->lerpOrigin);
+            break;
+
+        case EV_BREAK_FLESH:
+            DEBUGNAME("EV_BREAK_FLESH");
+            trap_S_StartSound(NULL, es->number, CHAN_BODY, cgs.media.gibSound);
+            CG_BreakFlesh(cent->lerpOrigin);
+            break;
+
+        case EV_BREAK_WOOD:
+            DEBUGNAME("EV_BREAK_WOOD");
+            trap_S_StartSound(NULL, es->number, CHAN_BODY, cgs.media.gibSound);
+            CG_BreakWood(cent->lerpOrigin);
+            break;
+
+        case EV_BREAK_STONE:
+            DEBUGNAME("EV_BREAK_STONE");
+            trap_S_StartSound(NULL, es->number, CHAN_BODY, cgs.media.gibSound);
+            CG_BreakStone(cent->lerpOrigin);
+            break;
+
+        case EV_BREAK_METAL:
+            DEBUGNAME("EV_BREAK_METAL");
+            trap_S_StartSound(NULL, es->number, CHAN_BODY, cgs.media.gibSound);
+            CG_BreakMetal(cent->lerpOrigin);
             break;
 
         case EV_STOPLOOPINGSOUND:

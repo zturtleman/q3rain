@@ -292,14 +292,15 @@ char *BotWeaponNameForMeansOfDeath(int mod) {
         case MOD_LIGHTNING: return "Lightning Gun";
         case MOD_BFG:
         case MOD_BFG_SPLASH: return "BFG10K";
-#ifdef MISSIONPACK
-        case MOD_NAIL: return "Nailgun";
-        case MOD_CHAINGUN: return "Chaingun";
-        case MOD_PROXIMITY_MINE: return "Proximity Launcher";
-        case MOD_KAMIKAZE: return "Kamikaze";
-        case MOD_JUICED: return "Prox mine";
-#endif
         case MOD_GRAPPLE: return "Grapple";
+        case MOD_KNIFE: return "Knife";
+        case MOD_HE: return "Grenade";
+        case MOD_HE_SPLASH: return "Grenade";
+        case MOD_BARRETT: return "Barrett";
+        case MOD_INTERVENTION: return "Intervention";
+        case MOD_CROSSBOW: return "Crossbow";
+        case MOD_ACR: return "ACR";
+        case MOD_WALTHER: return "Walther";
         default: return "[unknown weapon]";
     }
 }
@@ -326,11 +327,6 @@ char *BotRandomWeaponName(void) {
         case 5: return "Plasmagun";
         case 6: return "Railgun";
         case 7: return "Lightning Gun";
-#ifdef MISSIONPACK
-        case 8: return "Nailgun";
-        case 9: return "Chaingun";
-        case 10: return "Proximity Launcher";
-#endif
         default: return "BFG10K";
     }
 }
@@ -591,6 +587,8 @@ int BotChat_Death(bot_state_t *bs) {
             BotAI_BotInitialChat(bs, "death_drown", BotRandomOpponentName(bs), NULL);
         else if (bs->botdeathtype == MOD_SLIME)
             BotAI_BotInitialChat(bs, "death_slime", BotRandomOpponentName(bs), NULL);
+        else if (bs->botdeathtype == MOD_MOOR)
+            BotAI_BotInitialChat(bs, "death_moor", BotRandomOpponentName(bs), NULL);
         else if (bs->botdeathtype == MOD_LAVA)
             BotAI_BotInitialChat(bs, "death_lava", BotRandomOpponentName(bs), NULL);
         else if (bs->botdeathtype == MOD_FALLING)
@@ -605,17 +603,17 @@ int BotChat_Death(bot_state_t *bs) {
         else if (bs->botdeathtype == MOD_TELEFRAG)
             BotAI_BotInitialChat(bs, "death_telefrag", name, NULL);
         else {
-            if ((bs->botdeathtype == MOD_GAUNTLET ||
+            if ((bs->botdeathtype == MOD_KNIFE ||
                     bs->botdeathtype == MOD_RAILGUN ||
                     bs->botdeathtype == MOD_BFG ||
                     bs->botdeathtype == MOD_BFG_SPLASH) && random() < 0.5) {
 
-                if (bs->botdeathtype == MOD_GAUNTLET)
+                if (bs->botdeathtype == MOD_KNIFE)
                     BotAI_BotInitialChat(bs, "death_gauntlet",
                         name, // 0
                         BotWeaponNameForMeansOfDeath(bs->botdeathtype), // 1
                         NULL);
-                else if (bs->botdeathtype == MOD_RAILGUN)
+                else if (bs->botdeathtype == MOD_BARRETT)
                     BotAI_BotInitialChat(bs, "death_rail",
                         name, // 0
                         BotWeaponNameForMeansOfDeath(bs->botdeathtype), // 1
@@ -625,7 +623,7 @@ int BotChat_Death(bot_state_t *bs) {
                         name, // 0
                         BotWeaponNameForMeansOfDeath(bs->botdeathtype), // 1
                         NULL);
-            }                //choose between insult and praise
+            }//choose between insult and praise
             else if (random() < trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_INSULT, 0, 1)) {
                 BotAI_BotInitialChat(bs, "death_insult",
                         name, // 0
@@ -679,17 +677,13 @@ int BotChat_Kill(bot_state_t *bs) {
             return qfalse; // don't wait
         }
         //
-        if (bs->enemydeathtype == MOD_GAUNTLET) {
+        if (bs->enemydeathtype == MOD_KNIFE) {
             BotAI_BotInitialChat(bs, "kill_gauntlet", name, NULL);
-        } else if (bs->enemydeathtype == MOD_RAILGUN) {
+        } else if (bs->enemydeathtype == MOD_BARRETT) {
             BotAI_BotInitialChat(bs, "kill_rail", name, NULL);
         } else if (bs->enemydeathtype == MOD_TELEFRAG) {
             BotAI_BotInitialChat(bs, "kill_telefrag", name, NULL);
         }
-#ifdef MISSIONPACK
-        else if (bs->botdeathtype == MOD_KAMIKAZE && trap_BotNumInitialChats(bs->cs, "kill_kamikaze"))
-            BotAI_BotInitialChat(bs, "kill_kamikaze", name, NULL);
-#endif
             //choose between insult and praise
         else if (random() < trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_INSULT, 0, 1)) {
             BotAI_BotInitialChat(bs, "kill_insult", name, NULL);
@@ -1008,6 +1002,11 @@ void BotChatTest(bot_state_t *bs) {
     num = trap_BotNumInitialChats(bs->cs, "death_slime");
     for (i = 0; i < num; i++) {
         BotAI_BotInitialChat(bs, "death_slime", name, NULL);
+        trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
+    }
+    num = trap_BotNumInitialChats(bs->cs, "death_moor");
+    for (i = 0; i < num; i++) {
+        BotAI_BotInitialChat(bs, "death_moor", name, NULL);
         trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
     }
     num = trap_BotNumInitialChats(bs->cs, "death_lava");

@@ -432,6 +432,10 @@ typedef enum {
 
     EV_GIB_PLAYER, // gib a previously living player
     EV_BREAK_GLASS,
+    EV_BREAK_FLESH,
+    EV_BREAK_WOOD,
+    EV_BREAK_STONE,
+    EV_BREAK_METAL,
     EV_SCOREPLUM, // score plum
 
     EV_DEBUG_LINE,
@@ -445,7 +449,8 @@ typedef enum {
     EV_TAUNT_PATROL,
 
     EV_WALLJUMP,
-    EV_GRAB
+    EV_GRAB,
+            EV_FALL_MINIMAL
 } entity_event_t;
 
 // animations

@@ -183,7 +183,7 @@ static cvarTable_t cvarTable[] = {
     { &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE},
     { &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE},
     { &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE},
-    { &cg_fov, "cg_fov", "90", CVAR_ARCHIVE},
+    { &cg_fov, "cg_fov", "90", CVAR_ARCHIVE | CVAR_CHEAT},
     { &cg_viewsize, "cg_viewsize", "100", CVAR_ARCHIVE},
     { &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE},
     { &cg_gibs, "cg_gibs", "1", CVAR_ARCHIVE},
@@ -724,6 +724,7 @@ static void CG_RegisterGraphics(void) {
     cgs.media.glass01 = trap_R_RegisterModel("models/weaphits/glass01.md3");
     cgs.media.glass02 = trap_R_RegisterModel("models/weaphits/glass02.md3");
     cgs.media.glass03 = trap_R_RegisterModel("models/weaphits/glass03.md3");
+    cgs.media.glass = trap_R_RegisterShader("breakable/glass");
 
     cgs.media.smoke2 = trap_R_RegisterModel("models/weapons2/shells/s_shell.md3");
 
@@ -928,7 +929,7 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum) {
 
     CG_InitConsoleCommands();
 
-    cg.weaponSelect = WP_MACHINEGUN;
+    cg.weaponSelect = WP_ACR;
 
     cgs.redflag = cgs.blueflag = -1; // For compatibily, default to unset for
     cgs.flagStatus = -1;

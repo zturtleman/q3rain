@@ -19,9 +19,6 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
  */
-//
-
-#undef MISSIONPACK
 
 /*****************************************************************************
  * name:		ai_dmq3.c
@@ -904,11 +901,14 @@ void BotUpdateInventory(bot_state_t *bs) {
     bs->inventory[INVENTORY_PLASMAGUN] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_PLASMAGUN)) != 0;
     bs->inventory[INVENTORY_BFG10K] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_BFG)) != 0;
     bs->inventory[INVENTORY_GRAPPLINGHOOK] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_GRAPPLING_HOOK)) != 0;
+
     bs->inventory[INVENTORY_HE] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_HE)) != 0;
     bs->inventory[INVENTORY_BARRETT] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_BARRETT)) != 0;
     bs->inventory[INVENTORY_INTERVENTION] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_INTERVENTION)) != 0;
     bs->inventory[INVENTORY_CROSSBOW] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_CROSSBOW)) != 0;
     bs->inventory[INVENTORY_KNIFE] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_KNIFE)) != 0;
+    bs->inventory[INVENTORY_ACR] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_ACR)) != 0;
+    bs->inventory[INVENTORY_WALTHER] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_WALTHER)) != 0;
     //ammo
     bs->inventory[INVENTORY_SHELLS] = bs->cur_ps.ammo[WP_SHOTGUN];
     bs->inventory[INVENTORY_BULLETS] = bs->cur_ps.ammo[WP_MACHINEGUN];
@@ -1024,7 +1024,7 @@ qboolean BotInLavaOrSlime(bot_state_t *bs) {
 
     VectorCopy(bs->origin, feet);
     feet[2] -= 23;
-    return (trap_AAS_PointContents(feet) & (CONTENTS_LAVA | CONTENTS_SLIME));
+    return (trap_AAS_PointContents(feet) & (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_MOOR));
 }
 
 /*
@@ -1159,6 +1159,10 @@ float BotAggression(bot_state_t *bs) {
             bs->inventory[INVENTORY_INTERVENTION] > 1) return 50;
     if (bs->inventory[INVENTORY_CROSSBOW] > 0 &&
             bs->inventory[INVENTORY_CROSSBOW] > 1) return 50;
+    if (bs->inventory[INVENTORY_ACR] > 0 &&
+            bs->inventory[INVENTORY_ACR] > 1) return 50;
+    if (bs->inventory[INVENTORY_WALTHER] > 0 &&
+            bs->inventory[INVENTORY_WALTHER] > 1) return 50;
     //otherwise the bot is not feeling too good
     return 0;
 }
@@ -1175,7 +1179,7 @@ float BotFeelingBad(bot_state_t *bs) {
     if (bs->inventory[INVENTORY_HEALTH] < 40) {
         return 100;
     }
-    if (bs->weaponnum == WP_MACHINEGUN) {
+    if (bs->weaponnum == WP_ACR) {
         return 90;
     }
     if (bs->inventory[INVENTORY_HEALTH] < 60) {
@@ -1465,7 +1469,7 @@ void BotRoamGoal(bot_state_t *bs, vec3_t goal) {
             if (!trace.startsolid) {
                 trace.endpos[2]++;
                 pc = trap_PointContents(trace.endpos, bs->entitynum);
-                if (!(pc & (CONTENTS_LAVA | CONTENTS_SLIME))) {
+                if (!(pc & (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_MOOR))) {
                     VectorCopy(bestorg, goal);
                     return;
                 }
@@ -1685,7 +1689,7 @@ float BotEntityVisible(int viewer, vec3_t eye, vec3_t viewangles, float fov, int
     //
     pc = trap_AAS_PointContents(eye);
     infog = (pc & CONTENTS_FOG);
-    inwater = (pc & (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER));
+    inwater = (pc & (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER | CONTENTS_MOOR));
     //
     bestvis = 0;
     for (i = 0; i < 3; i++) {
@@ -1698,28 +1702,28 @@ float BotEntityVisible(int viewer, vec3_t eye, vec3_t viewangles, float fov, int
         VectorCopy(eye, start);
         VectorCopy(middle, end);
         //if the entity is in water, lava or slime
-        if (trap_AAS_PointContents(middle) & (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER)) {
-            contents_mask |= (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER);
+        if (trap_AAS_PointContents(middle) & (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER | CONTENTS_MOOR)) {
+            contents_mask |= (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER | CONTENTS_MOOR);
         }
         //if eye is in water, lava or slime
         if (inwater) {
-            if (!(contents_mask & (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER))) {
+            if (!(contents_mask & (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER | CONTENTS_MOOR))) {
                 passent = ent;
                 hitent = viewer;
                 VectorCopy(middle, start);
                 VectorCopy(eye, end);
             }
-            contents_mask ^= (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER);
+            contents_mask ^= (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER | CONTENTS_MOOR);
         }
         //trace from start to end
         BotAI_Trace(&trace, start, NULL, NULL, end, passent, contents_mask);
         //if water was hit
         waterfactor = 1.0;
-        if (trace.contents & (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER)) {
+        if (trace.contents & (CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER | CONTENTS_MOOR)) {
             //if the water surface is translucent
             if (1) {
                 //trace through the water
-                contents_mask &= ~(CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER);
+                contents_mask &= ~(CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_WATER | CONTENTS_MOOR);
                 BotAI_Trace(&trace, trace.endpos, NULL, NULL, end, passent, contents_mask);
                 waterfactor = 0.5;
             }
@@ -2262,6 +2266,8 @@ void BotAimAtEnemy(bot_state_t *bs) {
             wi.number == WP_CROSSBOW ||
             wi.number == WP_BARRETT ||
             wi.number == WP_INTERVENTION ||
+            wi.number == WP_ACR ||
+            wi.number == WP_WALTHER ||
             wi.number == WP_RAILGUN) {
         //distance towards the enemy
         dist = VectorLength(dir);
@@ -2903,6 +2909,11 @@ int BotGetActivateGoal(bot_state_t *bs, int entitynum, bot_activategoal_t *activ
     if (!*classname) {
         BotAI_Print(PRT_ERROR, "BotGetActivateGoal: entity with model %s has no classname\n", model);
         return 0;
+    }
+    //if it is a breakable
+    if (!strcmp(classname, "func_breakable")) {
+        BotFuncDoorActivateGoal(bs, ent, activategoal);
+        return ent;
     }
     //if it is a door
     if (!strcmp(classname, "func_door")) {
@@ -3619,7 +3630,7 @@ BotCheckAir
  */
 void BotCheckAir(bot_state_t *bs) {
     if (bs->inventory[INVENTORY_ENVIRONMENTSUIT] <= 0) {
-        if (trap_AAS_PointContents(bs->eye) & (CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA)) {
+        if (trap_AAS_PointContents(bs->eye) & (CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA | CONTENTS_MOOR)) {
             return;
         }
     }
@@ -3892,14 +3903,14 @@ void BotSetupDeathmatchAI(void) {
     gametype = trap_Cvar_VariableIntegerValue("g_gametype");
     maxclients = trap_Cvar_VariableIntegerValue("sv_maxclients");
 
-    trap_Cvar_Register(&bot_rocketjump, "bot_rocketjump", "1", 0);
+    trap_Cvar_Register(&bot_rocketjump, "bot_rocketjump", "0", 0);
     trap_Cvar_Register(&bot_grapple, "bot_grapple", "0", 0);
-    trap_Cvar_Register(&bot_fastchat, "bot_fastchat", "0", 0);
+    trap_Cvar_Register(&bot_fastchat, "bot_fastchat", "1", 0);
     trap_Cvar_Register(&bot_nochat, "bot_nochat", "0", 0);
     trap_Cvar_Register(&bot_testrchat, "bot_testrchat", "0", 0);
     trap_Cvar_Register(&bot_challenge, "bot_challenge", "0", 0);
     trap_Cvar_Register(&bot_predictobstacles, "bot_predictobstacles", "1", 0);
-    trap_Cvar_Register(&g_spSkill, "g_spSkill", "2", 0);
+    trap_Cvar_Register(&g_spSkill, "g_spSkill", "3", 0);
     //
 
     max_bspmodelindex = 0;

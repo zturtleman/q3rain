@@ -446,7 +446,6 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
     int event;
     gclient_t *client;
     int damage;
-    int adrenaline;
     vec3_t dir;
     vec3_t origin, angles;
     //	qboolean	fired;
@@ -463,6 +462,7 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
         event = client->ps.events[ i & (MAX_PS_EVENTS - 1) ];
 
         switch (event) {
+            case EV_FALL_SHORT:
             case EV_FALL_MEDIUM:
             case EV_FALL_FAR:
                 if (ent->s.eType != ET_PLAYER) {
@@ -471,14 +471,22 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
                 if (g_dmflags.integer & DF_NO_FALLING) {
                     break;
                 }
+                if (ent->flags & FL_GODMODE) {
+                    return;
+                }
                 // FALL DAMAGE
                 if (event == EV_FALL_FAR) {
                     damage = 100;
-                } else {
+                } else if (event == EV_FALL_MEDIUM) {
                     damage = 60;
-                    if (ent->flags & FL_GODMODE) {
-                        return;
+                    ent->client->ps.legsfactor = 2.5;
+                } else {
+                    damage = 20;
+                    if (ent->client->ps.legsfactor < 1.5) {
+                        ent->client->ps.legsfactor = 1.5;
                     }
+                }
+                if (ent->client->ps.stats[STAT_HEALTH] - damage <= 50 && ent->client->ps.legsfactor <= 1.5) {
                     ent->client->ps.legsfactor = 2.5;
                 }
                 VectorSet(dir, 0, 0, 1);

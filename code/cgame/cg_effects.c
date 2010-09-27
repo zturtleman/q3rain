@@ -569,7 +569,7 @@ Generated a bunch of glass shards launching out from the glass location
  */
 #define	GLASS_VELOCITY	175
 #define	GLASS_JUMP	125
-#define GLASS_SHARDS    64
+#define GLASS_SHARDS    16
 
 void CG_BreakGlass(vec3_t playerOrigin) {
     vec3_t origin, velocity;
@@ -601,6 +601,193 @@ void CG_BreakGlass(vec3_t playerOrigin) {
                 break;
             case 3:
                 CG_LaunchGlass(origin, velocity, cgs.media.glass03);
+                break;
+        }
+    }
+}
+
+
+/*
+===================
+CG_BreakFlesh
+
+Generated a bunch of flesh gibs launching out from the location
+===================
+ */
+#define	FLESH_VELOCITY	100
+#define	FLESH_JUMP	50
+#define FLESH_SHARDS    8
+
+void CG_BreakFlesh(vec3_t playerOrigin) {
+    vec3_t origin, velocity;
+    int value;
+    int count;
+    int states[] = {1, 2, 3};
+    int numstates = sizeof (states) / sizeof (states[0]);
+
+    count = FLESH_SHARDS;
+
+    // Countdown "count" so this will subtract 1 from the "count"
+    // X many times. X being the "count" value
+    while (count--) {
+        // Generate the random number every count so every shard is a
+        // of the three. If this is placed above it only gets a random
+        // number every time a piece of glass is broken.
+        value = states[rand() % numstates];
+        VectorCopy(playerOrigin, origin);
+        velocity[0] = crandom() * FLESH_VELOCITY;
+        velocity[1] = crandom() * FLESH_VELOCITY;
+        velocity[2] = FLESH_JUMP + crandom() * FLESH_VELOCITY;
+        switch (value) {
+            case 1:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibArm);
+                break;
+            case 2:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibLeg);
+                break;
+            case 3:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibFoot);
+                break;
+        }
+    }
+}
+
+
+
+/*
+===================
+CG_BreakWood
+
+Generated a bunch of flesh gibs launching out from the location
+===================
+ */
+#define	WOOD_VELOCITY	100
+#define	WOOD_JUMP	50
+#define WOOD_SHARDS     16
+
+void CG_BreakWood(vec3_t playerOrigin) {
+    vec3_t origin, velocity;
+    int value;
+    int count;
+    int states[] = {1, 2, 3};
+    int numstates = sizeof (states) / sizeof (states[0]);
+
+    count = WOOD_SHARDS;
+
+    // Countdown "count" so this will subtract 1 from the "count"
+    // X many times. X being the "count" value
+    while (count--) {
+        // Generate the random number every count so every shard is a
+        // of the three. If this is placed above it only gets a random
+        // number every time a piece of glass is broken.
+        value = states[rand() % numstates];
+        VectorCopy(playerOrigin, origin);
+        velocity[0] = crandom() * WOOD_VELOCITY;
+        velocity[1] = crandom() * WOOD_VELOCITY;
+        velocity[2] = WOOD_JUMP + crandom() * WOOD_VELOCITY;
+        switch (value) {
+            case 1:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibArm);
+                break;
+            case 2:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibLeg);
+                break;
+            case 3:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibFoot);
+                break;
+        }
+    }
+}
+
+
+
+/*
+===================
+CG_BreakMetal
+
+Generated a bunch of flesh gibs launching out from the location
+===================
+ */
+#define	METAL_VELOCITY	100
+#define	METAL_JUMP	50
+#define METAL_SHARDS    8
+
+void CG_BreakMetal(vec3_t playerOrigin) {
+    vec3_t origin, velocity;
+    int value;
+    int count;
+    int states[] = {1, 2, 3};
+    int numstates = sizeof (states) / sizeof (states[0]);
+
+    count = METAL_SHARDS;
+
+    // Countdown "count" so this will subtract 1 from the "count"
+    // X many times. X being the "count" value
+    while (count--) {
+        // Generate the random number every count so every shard is a
+        // of the three. If this is placed above it only gets a random
+        // number every time a piece of glass is broken.
+        value = states[rand() % numstates];
+        VectorCopy(playerOrigin, origin);
+        velocity[0] = crandom() * METAL_VELOCITY;
+        velocity[1] = crandom() * METAL_VELOCITY;
+        velocity[2] = METAL_JUMP + crandom() * METAL_VELOCITY;
+        switch (value) {
+            case 1:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibArm);
+                break;
+            case 2:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibLeg);
+                break;
+            case 3:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibFoot);
+                break;
+        }
+    }
+}
+
+
+
+/*
+===================
+CG_BreakStone
+
+Generated a bunch of flesh gibs launching out from the location
+===================
+ */
+#define	STONE_VELOCITY	100
+#define	STONE_JUMP	50
+#define STONE_SHARDS    16
+
+void CG_BreakStone(vec3_t playerOrigin) {
+    vec3_t origin, velocity;
+    int value;
+    int count;
+    int states[] = {1, 2, 3};
+    int numstates = sizeof (states) / sizeof (states[0]);
+
+    count = STONE_SHARDS;
+
+    // Countdown "count" so this will subtract 1 from the "count"
+    // X many times. X being the "count" value
+    while (count--) {
+        // Generate the random number every count so every shard is a
+        // of the three. If this is placed above it only gets a random
+        // number every time a piece of glass is broken.
+        value = states[rand() % numstates];
+        VectorCopy(playerOrigin, origin);
+        velocity[0] = crandom() * STONE_VELOCITY;
+        velocity[1] = crandom() * STONE_VELOCITY;
+        velocity[2] = STONE_JUMP + crandom() * STONE_VELOCITY;
+        switch (value) {
+            case 1:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibArm);
+                break;
+            case 2:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibLeg);
+                break;
+            case 3:
+                CG_LaunchGlass(origin, velocity, cgs.media.gibFoot);
                 break;
         }
     }

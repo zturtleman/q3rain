@@ -732,6 +732,78 @@ static void PM_WallClimb(void) {
 }
 
 /*
+=============
+PM_CheckWallJump
+=============
+ */
+static qboolean PM_CheckWallJump(void) {
+    vec3_t flatforward, spot;
+    trace_t trace;
+
+    if (pm->ps->pm_flags & PMF_RESPAWNED) {
+        return qfalse;
+    }
+
+    if (pm->cmd.upmove < 10) {
+        return qfalse;
+    }
+
+    if (pm->waterlevel >= 2) {
+        return qfalse;
+    }
+
+    if (pm->ps->pm_flags & PMF_JUMP_HELD) {
+        pm->cmd.upmove = 0;
+        return qfalse;
+    }
+
+    flatforward[0] = pml.forward[0];
+    flatforward[1] = pml.forward[1];
+    flatforward[2] = 0;
+    VectorNormalize(flatforward);
+    VectorMA(pm->ps->origin, 1, flatforward, spot);
+    pm->trace(&trace, pm->ps->origin, pm->mins, pm->maxs, spot, pm->ps->clientNum, MASK_PLAYERSOLID);
+    if ((trace.fraction >= 1.0) || (trace.contents != CONTENTS_SOLID)) {
+        return qfalse;
+    }
+
+    return qtrue;
+}
+
+/*
+=============
+PM_WallJump
+=============
+ */
+static void PM_WallJump(void) {/*
+    vec3_t flatforward, spot;
+    trace_t trace;
+    vec3_t velocity;
+    float dot;
+
+    flatforward[0] = pml.forward[0];
+    flatforward[1] = pml.forward[1];
+    flatforward[2] = 0;
+    VectorNormalize(flatforward);
+    VectorMA(pm->ps->origin, 1, flatforward, spot);
+    pm->trace(&trace, pm->ps->origin, pm->mins, pm->maxs, spot, pm->ps->clientNum, MASK_PLAYERSOLID);
+    
+    dot = DotProduct(velocity, trace->plane.normal);
+    VectorMA(velocity, -2 * dot, trace->plane.normal, ent->s.pos.trDelta);
+
+    VectorScale(ent->s.pos.trDelta, 0.65, ent->s.pos.trDelta);
+    
+    if (trace->plane.normal[2] > 0.2 && VectorLength(pm->ps->origin) < 40) {
+        //G_SetOrigin(ent, trace->endpos);
+        pm->ps->origin = trace->endpos;
+        return;
+    }
+
+    VectorAdd(ent->r.currentOrigin, trace->plane.normal, ent->r.currentOrigin);
+    VectorCopy(ent->r.currentOrigin, ent->s.pos.trBase);*/
+}
+
+/*
 ===================
 PM_AirMove
 
@@ -1134,9 +1206,9 @@ static void PM_CrashLand(void) {
     delta = delta * delta * 0.0001;
 
     // ducking while falling doubles damage
-    if (pm->ps->pm_flags & PMF_DUCKED) {
+    /*if (pm->ps->pm_flags & PMF_DUCKED) {
         delta *= 2;
-    }
+    }*/
 
     if (pm->waterlevel == 3) {
         return;
@@ -1159,12 +1231,14 @@ static void PM_CrashLand(void) {
     // SURF_NODAMAGE is used for bounce pads where you don't ever
     // want to take damage or play a crunch sound
     if (!(pml.groundTrace.surfaceFlags & SURF_NODAMAGE)) {
-        if (delta > 50) {
+        if (delta > 110) {
             PM_AddEvent(EV_FALL_FAR);
-        } else if (delta > 30) {
+        } else if (delta > 60) {
             PM_AddEvent(EV_FALL_MEDIUM);
-        } else if (delta > 10) {
+        } else if (delta > 30) {
             PM_AddEvent(EV_FALL_SHORT);
+        } else if (delta > 10) {
+            PM_AddEvent(EV_FALL_MINIMAL);
         } else {
             PM_AddEvent(PM_FootstepForSurface());
         }
@@ -1690,6 +1764,7 @@ Generates weapon events and modifes the weapon counter
  */
 #define SEMI_DELAY 50
 #define INFINITE 9999999
+
 static void PM_Weapon(void) {
     int addTime;
 
@@ -1789,10 +1864,10 @@ static void PM_Weapon(void) {
         pm->ps->weaponTime += 200;
         return;
     }
-    
+
     // fire weapon
     PM_AddEvent(EV_FIRE_WEAPON);
-    
+
     switch (pm->ps->weapon) {
         default:
             addTime = 100;

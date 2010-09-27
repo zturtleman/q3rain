@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 int g_console_field_width = 78;
 
 
-#define	NUM_CON_TIMES 4
+#define	NUM_CON_TIMES 6
 
 #define		CON_TEXTSIZE	32768
 
@@ -317,6 +317,40 @@ void Cmd_AuthMenu(char *args, int argNum) {
 }
 
 /*
+==================
+Con_Auth_f
+==================
+ */
+void Con_Auth_f(void) {
+    netadr_t master;
+    char *message;
+    if (Cmd_Argc() != 3) {
+        Com_Printf("usage: auth <nickname> <password>\nSpace, \", @ and ^ are not allowed.\n");
+        return;
+    }
+    if (!NET_StringToAdr("localhost:1337", &master, NA_UNSPEC)) {
+        Com_Printf("^1ERROR: Couldn't resolve master server\n");
+        return;
+    }
+    message = va("%s %s %s", Cmd_Argv(0), Cmd_Argv(1), Cmd_Argv(2));
+
+    NET_SendPacket(NS_CLIENT, strlen(message) + 1, message, master);
+    NET_OutOfBandPrint(NS_CLIENT, master, "%s", message);
+
+    NET_SendPacket(NS_SERVER, strlen(message) + 1, message, master);
+    NET_OutOfBandPrint(NS_SERVER, master, "%s", message);
+}
+
+/*
+==================
+Cmd_Auth
+==================
+ */
+void Cmd_Auth(char *args, int argNum) {
+    Con_Auth_f();
+}
+
+/*
 ================
 Con_Init
 ================
@@ -340,10 +374,12 @@ void Con_Init(void) {
     Cmd_AddCommand("messagemode2", Con_MessageMode2_f);
     Cmd_AddCommand("messagemode3", Con_MessageMode3_f);
     Cmd_AddCommand("messagemode4", Con_MessageMode4_f);
+    Cmd_AddCommand("auth", Con_Auth_f);
     Cmd_AddCommand("authmenu", Con_AuthMenu_f);
     Cmd_AddCommand("clear", Con_Clear_f);
     Cmd_AddCommand("condump", Con_Dump_f);
     Cmd_SetCommandCompletionFunc("condump", Cmd_CompleteTxtName);
+    Com_Printf(S_COLOR_GREEN "Initialized console.\n");
 }
 
 /*
@@ -542,10 +578,11 @@ void Con_DrawNotify(void) {
                 currentColor = (text[x] >> 8)&7;
                 re.SetColor(g_color_table[currentColor]);
             }
-            SCR_DrawSmallChar(cl_conXOffset->integer + con.xadjust + (x + 1) * SMALLCHAR_WIDTH, v, text[x] & 0xff);
+            //SCR_DrawSmallChar(cl_conXOffset->integer + con.xadjust + (x + 1) * SMALLCHAR_WIDTH, v, text[x] & 0xff);
+            SCR_DrawChatChar(8 + con.xadjust + (x + 1) * CHATCHAR_WIDTH, v + cls.glconfig.vidWidth / 2, text[x] & 0xff);
         }
 
-        v += SMALLCHAR_HEIGHT;
+        v += CHATCHAR_HEIGHT;
     }
 
     re.SetColor(NULL);

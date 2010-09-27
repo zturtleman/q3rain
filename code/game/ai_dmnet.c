@@ -62,7 +62,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 int numnodeswitches;
 char nodeswitch[MAX_NODESWITCHES + 1][144];
 
-#define LOOKAHEAD_DISTANCE			512
+#define LOOKAHEAD_DISTANCE	512
 
 /*
 ==================
@@ -277,7 +277,7 @@ int BotGetItemLongTermGoal(bot_state_t *bs, int tfl, bot_goal_t *goal) {
     if (!trap_BotGetTopGoal(bs->gs, goal)) {
         //BotAI_Print(PRT_MESSAGE, "no ltg on stack\n");
         bs->ltg_time = 0;
-    }        //if the bot touches the current goal
+    }//if the bot touches the current goal
     else if (BotReachedGoal(bs, goal)) {
         BotChooseWeapon(bs);
         bs->ltg_time = 0;
@@ -447,10 +447,10 @@ int BotGetLongTermGoal(bot_state_t *bs, int tfl, int retreat, bot_goal_t *goal) 
                         BotAI_BotInitialChat(bs, "accompany_arrive", EasyClientName(bs->teammate, netname, sizeof (netname)), NULL);
                         trap_BotEnterChat(bs->cs, bs->teammate, CHAT_TELL);
                         bs->arrive_time = FloatTime();
-                    }                        //if the bot wants to crouch
+                    }//if the bot wants to crouch
                     else if (bs->attackcrouch_time > FloatTime()) {
                         trap_EA_Crouch(bs->client);
-                    }                        //else do some model taunts
+                    }//else do some model taunts
                     else if (random() < bs->thinktime * 0.05) {
                         //do a gesture :)
                         trap_EA_Gesture(bs->client);
@@ -461,7 +461,7 @@ int BotGetLongTermGoal(bot_state_t *bs, int tfl, int retreat, bot_goal_t *goal) 
                     VectorSubtract(entinfo.origin, bs->origin, dir);
                     vectoangles(dir, bs->ideal_viewangles);
                     bs->ideal_viewangles[2] *= 0.5;
-                }                    //else look strategically around for enemies
+                }//else look strategically around for enemies
                 else if (random() < bs->thinktime * 0.8) {
                     BotRoamGoal(bs, target);
                     VectorSubtract(target, bs->origin, dir);
@@ -997,6 +997,12 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
         return WEAPONINDEX_HE;
     else if (bs->inventory[INVENTORY_INTERVENTION] > 0 && bs->inventory[INVENTORY_INTERVENTION] > 0)
         return WEAPONINDEX_INTERVENTION;
+    else if (bs->inventory[INVENTORY_WALTHER] > 0 && bs->inventory[INVENTORY_WALTHER] > 0)
+        return WEAPONINDEX_WALTHER;
+    else if (bs->inventory[INVENTORY_KNIFE] > 0 && bs->inventory[INVENTORY_KNIFE] > 0)
+        return WEAPONINDEX_KNIFE;
+    else if (bs->inventory[INVENTORY_ACR] > 0 && bs->inventory[INVENTORY_ACR] > 0)
+        return WEAPONINDEX_ACR;
     else {
         return 1;
     }
@@ -1210,7 +1216,7 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
         // if the bot has no goal
         if (!goal) {
             bs->activatestack->time = 0;
-        }            // if the bot does not have a shoot goal
+        }// if the bot does not have a shoot goal
         else if (!bs->activatestack->shoot) {
             //if the bot touches the current goal
             if (trap_BotTouchingGoal(bs->origin, goal)) {
@@ -1273,7 +1279,7 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
     // if the ideal view angles are set for movement
     if (moveresult.flags & (MOVERESULT_MOVEMENTVIEWSET | MOVERESULT_MOVEMENTVIEW | MOVERESULT_SWIMVIEW)) {
         VectorCopy(moveresult.ideal_viewangles, bs->ideal_viewangles);
-    }        // if waiting for something
+    }// if waiting for something
     else if (moveresult.flags & MOVERESULT_WAITING) {
         if (random() < bs->thinktime * 0.8) {
             BotRoamGoal(bs, target);
@@ -1403,7 +1409,7 @@ int AINode_Seek_NBG(bot_state_t *bs) {
     //if the viewangles are used for the movement
     if (moveresult.flags & (MOVERESULT_MOVEMENTVIEWSET | MOVERESULT_MOVEMENTVIEW | MOVERESULT_SWIMVIEW)) {
         VectorCopy(moveresult.ideal_viewangles, bs->ideal_viewangles);
-    }        //if waiting for something
+    }//if waiting for something
     else if (moveresult.flags & MOVERESULT_WAITING) {
         if (random() < bs->thinktime * 0.8) {
             BotRoamGoal(bs, target);
@@ -1416,7 +1422,7 @@ int AINode_Seek_NBG(bot_state_t *bs) {
         if (trap_BotMovementViewTarget(bs->ms, &goal, bs->tfl, 300, target)) {
             VectorSubtract(target, bs->origin, dir);
             vectoangles(dir, bs->ideal_viewangles);
-        }            //FIXME: look at cluster portals?
+        }//FIXME: look at cluster portals?
         else vectoangles(moveresult.movedir, bs->ideal_viewangles);
         bs->ideal_viewangles[2] *= 0.5;
     }
@@ -1572,7 +1578,7 @@ int AINode_Seek_LTG(bot_state_t *bs) {
     //if the viewangles are used for the movement
     if (moveresult.flags & (MOVERESULT_MOVEMENTVIEWSET | MOVERESULT_MOVEMENTVIEW | MOVERESULT_SWIMVIEW)) {
         VectorCopy(moveresult.ideal_viewangles, bs->ideal_viewangles);
-    }        //if waiting for something
+    }//if waiting for something
     else if (moveresult.flags & MOVERESULT_WAITING) {
         if (random() < bs->thinktime * 0.8) {
             BotRoamGoal(bs, target);
@@ -1584,7 +1590,7 @@ int AINode_Seek_LTG(bot_state_t *bs) {
         if (trap_BotMovementViewTarget(bs->ms, &goal, bs->tfl, 300, target)) {
             VectorSubtract(target, bs->origin, dir);
             vectoangles(dir, bs->ideal_viewangles);
-        }            //FIXME: look at cluster portals?
+        }//FIXME: look at cluster portals?
         else if (VectorLengthSquared(moveresult.movedir)) {
             vectoangles(moveresult.movedir, bs->ideal_viewangles);
         } else if (random() < bs->thinktime * 0.8) {
@@ -1993,7 +1999,7 @@ int AINode_Battle_Retreat(bot_state_t *bs) {
     if (bs->enemyvisible_time < FloatTime() - 4) {
         AIEnter_Seek_LTG(bs, "battle retreat: lost enemy");
         return qfalse;
-    }        //else if the enemy is NOT visible
+    }//else if the enemy is NOT visible
     else if (bs->enemyvisible_time < FloatTime()) {
         //if there is another enemy
         if (BotFindEnemy(bs, -1)) {

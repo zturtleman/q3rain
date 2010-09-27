@@ -64,6 +64,8 @@ UI_AuthMenu_Event
 ===============
  */
 static void UI_AuthMenu_Event(void *ptr, int event) {
+    char *msg;
+
     if (event != QM_ACTIVATED) {
         return;
     }
@@ -71,9 +73,8 @@ static void UI_AuthMenu_Event(void *ptr, int event) {
     switch (((menucommon_s*) ptr)->id) {
         case ID_ACCEPT:
             if (authMenuInfo.nickname.field.buffer[0] && authMenuInfo.password.field.buffer[0]) {
-                //trap_SetAuthNickname(authMenuInfo.nickname.field.buffer);
-                //trap_SetAuthPassword(authMenuInfo.password.field.buffer);
-                // FIXME causes FS errors
+                msg = va("auth %s %s\n", authMenuInfo.nickname.field.buffer, authMenuInfo.password.field.buffer);
+                trap_Cmd_ExecuteText(EXEC_INSERT, msg);
             }
             UI_PopMenu();
             break;
@@ -195,7 +196,7 @@ static void UI_AuthMenu_DrawNickname(void *self) {
         UI_DrawProportionalString(320, 376, "Nickname contains invalid characters", UI_CENTER | UI_SMALLFONT, color_red);
     }
 
-    UI_DrawProportionalString(320, 240-42, "Nickname:", UI_CENTER | UI_SMALLFONT, color_yellow);
+    UI_DrawProportionalString(320, 240 - 42, "Nickname:", UI_CENTER | UI_SMALLFONT, color_yellow);
 }
 
 /*

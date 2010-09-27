@@ -58,8 +58,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 int notleader[MAX_CLIENTS];
 
-#undef MISSIONPACK
-
 #ifdef DEBUG
 
 /*
@@ -99,18 +97,6 @@ void BotPrintTeamGoal(bot_state_t *bs) {
             BotAI_Print(PRT_MESSAGE, "%s: I'm gonna try to return the flag for %1.0f secs\n", netname, t);
             break;
         }
-#ifdef MISSIONPACK
-        case LTG_ATTACKENEMYBASE:
-        {
-            BotAI_Print(PRT_MESSAGE, "%s: I'm gonna attack the enemy base for %1.0f secs\n", netname, t);
-            break;
-        }
-        case LTG_HARVEST:
-        {
-            BotAI_Print(PRT_MESSAGE, "%s: I'm gonna harvest for %1.0f secs\n", netname, t);
-            break;
-        }
-#endif
         case LTG_DEFENDKEYAREA:
         {
             BotAI_Print(PRT_MESSAGE, "%s: I'm gonna defend a key area for %1.0f secs\n", netname, t);
@@ -1091,7 +1077,7 @@ void BotMatch_StartTeamLeaderShip(bot_state_t *bs, bot_match_t *match) {
         trap_BotMatchVariable(match, NETNAME, teammate, sizeof (teammate));
         strncpy(bs->teamleader, teammate, sizeof (bs->teamleader));
         bs->teamleader[sizeof (bs->teamleader) - 1] = '\0';
-    }        //chats for someone else
+    }//chats for someone else
     else {
         //get the team mate that will be the team leader
         trap_BotMatchVariable(match, TEAMMATE, teammate, sizeof (teammate));
@@ -1117,7 +1103,7 @@ void BotMatch_StopTeamLeaderShip(bot_state_t *bs, bot_match_t *match) {
     if (match->subtype & ST_I) {
         trap_BotMatchVariable(match, NETNAME, netname, sizeof (netname));
         client = FindClientByName(netname);
-    }        //chats for someone else
+    }//chats for someone else
     else {
         client = FindClientByName(teammate);
     } //end else
@@ -1216,18 +1202,6 @@ void BotMatch_WhatAreYouDoing(bot_state_t *bs, bot_match_t *match) {
             BotAI_BotInitialChat(bs, "returningflag", NULL);
             break;
         }
-#ifdef MISSIONPACK
-        case LTG_ATTACKENEMYBASE:
-        {
-            BotAI_BotInitialChat(bs, "attackingenemybase", NULL);
-            break;
-        }
-        case LTG_HARVEST:
-        {
-            BotAI_BotInitialChat(bs, "harvesting", NULL);
-            break;
-        }
-#endif
         default:
         {
             BotAI_BotInitialChat(bs, "roaming", NULL);
@@ -1297,6 +1271,7 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
     int i, bestitem, client;
     bot_goal_t goal;
     char netname[MAX_MESSAGE_SIZE];
+    // TODO fix item list
     char *nearbyitems[] = {
         "Shotgun",
         "Grenade Launcher",
@@ -1315,19 +1290,6 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
         "Heavy Armor",
         "Red Flag",
         "Blue Flag",
-#ifdef MISSIONPACK
-        "Nailgun",
-        "Prox Launcher",
-        "Chaingun",
-        "Scout",
-        "Guard",
-        "Doubler",
-        "Ammo Regen",
-        "Neutral Flag",
-        "Red Obelisk",
-        "Blue Obelisk",
-        "Neutral Obelisk",
-#endif
         NULL
     };
     //
@@ -1534,20 +1496,6 @@ int BotMatchMessage(bot_state_t *bs, char *message) {
             BotMatch_GetFlag(bs, &match);
             break;
         }
-#ifdef MISSIONPACK
-            //CTF & 1FCTF & Obelisk & Harvester
-        case MSG_ATTACKENEMYBASE:
-        {
-            BotMatch_AttackEnemyBase(bs, &match);
-            break;
-        }
-            //Harvester
-        case MSG_HARVEST:
-        {
-            BotMatch_Harvest(bs, &match);
-            break;
-        }
-#endif
             //CTF & 1FCTF & Harvester
         case MSG_RUSHBASE: //ctf rush to the base
         {

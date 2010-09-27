@@ -243,7 +243,7 @@ Transform Q3 colour codes to ANSI escape sequences
 void Sys_AnsiColorPrint(const char *msg) {
     static char buffer[ MAXPRINTMSG ];
     int length = 0;
-    static int q3ToAnsi[ 8 ] ={
+    static int q3ToAnsi[ 8 ] = {
         30, // COLOR_BLACK
         31, // COLOR_RED
         32, // COLOR_GREEN
