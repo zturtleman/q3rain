@@ -678,7 +678,7 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
     // If we shot a breakable item subtract the damage from its health and try to break it
     if (targ->s.eType == ET_BREAKABLE) {
         targ->health -= damage;
-        if (G_BreakGlass(targ, point, mod)) {
+        if (G_BreakGlass(targ, point, mod) && attacker->client->ps.weapon == WP_HANDS && mod != MOD_HE_SPLASH) {
             damage = 5;
             //inflictor = attacker;
             targ = attacker;

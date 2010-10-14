@@ -1876,7 +1876,7 @@ static void PM_Weapon(void) {
             addTime = 300;
             break;
         case WP_HANDS:
-            addTime = 200;
+            addTime = 500;
             break;
         case WP_BARRETT:
             addTime = 4000;
