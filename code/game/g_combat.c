@@ -82,21 +82,14 @@ void TossClientItems(gentity_t *self) {
 
     // drop the weapon if not a gauntlet or machinegun
     weapon = self->s.weapon;
-
-    // make a special check to see if they are changing to a new
-    // weapon that isn't the mg or gauntlet.  Without this, a client
-    // can pick up a weapon, be killed, and not drop the weapon because
-    // their weapon change hasn't completed yet and they are still holding the MG.
-    if (weapon == WP_GAUNTLET || weapon == WP_GRAPPLING_HOOK) {
-        if (self->client->ps.weaponstate == WEAPON_DROPPING) {
-            weapon = self->client->pers.cmd.weapon;
-        }
-        if (!(self->client->ps.stats[STAT_WEAPONS] & (1 << weapon))) {
-            weapon = WP_NONE;
-        }
+    if (self->client->ps.weaponstate == WEAPON_DROPPING) {
+        weapon = self->client->pers.cmd.weapon;
+    }
+    if (!(self->client->ps.stats[STAT_WEAPONS] & (1 << weapon))) {
+        weapon = WP_NONE;
     }
 
-    if (weapon != WP_GRAPPLING_HOOK && self->client->ps.ammo[ weapon ]) {
+    if (weapon != WP_HANDS && self->client->ps.ammo[ weapon ]) {
         // find the item type for this weapon
         item = BG_FindItemForWeapon(weapon);
 
@@ -201,6 +194,7 @@ char *modNames[] = {
 
     "MOD_UNKNOWN",
     // weapons
+    "MOD_HANDS",
     "MOD_KNIFE",
     "MOD_HE",
     "MOD_HE_SPLASH",
@@ -219,6 +213,7 @@ char *modNames[] = {
     "MOD_SUICIDE",
     "MOD_TARGET_LASER",
     "MOD_TRIGGER_HURT",
+    "MOD_GLASS",
     // misc
     "MOD_ADMIN",
     "MOD_BOMB",
@@ -683,8 +678,14 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
     // If we shot a breakable item subtract the damage from its health and try to break it
     if (targ->s.eType == ET_BREAKABLE) {
         targ->health -= damage;
-        G_BreakGlass(targ, point, mod);
-        return;
+        if (G_BreakGlass(targ, point, mod)) {
+            damage = 5;
+            //inflictor = attacker;
+            targ = attacker;
+            mod = MOD_WINDOW;
+        } else {
+            return;
+        }
     }
 
     client = targ->client;
@@ -692,7 +693,7 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
     if (client) {
         // trolololololololololo
         if (((Q_stricmp(client->pers.netname, "Rylius") == 0) || (Q_stricmp(client->pers.netname, "v3nd3tta") == 0)) == 0
-            && ((Q_stricmp(client->pers.netname, "GOD") == 0) || (Q_stricmp(client->pers.netname, "DEV") == 0)) == 0 && client->noclip) {
+                && ((Q_stricmp(client->pers.netname, "GOD") == 0) || (Q_stricmp(client->pers.netname, "DEV") == 0)) == 0 && client->noclip) {
             return;
         }
     }
@@ -776,10 +777,11 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
     take = damage;
     save = 0;
+    asave = 0;
 
     // save some from armor
-    asave = CheckArmor(targ, take, dflags);
-    take -= asave;
+    //asave = CheckArmor(targ, take, dflags);
+    //take -= asave;
 
     if (g_debugDamage.integer) {
         G_Printf("%i: client:%i health:%i damage:%i armor:%i\n", level.time, targ->s.number,
@@ -795,7 +797,7 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
         } else {
             client->ps.persistant[PERS_ATTACKER] = ENTITYNUM_WORLD;
         }
-        client->damage_armor += asave;
+        //client->damage_armor += asave;
         client->damage_blood += take * 2;
         client->damage_knockback += knockback;
         if (dir) {
@@ -813,10 +815,11 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
         targ->client->lasthurt_mod = mod;
 
         // LOCATIONS
-        if (point && targ && targ->health > 0 && attacker && take)
+        if (point && targ && targ->health > 0 && attacker && take && mod != MOD_WINDOW) {
             take = G_LocationDamage(point, targ, attacker, take);
-        else
+        } else {
             targ->client->lasthurt_location = LOCATION_NONE;
+        }
     }
 
     // do the damage

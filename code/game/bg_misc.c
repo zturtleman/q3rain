@@ -396,6 +396,22 @@ gitem_t bg_itemlist[] ={
         /* sounds */ ""
     },
 
+    /*QUAKED weapon_hands (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+     */
+    {
+        "weapon_hands",
+        "sound/misc/w_pkup.wav",
+        { "models/weapons2/gauntlet/gauntlet.md3",
+            NULL, NULL, NULL},
+        /* icon */ "icons/iconw_gauntlet",
+        /* pickup */ "Hands",
+        0,
+        IT_WEAPON,
+        WP_HANDS,
+        /* precache */ "",
+        /* sounds */ ""
+    },
+
     /*QUAKED weapon_crossbow (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
      */
     {

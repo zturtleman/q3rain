@@ -31,22 +31,22 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define GIB_HEALTH -999
 #define	ARMOR_PROTECTION	0.66
 
-#define	MAX_ITEMS			256
+#define	MAX_ITEMS		256
 
 #define	RANK_TIED_FLAG		0x4000
 
 #define DEFAULT_SHOTGUN_SPREAD	600
 #define DEFAULT_SHOTGUN_COUNT	10
 
-#define	ITEM_RADIUS			15		// item sizes are needed for client side pickup detection
+#define	ITEM_RADIUS		15		// item sizes are needed for client side pickup detection
 
 #define	LIGHTNING_RANGE		768
 
 #define	SCORE_NOT_PRESENT	-9999	// for the CS_SCORES[12] when only one player is present
 
-#define	VOTE_TIME			30000	// 30 seconds before vote times out
+#define	VOTE_TIME		30000	// 30 seconds before vote times out
 
-#define	MINS_Z				-24
+#define	MINS_Z			-24
 #define	DEFAULT_VIEWHEIGHT	26
 #define CROUCH_VIEWHEIGHT	12
 #define	DEAD_VIEWHEIGHT		-16
@@ -57,16 +57,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
 // CS_SERVERINFO and CS_SYSTEMINFO are defined in q_shared.h
-#define	CS_MUSIC				2
-#define	CS_MESSAGE				3		// from the map worldspawn's message field
-#define	CS_MOTD					4		// g_motd string for server message of the day
-#define	CS_WARMUP				5		// server time when the match will be restarted
-#define	CS_SCORES1				6
-#define	CS_SCORES2				7
+#define	CS_MUSIC			2
+#define	CS_MESSAGE			3		// from the map worldspawn's message field
+#define	CS_MOTD				4		// g_motd string for server message of the day
+#define	CS_WARMUP			5		// server time when the match will be restarted
+#define	CS_SCORES1			6
+#define	CS_SCORES2			7
 #define CS_VOTE_TIME			8
 #define CS_VOTE_STRING			9
-#define	CS_VOTE_YES				10
-#define	CS_VOTE_NO				11
+#define	CS_VOTE_YES			10
+#define	CS_VOTE_NO			11
 
 #define CS_TEAMVOTE_TIME		12
 #define CS_TEAMVOTE_STRING		14
@@ -78,17 +78,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CS_INTERMISSION			22		// when 1, fraglimit/timelimit has been hit and intermission will start in a second or two
 #define CS_FLAGSTATUS			23		// string indicating flag status in CTF
 #define CS_SHADERSTATE			24
-#define CS_BOTINFO				25
+#define CS_BOTINFO			25
 
-#define	CS_ITEMS				27		// string of 0's and 1's that tell which items are present
+#define	CS_ITEMS			27		// string of 0's and 1's that tell which items are present
 
-#define	CS_MODELS				32
-#define	CS_SOUNDS				(CS_MODELS+MAX_MODELS)
-#define	CS_PLAYERS				(CS_SOUNDS+MAX_SOUNDS)
+#define	CS_MODELS			32
+#define	CS_SOUNDS			(CS_MODELS+MAX_MODELS)
+#define	CS_PLAYERS			(CS_SOUNDS+MAX_SOUNDS)
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
 #define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS) 
 
-#define CS_MAX					(CS_PARTICLES+MAX_LOCATIONS)
+#define CS_MAX				(CS_PARTICLES+MAX_LOCATIONS)
 
 #if (CS_MAX) > MAX_CONFIGSTRINGS
 #error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
@@ -139,7 +139,7 @@ typedef enum {
 } weaponstate_t;
 
 // pmove->pm_flags
-#define	PMF_DUCKED			1
+#define	PMF_DUCKED		1
 #define	PMF_JUMP_HELD		2
 #define	PMF_BACKWARDS_JUMP	8		// go into backwards land
 #define	PMF_BACKWARDS_RUN	16		// coast down to backwards run
@@ -149,13 +149,13 @@ typedef enum {
 #define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
 #define	PMF_USE_ITEM_HELD	1024
 #define PMF_GRAPPLE_PULL	2048	// pull towards grapple location
-#define PMF_FOLLOW			4096	// spectate following another player
+#define PMF_FOLLOW		4096	// spectate following another player
 #define PMF_SCOREBOARD		8192	// spectate as a scoreboard
 #define PMF_INVULEXPAND		16384	// invulnerability sphere set to full size
 
-#define	PMF_ALL_TIMES	(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
+#define	PMF_ALL_TIMES           (PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
 
-#define	MAXTOUCH	32
+#define	MAXTOUCH                32
 
 typedef struct {
     // state (in / out)
@@ -304,6 +304,7 @@ typedef enum {
 typedef enum {
     WP_NONE,
 
+    WP_HANDS,
     WP_KNIFE,
     WP_HE,
     WP_BARRETT,
@@ -450,7 +451,7 @@ typedef enum {
 
     EV_WALLJUMP,
     EV_GRAB,
-            EV_FALL_MINIMAL
+    EV_FALL_MINIMAL
 } entity_event_t;
 
 // animations
@@ -593,6 +594,7 @@ typedef enum {
 
     MOD_UNKNOWN,
     // weapons
+    MOD_HANDS,
     MOD_KNIFE,
     MOD_HE,
     MOD_HE_SPLASH,
@@ -612,6 +614,7 @@ typedef enum {
     MOD_SUICIDE,
     MOD_TARGET_LASER,
     MOD_TRIGGER_HURT,
+    MOD_WINDOW,
     // misc
     MOD_ADMIN,
     MOD_BOMB,

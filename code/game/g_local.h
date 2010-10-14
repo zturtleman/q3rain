@@ -31,30 +31,30 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	BASEGAME
 
-#define BODY_QUEUE_SIZE		64
+#define BODY_QUEUE_SIZE                 64
 
 #define INFINITE			1000000
 
 #define	FRAMETIME			100					// msec
-#define	CARNAGE_REWARD_TIME	3000
-#define REWARD_SPRITE_TIME	2000
+#define	CARNAGE_REWARD_TIME             3000
+#define REWARD_SPRITE_TIME              2000
 
-#define	INTERMISSION_DELAY_TIME	1000
+#define	INTERMISSION_DELAY_TIME         1000
 #define	SP_INTERMISSION_DELAY_TIME	5000
 
 // gentity->flags
-#define	FL_GODMODE				0x00000010
-#define	FL_NOTARGET				0x00000020
+#define	FL_GODMODE                      0x00000010
+#define	FL_NOTARGET			0x00000020
 #define	FL_TEAMSLAVE			0x00000400	// not the first on the team
 #define FL_NO_KNOCKBACK			0x00000800
 #define FL_DROPPED_ITEM			0x00001000
-#define FL_NO_BOTS				0x00002000	// spawn point not for bot use
+#define FL_NO_BOTS			0x00002000	// spawn point not for bot use
 #define FL_NO_HUMANS			0x00004000	// spawn point just for bots
 #define FL_FORCE_GESTURE		0x00008000	// force gesture on client
-#define FL_THROWN_ITEM		0x00016000  // XRAY FMJ weapon throwing WEAPONDROP
-#define FL_TARGET_SPAWN   0x00032000
-#define FL_POLICE_SPAWN   0x00064000
-#define FL_CIVIL_SPAWN   0x00128000
+#define FL_THROWN_ITEM                  0x00016000  // XRAY FMJ weapon throwing WEAPONDROP
+#define FL_TARGET_SPAWN                 0x00032000
+#define FL_POLICE_SPAWN                 0x00064000
+#define FL_CIVIL_SPAWN                  0x00128000
 
 // movers are things like doors, plats, buttons, etc
 
@@ -541,7 +541,7 @@ void trigger_teleporter_touch(gentity_t *self, gentity_t *other, trace_t *trace)
 // g_misc.c
 //
 void TeleportPlayer(gentity_t *player, vec3_t origin, vec3_t angles);
-void G_BreakGlass(gentity_t *ent, vec3_t point, int mod);
+qboolean G_BreakGlass(gentity_t *ent, vec3_t point, int mod);
 
 
 //

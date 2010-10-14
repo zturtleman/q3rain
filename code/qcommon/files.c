@@ -3271,8 +3271,7 @@ qboolean FS_ConditionalRestart(int checksumFeed) {
     if (fs_gamedirvar->modified) {
         Com_GameRestart(checksumFeed, qfalse);
         return qtrue;
-    }
-    else if (checksumFeed != fs_checksumFeed) {
+    } else if (checksumFeed != fs_checksumFeed) {
         FS_Restart(checksumFeed);
         return qtrue;
     }
@@ -3355,8 +3354,7 @@ void FS_Flush(fileHandle_t f) {
     fflush(fsh[f].handleFiles.file.o);
 }
 
-void FS_FilenameCompletion(const char *dir, const char *ext,
-        qboolean stripExt, void(*callback)(const char *s)) {
+void FS_FilenameCompletion(const char *dir, const char *ext, qboolean stripExt, void(*callback)(const char *s)) {
     char **filenames;
     int nfiles;
     int i;

@@ -1763,7 +1763,7 @@ Generates weapon events and modifes the weapon counter
 ==============
  */
 #define SEMI_DELAY 50
-#define INFINITE 9999999
+#define INFINITE 9999999*2
 
 static void PM_Weapon(void) {
     int addTime;
@@ -1859,7 +1859,7 @@ static void PM_Weapon(void) {
 
     // check for out of ammo
     // modified for changing ammo from ps->ammo to client->clipammo updated to ps->stats[STAT_AMMO]
-    if (!pm->ps->stats[STAT_AMMO] && pm->ps->weapon != WP_KNIFE) {
+    if (!pm->ps->stats[STAT_AMMO] && pm->ps->weapon != WP_KNIFE && pm->ps->weapon != WP_HANDS) {
         PM_AddEvent(EV_NOAMMO);
         pm->ps->weaponTime += 200;
         return;
@@ -1874,6 +1874,9 @@ static void PM_Weapon(void) {
             break;
         case WP_KNIFE:
             addTime = 300;
+            break;
+        case WP_HANDS:
+            addTime = 200;
             break;
         case WP_BARRETT:
             addTime = 4000;

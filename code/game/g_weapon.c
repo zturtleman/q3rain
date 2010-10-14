@@ -711,6 +711,8 @@ Weapon_Knife_Fire
 
 ===============
  */
+#define KNIFE_DAMAGE 50
+
 void Weapon_Knife_Fire(gentity_t *ent) {
     trace_t tr;
     vec3_t end;
@@ -744,8 +746,50 @@ void Weapon_Knife_Fire(gentity_t *ent) {
         return;
     }
 
-    damage = 50;
-    G_Damage(traceEnt, ent, ent, forward, tr.endpos, damage, 0, MOD_KNIFE);
+    G_Damage(traceEnt, ent, ent, forward, tr.endpos, KNIFE_DAMAGE, 0, MOD_KNIFE);
+}
+
+/*
+===============
+Weapon_Hands_Fire
+
+===============
+ */
+#define HANDS_DAMAGE 10
+
+void Weapon_Hands_Fire(gentity_t *ent) {
+    trace_t tr;
+    vec3_t end;
+    gentity_t *tent;
+    gentity_t *traceEnt;
+
+    // set aiming directions
+    AngleVectors(ent->client->ps.viewangles, forward, right, up);
+
+    CalcMuzzlePoint(ent, forward, right, up, muzzle);
+
+    VectorMA(muzzle, 32, forward, end);
+
+    trap_Trace(&tr, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
+    if (tr.surfaceFlags & SURF_NOIMPACT) {
+        return;
+    }
+
+    traceEnt = &g_entities[ tr.entityNum ];
+
+    // send blood impact
+    if (traceEnt->takedamage && traceEnt->client) {
+        tent = G_TempEntity(tr.endpos, EV_MISSILE_HIT);
+        tent->s.otherEntityNum = traceEnt->s.number;
+        tent->s.eventParm = DirToByte(tr.plane.normal);
+        tent->s.weapon = ent->s.weapon;
+    }
+
+    if (!traceEnt->takedamage) {
+        return;
+    }
+
+    G_Damage(traceEnt, ent, ent, forward, tr.endpos, HANDS_DAMAGE, 0, MOD_HANDS);
 }
 
 /*
@@ -960,14 +1004,8 @@ void FireWeapon(gentity_t *ent) {
         ent->client->clipammo[ ent->client->ps.weapon ]--;
     }
 
-    if (ent->client->ps.powerups[PW_QUAD]) {
-        s_quadFactor = g_quadfactor.value;
-    } else {
-        s_quadFactor = 1;
-    }
-
     // track shots taken for accuracy tracking.  Grapple is not a weapon and gauntet is just not tracked
-    if (ent->s.weapon != WP_GRAPPLING_HOOK && ent->s.weapon != WP_KNIFE) {
+    if (ent->s.weapon != WP_GRAPPLING_HOOK && ent->s.weapon != WP_KNIFE && ent->s.weapon != WP_HANDS) {
         ent->client->accuracy_shots++;
     }
 
@@ -978,6 +1016,9 @@ void FireWeapon(gentity_t *ent) {
 
     // fire the specific weapon
     switch (ent->s.weapon) {
+        case WP_HANDS:
+            Weapon_Hands_Fire(ent);
+            break;
         case WP_KNIFE:
             Weapon_Knife_Fire(ent);
             break;

@@ -165,6 +165,9 @@ static void CG_Obituary(entityState_t *ent) {
             case MOD_HE_SPLASH:
                 message = "doesn't know how to use grenades";
                 break;
+            case MOD_WINDOW:
+                message = "hit it too hard";
+                break;
             default:
                 if (gender == GENDER_FEMALE)
                     message = "killed herself";
@@ -234,6 +237,9 @@ static void CG_Obituary(entityState_t *ent) {
                 break;
             case MOD_WALTHER:
                 message = "was shot by";
+                break;
+            case MOD_HANDS:
+                message = "was beaten to death by";
                 break;
             default:
                 message = "was killed by";
