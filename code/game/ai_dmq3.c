@@ -909,6 +909,8 @@ void BotUpdateInventory(bot_state_t *bs) {
     bs->inventory[INVENTORY_KNIFE] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_KNIFE)) != 0;
     bs->inventory[INVENTORY_ACR] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_ACR)) != 0;
     bs->inventory[INVENTORY_WALTHER] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_WALTHER)) != 0;
+    bs->inventory[INVENTORY_INJECTOR] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_INJECTOR)) != 0;
+    bs->inventory[INVENTORY_HANDS] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_HANDS)) != 0;
     //ammo
     bs->inventory[INVENTORY_SHELLS] = bs->cur_ps.ammo[WP_SHOTGUN];
     bs->inventory[INVENTORY_BULLETS] = bs->cur_ps.ammo[WP_MACHINEGUN];
@@ -920,6 +922,8 @@ void BotUpdateInventory(bot_state_t *bs) {
     bs->inventory[INVENTORY_BFGAMMO] = bs->cur_ps.ammo[WP_BFG];
     //powerups
     bs->inventory[INVENTORY_HEALTH] = bs->cur_ps.stats[STAT_HEALTH];
+    bs->inventory[INVENTORY_ADRENALINE] = bs->cur_ps.powerups[PW_ADRENALINE] != 0;
+    // TODO remove
     bs->inventory[INVENTORY_TELEPORTER] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_TELEPORTER;
     bs->inventory[INVENTORY_MEDKIT] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_MEDKIT;
     bs->inventory[INVENTORY_QUAD] = bs->cur_ps.powerups[PW_QUAD] != 0;
@@ -955,17 +959,12 @@ BotBattleUseItems
  */
 void BotBattleUseItems(bot_state_t *bs) {
     if (bs->inventory[INVENTORY_HEALTH] < 40) {
-        if (bs->inventory[INVENTORY_TELEPORTER] > 0) {
+        /*if (bs->inventory[INVENTORY_TELEPORTER] > 0) {
             if (!BotCTFCarryingFlag(bs)
                     ) {
                 trap_EA_Use(bs->client);
             }
-        }
-    }
-    if (bs->inventory[INVENTORY_HEALTH] < 60) {
-        if (bs->inventory[INVENTORY_MEDKIT] > 0) {
-            trap_EA_Use(bs->client);
-        }
+        }*/
     }
 }
 
@@ -1112,25 +1111,12 @@ BotAggression
 ==================
  */
 float BotAggression(bot_state_t *bs) {
-    //if the bot has quad
-    if (bs->inventory[INVENTORY_QUAD]) {
-        //if the bot is not holding the gauntlet or the enemy is really nearby
-        if (bs->weaponnum != WP_KNIFE ||
-                bs->inventory[ENEMY_HORIZONTAL_DIST] < 80) {
-            return 70;
-        }
-    }
     //if the enemy is located way higher than the bot
     if (bs->inventory[ENEMY_HEIGHT] > 200) return 0;
     //if the bot is very low on health
-    if (bs->inventory[INVENTORY_HEALTH] < 60) return 0;
-    //if the bot is low on health
-    if (bs->inventory[INVENTORY_HEALTH] < 80) {
-        //if the bot has insufficient armor
-        if (bs->inventory[INVENTORY_ARMOR] < 40) return 0;
-    }
+    if (bs->inventory[INVENTORY_HEALTH] < 40) return 0;
     //if the bot can use the bfg
-    if (bs->inventory[INVENTORY_BFG10K] > 0 &&
+    /*if (bs->inventory[INVENTORY_BFG10K] > 0 &&
             bs->inventory[INVENTORY_BFGAMMO] > 7) return 100;
     //if the bot can use the railgun
     if (bs->inventory[INVENTORY_RAILGUN] > 0 &&
@@ -1149,18 +1135,18 @@ float BotAggression(bot_state_t *bs) {
             bs->inventory[INVENTORY_GRENADES] > 10) return 80;
     //if the bot can use the shotgun
     if (bs->inventory[INVENTORY_SHOTGUN] > 0 &&
-            bs->inventory[INVENTORY_SHELLS] > 10) return 50;
+            bs->inventory[INVENTORY_SHELLS] > 10) return 50;*/
     // rain
     if (bs->inventory[INVENTORY_HE] > 0 &&
             bs->inventory[INVENTORY_HE] >= 1) return 50;
     if (bs->inventory[INVENTORY_BARRETT] > 0 &&
-            bs->inventory[INVENTORY_BARRETT] > 1) return 50;
+            bs->inventory[INVENTORY_BARRETT] > 1) return 200;
     if (bs->inventory[INVENTORY_INTERVENTION] > 0 &&
             bs->inventory[INVENTORY_INTERVENTION] > 1) return 50;
     if (bs->inventory[INVENTORY_CROSSBOW] > 0 &&
             bs->inventory[INVENTORY_CROSSBOW] > 1) return 50;
     if (bs->inventory[INVENTORY_ACR] > 0 &&
-            bs->inventory[INVENTORY_ACR] > 1) return 50;
+            bs->inventory[INVENTORY_ACR] > 1) return 100;
     if (bs->inventory[INVENTORY_WALTHER] > 0 &&
             bs->inventory[INVENTORY_WALTHER] > 1) return 50;
     //otherwise the bot is not feeling too good
@@ -1173,14 +1159,11 @@ BotFeelingBad
 ==================
  */
 float BotFeelingBad(bot_state_t *bs) {
-    if (bs->weaponnum == WP_KNIFE) {
+    if (bs->weaponnum == WP_KNIFE || bs->weaponnum == WP_HANDS || bs->weaponnum == WP_INJECTOR) {
         return 100;
     }
     if (bs->inventory[INVENTORY_HEALTH] < 40) {
         return 100;
-    }
-    if (bs->weaponnum == WP_ACR) {
-        return 90;
     }
     if (bs->inventory[INVENTORY_HEALTH] < 60) {
         return 80;
@@ -1242,28 +1225,7 @@ BotCanAndWantsToRocketJump
 ==================
  */
 int BotCanAndWantsToRocketJump(bot_state_t *bs) {
-    float rocketjumper;
-
     return qfalse;
-
-    /*//if rocket jumping is disabled
-    if (!bot_rocketjump.integer) return qfalse;
-    //if no rocket launcher
-    if (bs->inventory[INVENTORY_ROCKETLAUNCHER] <= 0) return qfalse;
-    //if low on rockets
-    if (bs->inventory[INVENTORY_ROCKETS] < 3) return qfalse;
-    //never rocket jump with the Quad
-    if (bs->inventory[INVENTORY_QUAD]) return qfalse;
-    //if low on health
-    if (bs->inventory[INVENTORY_HEALTH] < 60) return qfalse;
-    //if not full health
-    if (bs->inventory[INVENTORY_HEALTH] < 90) {
-            //if the bot has insufficient armor
-            if (bs->inventory[INVENTORY_ARMOR] < 40) return qfalse;
-    }
-    rocketjumper = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_WEAPONJUMPING, 0, 1);
-    if (rocketjumper < 0.5) return qfalse;
-    return qtrue;*/
 }
 
 /*
@@ -1273,12 +1235,7 @@ BotHasPersistantPowerupAndWeapon
  */
 int BotHasPersistantPowerupAndWeapon(bot_state_t *bs) {
     //if the bot is very low on health
-    if (bs->inventory[INVENTORY_HEALTH] < 60) return qfalse;
-    //if the bot is low on health
-    if (bs->inventory[INVENTORY_HEALTH] < 80) {
-        //if the bot has insufficient armor
-        if (bs->inventory[INVENTORY_ARMOR] < 40) return qfalse;
-    }
+    if (bs->inventory[INVENTORY_HEALTH] < 40) return qfalse;
     //if the bot can use the bfg
     if (bs->inventory[INVENTORY_BFG10K] > 0 &&
             bs->inventory[INVENTORY_BFGAMMO] > 7) return qtrue;
@@ -2229,9 +2186,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
         //if the bot is skilled anough
         if (aim_skill > 0.5) {
             //do prediction shots around corners
-            if (wi.number == WP_BFG ||
-                    wi.number == WP_ROCKET_LAUNCHER ||
-                    wi.number == WP_HE) {
+            if (wi.number == WP_HE) {
                 //create the chase goal
                 goal.entitynum = bs->client;
                 goal.areanum = bs->areanum;
@@ -2260,15 +2215,11 @@ void BotAimAtEnemy(bot_state_t *bs) {
     //get aim direction
     VectorSubtract(bestorigin, bs->eye, dir);
     //
-    if (wi.number == WP_MACHINEGUN ||
-            wi.number == WP_SHOTGUN ||
-            wi.number == WP_LIGHTNING ||
-            wi.number == WP_CROSSBOW ||
+    if (wi.number == WP_CROSSBOW ||
             wi.number == WP_BARRETT ||
             wi.number == WP_INTERVENTION ||
             wi.number == WP_ACR ||
-            wi.number == WP_WALTHER ||
-            wi.number == WP_RAILGUN) {
+            wi.number == WP_WALTHER) {
         //distance towards the enemy
         dist = VectorLength(dir);
         if (dist > 150) dist = 150;
@@ -2343,7 +2294,7 @@ void BotCheckAttack(bot_state_t *bs) {
     //
     VectorSubtract(bs->aimtarget, bs->eye, dir);
     //
-    if (bs->weaponnum == WP_KNIFE) {
+    if (bs->weaponnum == WP_KNIFE || bs->weaponnum == WP_HANDS) {
         if (VectorLengthSquared(dir) > Square(60)) {
             return;
         }

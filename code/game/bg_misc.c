@@ -412,6 +412,22 @@ gitem_t bg_itemlist[] ={
         /* sounds */ ""
     },
 
+    /*QUAKED weapon_injector (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+     */
+    {
+        "weapon_injector",
+        "sound/misc/w_pkup.wav",
+        { "models/weapons2/gauntlet/gauntlet.md3",
+            NULL, NULL, NULL},
+        /* icon */ "icons/iconw_gauntlet",
+        /* pickup */ "Injector",
+        0,
+        IT_WEAPON,
+        WP_INJECTOR,
+        /* precache */ "",
+        /* sounds */ ""
+    },
+
     /*QUAKED weapon_crossbow (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
      */
     {

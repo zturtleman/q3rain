@@ -310,9 +310,10 @@ typedef enum {
     WP_BARRETT,
     WP_INTERVENTION,
     WP_CROSSBOW,
-    WP_ACR,
     WP_WALTHER,
+    WP_ACR,
     WP_BOMB,
+    WP_INJECTOR,
 
     // TODO remove
     WP_GAUNTLET,

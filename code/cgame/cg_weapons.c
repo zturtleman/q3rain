@@ -763,6 +763,10 @@ void CG_RegisterWeapon(int weaponNum) {
             cgs.media.bulletExplosionShader = trap_R_RegisterShader("bulletExplosion");
             break;
 
+        case WP_INJECTOR:
+            weaponInfo->flashSound[0] = trap_S_RegisterSound("sound/weapons/melee/fstatck.wav", qfalse);
+            break;
+
             // end rain weapons
 
         default:

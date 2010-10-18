@@ -1893,6 +1893,9 @@ static void PM_Weapon(void) {
         case WP_ACR:
             addTime = 125;
             break;
+        case WP_INJECTOR:
+            addTime = 600;
+            break;
         case WP_WALTHER:
             addTime = INFINITE;
             break;

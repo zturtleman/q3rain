@@ -477,11 +477,13 @@ void weapon_railgun_fire(gentity_t *ent, int count) {
 weapon_barrett_fire
 =================
  */
-#define MAX_BARRETT_HITS	4
-#define MAX_BARRETT_WALLS	2
-#define MAX_BARRETT_UNITS	96
+#define MAX_BARRETT_HITS    4
+#define MAX_BARRETT_WALLS   2
+#define MAX_BARRETT_UNITS   96
+#define BARRETT_DAMAGE      200
+#define BARRETT_RANGE       8129
 
-void weapon_barrett_fire(gentity_t *ent, int count) {
+void Weapon_Barrett_Fire(gentity_t *ent, int count) {
     vec3_t end, oldmuzzle;
     trace_t trace, trace2;
     gentity_t *tent;
@@ -553,7 +555,7 @@ void weapon_barrett_fire(gentity_t *ent, int count) {
         trap_Trace(&trace2, muzzle, NULL, NULL, trace.endpos, ent->s.number, MASK_SHOT);
         VectorCopy(trace2.endpos, muzzle);
 
-        weapon_barrett_fire(ent, count);
+        Weapon_Barrett_Fire(ent, count);
     }
 
     VectorCopy(oldmuzzle, muzzle);
@@ -712,20 +714,20 @@ Weapon_Knife_Fire
 ===============
  */
 #define KNIFE_DAMAGE 50
+#define KNIFE_RANGE 32
 
 void Weapon_Knife_Fire(gentity_t *ent) {
     trace_t tr;
     vec3_t end;
     gentity_t *tent;
     gentity_t *traceEnt;
-    int damage;
 
     // set aiming directions
     AngleVectors(ent->client->ps.viewangles, forward, right, up);
 
     CalcMuzzlePoint(ent, forward, right, up, muzzle);
 
-    VectorMA(muzzle, 32, forward, end);
+    VectorMA(muzzle, KNIFE_RANGE, forward, end);
 
     trap_Trace(&tr, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
     if (tr.surfaceFlags & SURF_NOIMPACT) {
@@ -747,6 +749,48 @@ void Weapon_Knife_Fire(gentity_t *ent) {
     }
 
     G_Damage(traceEnt, ent, ent, forward, tr.endpos, KNIFE_DAMAGE, 0, MOD_KNIFE);
+}
+
+/*
+===============
+Weapon_Injector_Fire
+
+===============
+ */
+#define INJECTOR_RANGE 32
+
+void Weapon_Injector_Fire(gentity_t *ent) {
+    trace_t tr;
+    vec3_t end;
+    gentity_t *traceEnt;
+    qboolean okay = qtrue;
+
+    AngleVectors(ent->client->ps.viewangles, forward, right, up);
+    CalcMuzzlePoint(ent, forward, right, up, muzzle);
+    VectorMA(muzzle, INJECTOR_RANGE, forward, end);
+    trap_Trace(&tr, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
+
+    traceEnt = &g_entities[tr.entityNum];
+
+    if (tr.surfaceFlags & SURF_NOIMPACT) {
+        okay = qfalse;
+    }
+    if (tr.contents & CONTENTS_SOLID) {
+        okay = qfalse;
+    }
+    if (tr.entityNum == MAX_GENTITIES - 1) {
+        okay = qfalse;
+    }
+    if (tr.contents & CONTENTS_BODY) {
+        okay = qtrue;
+    }
+
+    if (okay == qtrue) {
+        //Com_Printf("Weapon_Injector_Fire: Injecting entity (%i)\n", tr.entityNum);
+        traceEnt->client->ps.powerups[PW_ADRENALINE] = level.time + ADRENALINE_TIME;
+    } else {
+        ent->client->ps.powerups[PW_ADRENALINE] = level.time + ADRENALINE_TIME;
+    }
 }
 
 /*
@@ -812,19 +856,6 @@ void Weapon_HE_Fire(gentity_t *ent) {
     m->damage = HE_DAMAGE;
     m->splashDamage = HE_SPLASHDAMAGE;
     m->splashRadius = HE_RADIUS;
-}
-
-/*
-===============
-Weapon_Barrett_Fire
-
-===============
- */
-#define BARRETT_DAMAGE 200
-#define BARRETT_RANGE 8129
-
-void Weapon_Barrett_Fire(gentity_t *ent) {
-    weapon_barrett_fire(ent, 0);
 }
 
 /*
@@ -1026,7 +1057,7 @@ void FireWeapon(gentity_t *ent) {
             Weapon_HE_Fire(ent);
             break;
         case WP_BARRETT:
-            Weapon_Barrett_Fire(ent);
+            Weapon_Barrett_Fire(ent, 0);
             break;
         case WP_INTERVENTION:
             Weapon_Intervention_Fire(ent);
@@ -1039,6 +1070,9 @@ void FireWeapon(gentity_t *ent) {
             break;
         case WP_WALTHER:
             Weapon_Walther_Fire(ent);
+            break;
+        case WP_INJECTOR:
+            Weapon_Injector_Fire(ent);
             break;
         case WP_BOMB:
             Com_Printf("^3FireWeapon: ent->s.weapon == WP_BOMB: ^1STUB!\n");

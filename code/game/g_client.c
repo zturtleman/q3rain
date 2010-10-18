@@ -1151,21 +1151,29 @@ void ClientSpawn(gentity_t *ent) {
     client->clipammo[WP_INTERVENTION] = 7;
     client->ps.ammo[WP_INTERVENTION] = 7;
 
-    client->ps.stats[STAT_WEAPONS] |= (1 << WP_HE);
-    client->clipammo[WP_HE] = 2;
-    client->ps.ammo[WP_HE] = 0;
-
-    client->ps.stats[STAT_WEAPONS] |= (1 << WP_CROSSBOW);
-    client->clipammo[WP_CROSSBOW] = 1;
-    client->ps.ammo[WP_CROSSBOW] = 3;
-
     client->ps.stats[STAT_WEAPONS] |= (1 << WP_ACR);
     client->clipammo[WP_ACR] = 30;
     client->ps.ammo[WP_ACR] = 30;
 
-    client->ps.stats[STAT_WEAPONS] |= (1 << WP_WALTHER);
-    client->clipammo[WP_WALTHER] = 10;
-    client->ps.ammo[WP_WALTHER] = 20;
+    if (ent->r.svFlags & SVF_BOT) {
+        client->clipammo[WP_ACR] = 300; // haaaaax!
+    } else {
+        client->ps.stats[STAT_WEAPONS] |= (1 << WP_WALTHER);
+        client->clipammo[WP_WALTHER] = 10;
+        client->ps.ammo[WP_WALTHER] = 20;
+
+        client->ps.stats[STAT_WEAPONS] |= (1 << WP_INJECTOR);
+        client->clipammo[WP_INJECTOR] = 1;
+        client->ps.ammo[WP_INJECTOR] = 0;
+
+        client->ps.stats[STAT_WEAPONS] |= (1 << WP_HE);
+        client->clipammo[WP_HE] = 2;
+        client->ps.ammo[WP_HE] = 0;
+
+        client->ps.stats[STAT_WEAPONS] |= (1 << WP_CROSSBOW);
+        client->clipammo[WP_CROSSBOW] = 1;
+        client->ps.ammo[WP_CROSSBOW] = 3;
+    }
 
     // health will count down towards max_health
     //ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] + 25;

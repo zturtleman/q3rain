@@ -51,15 +51,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_BELT				28
 //powerups
 #define INVENTORY_HEALTH			29
-#define INVENTORY_TELEPORTER		30
+#define INVENTORY_TELEPORTER                    30
 #define INVENTORY_MEDKIT			31
 #define INVENTORY_KAMIKAZE			32
 #define INVENTORY_PORTAL			33
-#define INVENTORY_INVULNERABILITY	34
+#define INVENTORY_INVULNERABILITY               34
 #define INVENTORY_QUAD				35
-#define INVENTORY_ENVIRONMENTSUIT	36
+#define INVENTORY_ENVIRONMENTSUIT               36
 #define INVENTORY_HASTE				37
-#define INVENTORY_INVISIBILITY		38
+#define INVENTORY_INVISIBILITY                  38
 #define INVENTORY_REGEN				39
 #define INVENTORY_FLIGHT			40
 #define INVENTORY_SCOUT				41
@@ -75,6 +75,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_ACR 50
 #define INVENTORY_WALTHER 51
 #define INVENTORY_BOMB 52
+#define INVENTORY_INJECTOR 53
+#define INVENTORY_HANDS 54
+#define INVENTORY_ADRENALINE 55
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200
 #define ENEMY_HEIGHT				201
