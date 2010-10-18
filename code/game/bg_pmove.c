@@ -707,7 +707,7 @@ static void PM_WallClimb(void) {
     pm->ps->pm_flags |= PMF_JUMP_HELD;
 
     boost = WALLCLIMB_BOOST;
-    if (pm->ps->speed < PLAYERSPEED) {
+    if (pm->ps->speed < PLAYER_SPEED) {
         boost /= 2;
     }
 
@@ -775,32 +775,7 @@ static qboolean PM_CheckWallJump(void) {
 PM_WallJump
 =============
  */
-static void PM_WallJump(void) {/*
-    vec3_t flatforward, spot;
-    trace_t trace;
-    vec3_t velocity;
-    float dot;
-
-    flatforward[0] = pml.forward[0];
-    flatforward[1] = pml.forward[1];
-    flatforward[2] = 0;
-    VectorNormalize(flatforward);
-    VectorMA(pm->ps->origin, 1, flatforward, spot);
-    pm->trace(&trace, pm->ps->origin, pm->mins, pm->maxs, spot, pm->ps->clientNum, MASK_PLAYERSOLID);
-    
-    dot = DotProduct(velocity, trace->plane.normal);
-    VectorMA(velocity, -2 * dot, trace->plane.normal, ent->s.pos.trDelta);
-
-    VectorScale(ent->s.pos.trDelta, 0.65, ent->s.pos.trDelta);
-    
-    if (trace->plane.normal[2] > 0.2 && VectorLength(pm->ps->origin) < 40) {
-        //G_SetOrigin(ent, trace->endpos);
-        pm->ps->origin = trace->endpos;
-        return;
-    }
-
-    VectorAdd(ent->r.currentOrigin, trace->plane.normal, ent->r.currentOrigin);
-    VectorCopy(ent->r.currentOrigin, ent->s.pos.trBase);*/
+static void PM_WallJump(void) {
 }
 
 /*

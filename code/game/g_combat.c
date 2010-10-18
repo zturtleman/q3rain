@@ -718,11 +718,8 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
     // figure momentum add, even if the damage won't be taken
     if (knockback && targ->client) {
         vec3_t kvel;
-        float mass;
 
-        mass = 200;
-
-        VectorScale(dir, g_knockback.value * (float) knockback / mass, kvel);
+        VectorScale(dir, g_knockback.value * (float) knockback / PLAYER_MASS, kvel);
         VectorAdd(targ->client->ps.velocity, kvel, targ->client->ps.velocity);
 
         // set the timer so that the other client can't cancel

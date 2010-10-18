@@ -722,9 +722,9 @@ void ClientThink_real(gentity_t *ent) {
     adrenaline = client->ps.powerups[PW_ADRENALINE] > level.time;
 
     if (adrenaline) {
-        client->ps.speed = PLAYERSPEED * 1.3;
+        client->ps.speed = PLAYER_SPEED * 1.3;
     } else {
-        client->ps.speed = PLAYERSPEED / client->ps.legsfactor;
+        client->ps.speed = PLAYER_SPEED / client->ps.legsfactor;
     }
 
     // set up for pmove

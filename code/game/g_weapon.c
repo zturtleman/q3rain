@@ -49,15 +49,40 @@ void G_BounceProjectile(vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout) 
 }
 
 /*
-======================================================================
-
-GAUNTLET
-
-======================================================================
+===============
+G_PushBack
+===============
  */
+void G_PushBack(gentity_t *ent, int knockback) {
+    vec3_t kvel;
+    vec3_t dir;
 
-void Weapon_Gauntlet(gentity_t *ent) {
+    VectorCopy(forward, dir);
+    dir[0] *= -1;
+    dir[1] *= -1;
+    // uncomment for z-change, gives boost when used in combination with wallclimb
+    //dir[2] *= -1;
+    // default behaviour
+    dir[2] = 0.1f;
 
+    VectorScale(dir, g_knockback.value * (float) knockback / PLAYER_MASS, kvel);
+    VectorAdd(ent->client->ps.velocity, kvel, ent->client->ps.velocity);
+
+    // set the timer so that the other client can't cancel
+    // out the movement immediately
+    if (!ent->client->ps.pm_time) {
+        int t;
+
+        t = knockback * 2;
+        if (t < 50) {
+            t = 50;
+        }
+        if (t > 150) {
+            t = 150;
+        }
+        ent->client->ps.pm_time = t;
+        ent->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
+    }
 }
 
 /*
@@ -715,6 +740,7 @@ Weapon_Knife_Fire
  */
 #define KNIFE_DAMAGE 50
 #define KNIFE_RANGE 32
+#define KNIFE_KNOCKBACK 25
 
 void Weapon_Knife_Fire(gentity_t *ent) {
     trace_t tr;
@@ -732,6 +758,8 @@ void Weapon_Knife_Fire(gentity_t *ent) {
     trap_Trace(&tr, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
     if (tr.surfaceFlags & SURF_NOIMPACT) {
         return;
+    } else if (tr.contents & CONTENTS_SOLID) {
+        G_PushBack(ent, KNIFE_KNOCKBACK);
     }
 
     traceEnt = &g_entities[ tr.entityNum ];
@@ -800,6 +828,8 @@ Weapon_Hands_Fire
 ===============
  */
 #define HANDS_DAMAGE 10
+#define HANDS_RANGE 32
+#define HANDS_KNOCKBACK 50
 
 void Weapon_Hands_Fire(gentity_t *ent) {
     trace_t tr;
@@ -812,11 +842,13 @@ void Weapon_Hands_Fire(gentity_t *ent) {
 
     CalcMuzzlePoint(ent, forward, right, up, muzzle);
 
-    VectorMA(muzzle, 32, forward, end);
+    VectorMA(muzzle, HANDS_RANGE, forward, end);
 
     trap_Trace(&tr, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
     if (tr.surfaceFlags & SURF_NOIMPACT) {
         return;
+    } else if (tr.contents & CONTENTS_SOLID) {
+        G_PushBack(ent, HANDS_KNOCKBACK);
     }
 
     traceEnt = &g_entities[ tr.entityNum ];
