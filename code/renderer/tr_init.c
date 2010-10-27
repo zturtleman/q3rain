@@ -1001,13 +1001,17 @@ void R_Register(void) {
     r_ext_multitexture = ri.Cvar_Get("r_ext_multitexture", "1", CVAR_ARCHIVE | CVAR_LATCH);
     r_ext_compiled_vertex_array = ri.Cvar_Get("r_ext_compiled_vertex_array", "1", CVAR_ARCHIVE | CVAR_LATCH);
     r_ext_texture_env_add = ri.Cvar_Get("r_ext_texture_env_add", "1", CVAR_ARCHIVE | CVAR_LATCH);
-    r_ext_vertex_buffer_object = ri.Cvar_Get("r_ext_vertex_buffer_object", "2", CVAR_ARCHIVE | CVAR_LATCH);
+    // 2 for full
+    r_ext_vertex_buffer_object = ri.Cvar_Get("r_ext_vertex_buffer_object", "0", CVAR_ARCHIVE | CVAR_LATCH);
 
-    //ri.Cvar_CheckRange(r_ext_vertex_buffer_object, 0, 2, qtrue);
+    // FIXME segfaults
+
+    ri.Cvar_CheckRange(r_ext_vertex_buffer_object, 0, 2, qtrue);
     //ri.Cvar_Alias(r_ext_vertex_buffer_object, "r_vbo");
 
+    // both 1
     r_ext_framebuffer_object = ri.Cvar_Get("r_ext_framebuffer_object", "1", CVAR_ARCHIVE | CVAR_LATCH);
-    r_ext_vertex_shader = ri.Cvar_Get("r_ext_vertex_shader", "1", CVAR_ARCHIVE | CVAR_LATCH);
+    r_ext_vertex_shader = ri.Cvar_Get("r_ext_vertex_shader", "0", CVAR_ARCHIVE | CVAR_LATCH);
 
     //ri.Cvar_Alias(r_ext_vertex_shader, "r_glsl");
 
@@ -1056,7 +1060,7 @@ void R_Register(void) {
     //
     // archived variables that can change at any time
     //
-    r_lodCurveError = ri.Cvar_Get("r_lodCurveError", "250", CVAR_ARCHIVE | CVAR_CHEAT);
+    r_lodCurveError = ri.Cvar_Get("r_lodCurveError", "750", CVAR_ARCHIVE | CVAR_CHEAT);
     r_lodbias = ri.Cvar_Get("r_lodbias", "0", CVAR_ARCHIVE);
     r_flares = ri.Cvar_Get("r_flares", "0", CVAR_ARCHIVE);
     r_znear = ri.Cvar_Get("r_znear", "1", CVAR_CHEAT);
@@ -1091,9 +1095,11 @@ void R_Register(void) {
     r_minEntityLight = ri.Cvar_Get("r_minEntityLight", "1.5", CVAR_ARCHIVE);
     ri.Cvar_CheckRange(r_minEntityLight, 0.0f, 2.0f, qfalse);
 
-    r_bloom = ri.Cvar_Get("r_glslbloom", "1", CVAR_ARCHIVE);
-    r_autobump = ri.Cvar_Get("r_autobump", "1", CVAR_ARCHIVE | CVAR_LATCH);
+    // both 1
+    r_bloom = ri.Cvar_Get("r_glslbloom", "0", CVAR_ARCHIVE);
+    r_autobump = ri.Cvar_Get("r_autobump", "0", CVAR_ARCHIVE | CVAR_LATCH);
 
+    
     r_dof = ri.Cvar_Get("r_dof", "0", CVAR_ARCHIVE | CVAR_LATCH);
     r_dofscale = ri.Cvar_Get("r_dofscale", "2", CVAR_ARCHIVE);
     ri.Cvar_CheckRange(r_dofscale, 0.0f, 10.0f, qfalse);
@@ -1101,7 +1107,8 @@ void R_Register(void) {
     ri.Cvar_CheckRange(r_dofblend, 0.001f, 1.0f, qfalse);
 
     // disables all pixelshader effects, just leaving the r_ext_vertex_buffer_object and FS_CHEAP
-    r_simpleshaders = ri.Cvar_Get("r_simpleshaders", "0", CVAR_ARCHIVE | CVAR_LATCH);
+    // 0 for enable
+    r_simpleshaders = ri.Cvar_Get("r_simpleshaders", "1", CVAR_ARCHIVE | CVAR_LATCH);
     r_glsl_debug = ri.Cvar_Get("r_glsl_debug", "0", CVAR_ARCHIVE | CVAR_LATCH | CVAR_CHEAT);
     // disable if you cant load sm3 shaders
     r_maxstaticverts = ri.Cvar_Get("r_maxstaticverts", "1500000", CVAR_ARCHIVE);
@@ -1166,7 +1173,6 @@ void R_Register(void) {
 
     // make sure all the commands added here are also
     // removed in R_Shutdown
-    Com_Printf("finished r cvars\n");
     ri.Cmd_AddCommand("imagelist", R_ImageList_f);
     ri.Cmd_AddCommand("shaderlist", R_ShaderList_f);
     ri.Cmd_AddCommand("skinlist", R_SkinList_f);
@@ -1176,7 +1182,6 @@ void R_Register(void) {
     ri.Cmd_AddCommand("screenshotJPEG", R_ScreenShotJPEG_f);
     ri.Cmd_AddCommand("gfxinfo", GfxInfo_f);
     ri.Cmd_AddCommand("glslinfo", GlslInfo_f);
-    Com_Printf("finished addcommands\n");
 }
 
 /*
