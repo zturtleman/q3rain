@@ -505,6 +505,10 @@ void RB_RenderFlares (void) {
 		qglDisable (GL_CLIP_PLANE0);
 	}
 
+	if ( backEnd.viewParms.isWater ) {
+		qglDisable (GL_CLIP_PLANE1);
+	}
+
 	qglPushMatrix();
     qglLoadIdentity();
 	qglMatrixMode( GL_PROJECTION );

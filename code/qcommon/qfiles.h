@@ -547,6 +547,17 @@ typedef struct {
 
 #define drawVert_t_cleared(x) drawVert_t (x) = {{0, 0, 0}, {0, 0}, {0, 0}, {0, 0, 0}, {0, 0, 0, 0}}
 
+typedef struct
+{
+        float position[3];
+        float uv[2];
+        float light_uv[2];
+        float normal[3];
+        float stv[3];
+        float ttv[3];
+        float rgba[4];
+} staticVert_t;
+
 typedef enum {
 	MST_BAD,
 	MST_PLANAR,

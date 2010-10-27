@@ -1428,6 +1428,7 @@ Q3OBJ = \
   $(B)/client/tr_curve.o \
   $(B)/client/tr_flares.o \
   $(B)/client/tr_font.o \
+  $(B)/client/tr_frag.o \
   $(B)/client/tr_image.o \
   $(B)/client/tr_image_png.o \
   $(B)/client/tr_image_jpg.o \

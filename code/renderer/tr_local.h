@@ -65,7 +65,75 @@ typedef struct dlight_s {
     int additive; // texture detail is lost tho when the lightmap is dark
 } dlight_t;
 
+typedef struct {
+    char name[128];
 
+    int vertexShader;
+    int fragShader;
+    int program;
+
+    //static base stuff
+    int position_i;
+    int uv_i;
+    int light_uv_i;
+    int normal_i;
+    int stv_i;
+    int ttv_i;
+    int rgba_i;
+    ///
+
+    int diffuse0;
+    int normal0;
+    int bump0;
+    int diffuse1;
+    int normal1;
+    int bump1;
+    int lightmap0;
+    int radbump0;
+    int radbump1;
+    int radbump2;
+    int specbump;
+    int cubemap;
+    int cubemap2;
+    int reflectmap;
+    int refractmap;
+    int scenetexture;
+
+    int vertexType; //0 is illegal, 1 for static, 2 for model
+
+    //md5 additions
+    /*	int boneindexs_i;
+            int boneweights_i;
+            int pos0_i;
+            int pos1_i;
+            int pos2_i;
+            int norm0_i;
+            int norm1_i;
+            int norm2_i;
+            int tangent0_i;
+            int tangent1_i;
+            int tangent2_i;
+            int bitangent0_i;
+            int bitangent1_i;
+            int bitangent2_i;*/
+
+    ////
+
+} fragShader_t;
+
+typedef struct renderbuffer_s {
+    unsigned int frameBuffer;
+    unsigned int depth_rb;
+
+    unsigned int texnum; //colour
+    unsigned int depthtexnum; //colour
+    qboolean depthtexture;
+    int x;
+    int y;
+
+} renderbuffer_t;
+
+//===============================================================================
 // a trRefEntity_t has all the information passed in by
 // the client game, as well as some locally derived info
 
@@ -87,6 +155,7 @@ typedef struct {
     vec3_t axis[3]; // orientation in world
     vec3_t viewOrigin; // viewParms->or.origin in local coordinates
     float modelMatrix[16];
+    float u_modelMatrix[16]; //unflipped
 } orientationr_t;
 
 typedef struct image_s {
@@ -102,10 +171,19 @@ typedef struct image_s {
 
     qboolean mipmap;
     qboolean allowPicmip;
+    qboolean hasAlpha;
     int wrapClampMode; // GL_CLAMP_TO_EDGE or GL_REPEAT
+
+    qboolean cubemap;
+    GLuint cubemap_faces[5]; // The textures for the other 5 faces.
 
     struct image_s* next;
 } image_t;
+
+typedef struct {
+    vec3_t origin;
+    image_t *cubemap;
+} cubemapProbe_t;
 
 //===============================================================================
 
@@ -294,6 +372,7 @@ typedef struct {
     qboolean isLightmap;
     qboolean vertexLightmap;
     qboolean isVideoMap;
+
 } textureBundle_t;
 
 #define NUM_TEXTURE_BUNDLES 2
@@ -316,6 +395,11 @@ typedef struct {
     acff_t adjustColorsForFog;
 
     qboolean isDetail;
+
+    fragShader_t *program;
+    image_t* normalmap;
+    image_t* bumpmap;
+
 } shaderStage_t;
 
 struct shaderCommands_s;
@@ -351,6 +435,8 @@ typedef struct {
 
 typedef struct shader_s {
     char name[MAX_QPATH]; // game path, including extension
+    long nameHash;
+
     int lightmapIndex; // for a shader to match, both name and lightmapIndex must match
 
     int index; // this shader == tr.shaders[index]
@@ -410,9 +496,20 @@ typedef struct shader_s {
 
     struct shader_s *remappedShader; // current shader this one is remapped too
 
-    int shaderStates[MAX_STATES_PER_SHADER]; // index to valid shader states
-
     struct shader_s *next;
+
+    qboolean isGLSL; // Shader is using one of the GLSL iterators... the image stages have been manipulated
+    qboolean isGLSLStatic; // Use SF_STATIC to render with, not the dynamic tess
+    qboolean implicitLoad; //set to true after we've attempted to implicitly load some normals or bumps
+
+    qboolean noFancyWater; //Don't render this if fancy water is on
+    int isFancyWater; //Replace this with a generic "override with a nice frag shader" command
+
+    vec3_t tint; //For fragshaders
+    float scale; //for fragshaders
+
+    qboolean useOffsetMapping; //Only true if both _n and _b are present
+    qboolean whiteLightmap;
 } shader_t;
 
 typedef struct shaderState_s {
@@ -459,10 +556,17 @@ typedef struct {
     int numDrawSurfs;
     struct drawSurf_s *drawSurfs;
 
+    byte* pixelTarget; //set this to Non Null to copy to a buffer after scene rendering
+    // this doesnt interfere with the dof/bloom code
+    int pixelTargetX; //xy size for pixeltarget.
+    int pixelTargetY;
+
+    unsigned int* zbuffer;
 
 } trRefdef_t;
 
-
+#define REF_CUBEMAP_SIZE 64
+#define REF_VISCALC_SIZE 256
 //=================================================================================
 
 // skins allow models to be retextured without modifying the model file
@@ -507,6 +611,11 @@ typedef struct {
     vec3_t visBounds[2];
     float zFar;
     stereoFrame_t stereoFrame;
+
+    cplane_t waterPlane; //Clip anything above or below this depending on water view
+    int isWater; //0 Normal Scene, 1 draw Below Water, 2 Draw above water only
+    qboolean isUnderwater; //obviously can only be true if doWater==true too
+    qboolean doWater; //rendering a water surf
 } viewParms_t;
 
 
@@ -535,7 +644,8 @@ typedef enum {
     SF_FLARE,
     SF_ENTITY, // beams, rails, lightning, etc that can be determined by entity
     SF_DISPLAY_LIST,
-
+    SF_STATIC,
+    SF_DECALSURF,
     SF_NUM_SURFACE_TYPES,
     SF_MAX = 0x7fffffff // ensures that sizeof( surfaceType_t ) == sizeof( int )
 } surfaceType_t;
@@ -618,6 +728,28 @@ typedef struct {
     // there is a variable length list of indices here also
 } srfSurfaceFace_t;
 
+typedef struct {
+    surfaceType_t surfaceType;
+    cplane_t plane;
+    shader_t *shader;
+
+    int merged; //surfacemerge marker
+    int surfnum; //debugging
+    // dynamic lighting information
+    int dlightBits[SMP_FRAMES];
+
+    //The data is inside vbo_vertexBuffer + vbo_indexBuffer
+    //we just need to store the info for the draw call
+    int numVerts;
+    int numIndices;
+    int startIndex; //offset
+    int startVertex;
+
+    vec3_t origin;
+    image_t *cubemap;
+    int modelNum;
+
+} srfSurfaceStatic_t;
 
 // misc_models in maps are turned into direct geometry by q3map
 
@@ -669,6 +801,19 @@ typedef struct msurface_s {
 } msurface_t;
 
 
+//Simple triangle surface type.
+//We're going to have ALOT of these but it allows for fairly
+//efficient poly soup decal code
+
+typedef struct {
+    surfaceType_t surfType;
+    vec3_t v[3];
+    cplane_t plane;
+    msurface_t* surf;
+    int viewCount;
+}
+srfSurfaceDecal_t;
+
 
 #define	CONTENTS_NODE		-1
 
@@ -689,6 +834,14 @@ typedef struct mnode_s {
 
     msurface_t **firstmarksurface;
     int nummarksurfaces;
+
+    //Decal stuff
+    msurface_t **o_firstmarksurface; //we tamper with this, best to have a clean copy
+    int o_nummarksurfaces;
+    srfSurfaceDecal_t **decalTris;
+    int numDecalTris;
+
+    int newVisCluster;
 } mnode_t;
 
 typedef struct {
@@ -696,6 +849,13 @@ typedef struct {
     msurface_t *firstSurface;
     int numSurfaces;
 } bmodel_t;
+
+//new vis format record;
+
+typedef struct {
+    drawSurf_t** surfs;
+    int surfsCount;
+} occSurfRecord_t;
 
 typedef struct {
     char name[MAX_QPATH]; // ie: maps/tim_dm2.bsp
@@ -707,6 +867,7 @@ typedef struct {
     dshader_t *shaders;
 
     bmodel_t *bmodels;
+    int numbmodels;
 
     int numplanes;
     cplane_t *planes;
@@ -739,6 +900,14 @@ typedef struct {
 
     char *entityString;
     char *entityParsePoint;
+
+    int numdecalTris;
+    srfSurfaceDecal_t *decalTris;
+
+    //For vis processing
+    occSurfRecord_t *occSurfRec;
+    int numOccSurfRecs;
+
 } world_t;
 
 //======================================================================
@@ -783,7 +952,7 @@ extern refimport_t ri;
 #define	MAX_DRAWIMAGES			2048
 #define	MAX_LIGHTMAPS			256
 #define	MAX_SKINS				1024
-
+#define MAX_PROBES				128
 
 #define	MAX_DRAWSURFS			0x10000
 #define	DRAWSURF_MASK			(MAX_DRAWSURFS-1)
@@ -833,15 +1002,37 @@ typedef struct {
 #define FUNCTABLE_MASK		(FUNCTABLE_SIZE-1)
 
 
+//world surface shaders
+
+typedef enum {
+    FS_NONE = 0,
+    FS_CHEAP,
+    FS_RAD_BUMP,
+    FS_RAD_BUMP_OFFSET,
+    FS_WATER,
+    FS_WATER_CHEAP,
+
+    FS_RAD_TERRAIN_ALPHA,
+    FS_TERRAIN_ALPHA_CHEAP,
+
+    FS_VERTEX_LIGHT,
+    FS_VERTEX_LIGHT_CHEAP,
+    FS_WIREFRAME,
+
+    FS_MAX_SHADERS
+} fshader_t;
+
 // the renderer front end should never modify glstate_t
 
 typedef struct {
-    int currenttextures[2];
+    int currenttextures[12];
     int currenttmu;
     qboolean finishCalled;
     int texEnv[2];
     int faceCulling;
     unsigned long glStateBits;
+    int VBOBound;
+    fragShader_t *currentFragShader;
 } glstate_t;
 
 typedef struct {
@@ -857,6 +1048,15 @@ typedef struct {
 
     int msec; // total msec for backend run
 } backEndCounters_t;
+
+typedef struct { // batch clusters.
+    int numSurfs;
+    srfSurfaceStatic_t *surfs;
+    int frame; // draw frame.  if ==frame this cluster has been flagged as visible
+
+} batchClusters_t;
+
+
 
 // all state modified by the back end is seperated
 // from the front end state
@@ -875,6 +1075,9 @@ typedef struct {
     byte color2D[4];
     qboolean vertexes2D; // shader needs to be finished
     trRefEntity_t entity2D; // currentEntity will point at this when doing 2D rendering
+    qboolean doneBloom; // done bloom this frame
+    qboolean doneSurfaces; // done any 3d surfaces already
+
 } backEndState_t;
 
 /*
@@ -903,13 +1106,24 @@ typedef struct {
 
     const byte *externalVisData; // from RE_SetWorldVisData, shared with CM_Load
 
+    image_t *fatlightmap;
+    image_t * radbump[3]; //three fat lightmaps for radbumping
+    qboolean radbumping; //false if we're not
+
     image_t *defaultImage;
     image_t * scratchImage[32];
     image_t *fogImage;
     image_t *dlightImage; // inverse-quare highlight for projective adding
     image_t *flareImage;
     image_t *whiteImage; // full of 0xff
+    image_t *blackImage; // full of 0x00
+    image_t *greyImage; // full of 0x0f
+    image_t *greenImage; // full of 0x0f
+    image_t *testCubemap;
+    image_t *blackCubeImage;
+    image_t *waterImage;
     image_t *identityLightImage; // full of tr.identityLightByte
+    image_t *normalImage; // full of normals
 
     shader_t *defaultShader;
     shader_t *shadowShader;
@@ -953,6 +1167,7 @@ typedef struct {
     int numModels;
 
     int numImages;
+    int imagesIndex; //added so we can index cubemaps properly, seeing they share an index num
     image_t * images[MAX_DRAWIMAGES];
 
     // shader indexes from other modules will be looked up in tr.shaders[]
@@ -971,6 +1186,59 @@ typedef struct {
     float sawToothTable[FUNCTABLE_SIZE];
     float inverseSawToothTable[FUNCTABLE_SIZE];
     float fogTable[FOG_TABLE_SIZE];
+
+    unsigned int VBO_vertexBuffer;
+    unsigned int VBO_indexBuffer;
+
+    staticVert_t* staticVertexData; // Temporary storage before we get to VBO_vertexBuffer
+    unsigned int* staticIndexData;
+    int numStaticVertex;
+    int numStaticIndex;
+
+    batchClusters_t *batchClusters;
+    int numBatchClusters;
+
+    int fatLightmapSize;
+    int fatLightmapStep;
+
+
+    //All of this stuff is bloom related
+    fragShader_t row3_fragshader; // blur kernel, used for 7x7 box filter
+    fragShader_t combine2_fragshader; // blit 2 textures @ blendfactor
+
+    fragShader_t bloom_fragshader; //final bloom only scene composite
+    fragShader_t bloom_fog_fragshader; //final fog+bloom scene composite
+    fragShader_t bloom_fog_dof_fragshader; //final fog+dof+bloom scene composite
+    fragShader_t hdrcull_fragshader; //used for setting up the blit for hdr bloom.  Anything under ~1.0 gets culled to black
+
+    fragShader_t fragshader[FS_MAX_SHADERS]; //All frag shaders
+
+
+    unsigned int sceneTexnum;
+    unsigned int depthTexnum;
+    unsigned int underwaterTexnum;
+    unsigned int reflectionTexnum;
+
+    float DOF_focus;
+
+    byte * cubeTemp[6]; // 6 textures for cubemap storage
+    qboolean flipx;
+    qboolean flipy;
+
+    cubemapProbe_t cubeProbes[MAX_PROBES];
+    int cubeProbesCount;
+
+    //Todo: move this to backend
+    renderbuffer_t sceneTexture;
+    renderbuffer_t bloomTexture;
+    renderbuffer_t bloomTempX;
+
+    ////
+
+    //Glsl
+    GLuint occlusionQuery;
+    int currentVisLeaf;
+
 } trGlobals_t;
 
 extern backEndState_t backEnd;
@@ -984,7 +1252,8 @@ extern glstate_t glState; // outside of TR since it shouldn't be cleared during 
 extern qboolean textureFilterAnisotropic;
 extern int maxAnisotropy;
 extern float displayAspect;
-
+extern qboolean vertexBufferObjects;
+extern qboolean vertexShaders;
 
 //
 // cvars
@@ -1001,7 +1270,6 @@ extern cvar_t *r_railSegmentLength;
 
 extern cvar_t *r_ignore; // used for debugging anything
 extern cvar_t *r_verbose; // used for verbose debug spew
-extern cvar_t *r_ignoreFastPath; // allows us to ignore our Tess fast paths
 
 extern cvar_t *r_znear; // near Z clip plane
 extern cvar_t *r_zproj; // z distance of projection plane
@@ -1011,7 +1279,6 @@ extern cvar_t *r_stencilbits; // number of desired stencil bits
 extern cvar_t *r_depthbits; // number of desired depth bits
 extern cvar_t *r_colorbits; // number of desired color bits, only relevant for fullscreen
 extern cvar_t *r_texturebits; // number of desired texture bits
-extern cvar_t *r_ext_multisample;
 // 0 = use framebuffer depth
 // 16 = use 16-bit textures
 // 32 = use 32-bit textures
@@ -1033,6 +1300,11 @@ extern cvar_t *r_drawSun; // controls drawing of sun quad
 extern cvar_t *r_dynamiclight; // dynamic lights enabled/disabled
 extern cvar_t *r_dlightBacks; // dlight non-facing surfaces for continuity
 
+extern cvar_t *r_minEntityLight; // minimum entity light value
+
+extern cvar_t *r_specularLighting; // extra specular pass for default shader
+extern cvar_t *r_specularLightingExponent; // specular exponent for extra pass
+
 extern cvar_t *r_norefresh; // bypasses the ref rendering
 extern cvar_t *r_drawentities; // disable/enable entity rendering
 extern cvar_t *r_drawworld; // disable/enable world rendering
@@ -1044,14 +1316,21 @@ extern cvar_t *r_facePlaneCull; // enables culling of planar surfaces with back 
 extern cvar_t *r_nocurves;
 extern cvar_t *r_showcluster;
 
+extern cvar_t *r_width;
+extern cvar_t *r_height;
+extern cvar_t *r_pixelAspect;
+
 extern cvar_t *r_mode; // video mode
 extern cvar_t *r_fullscreen;
-extern cvar_t *r_noborder;
+extern cvar_t *r_minimize;
 extern cvar_t *r_gamma;
+extern cvar_t *r_displayRefresh; // optional display refresh option
 extern cvar_t *r_ignorehwgamma; // overrides hardware gamma capabilities
 
 extern cvar_t *r_allowExtensions; // global enable/disable of OpenGL extensions
 extern cvar_t *r_ext_compressed_textures; // these control use of specific extensions
+extern cvar_t *r_ext_gamma_control;
+extern cvar_t *r_ext_texenv_op;
 extern cvar_t *r_ext_multitexture;
 extern cvar_t *r_ext_compiled_vertex_array;
 extern cvar_t *r_ext_texture_env_add;
@@ -1117,9 +1396,28 @@ extern cvar_t *r_debugSort;
 extern cvar_t *r_printShaders;
 extern cvar_t *r_saveFontData;
 
-extern cvar_t *r_marksOnTriangleMeshes;
-
 extern cvar_t *r_GLlibCoolDownMsec;
+
+extern cvar_t *r_ext_vertex_buffer_object;
+extern cvar_t *r_bloom;
+extern cvar_t *r_autobump;
+extern cvar_t *r_dof;
+extern cvar_t *r_dofscale;
+extern cvar_t *r_dofblend;
+extern cvar_t *r_ext_vertex_shader;
+extern cvar_t *r_maxstaticverts;
+extern cvar_t *r_radbump;
+extern cvar_t *r_decals;
+extern cvar_t *r_fancywater;
+extern cvar_t *r_simpleshaders;
+extern cvar_t *r_glsl_debug;
+
+extern cvar_t *r_fogdensity;
+extern cvar_t *r_fog_r;
+extern cvar_t *r_fog_g;
+extern cvar_t *r_fog_b;
+
+extern cvar_t *r_ext_framebuffer_object;
 
 //====================================================================
 
@@ -1143,6 +1441,11 @@ void R_DecomposeSort(unsigned sort, int *entityNum, shader_t **shader,
 
 void R_AddDrawSurf(surfaceType_t *surface, shader_t *shader, int fogIndex, int dlightMap);
 
+void R_LoadFragmentPrograms(void);
+void R_LoadSM3FragmentPrograms(void);
+
+void R_LoadSimpleFragmentPrograms(void);
+void R_CreateRenderTextures(renderbuffer_t *buffer, int xres, int yres, qboolean depth, qboolean depthtexture);
 
 #define	CULL_IN		0		// completely unclipped
 #define	CULL_CLIP	1		// clipped by one or more planes
@@ -1160,11 +1463,15 @@ void R_RotateForEntity(const trRefEntity_t *ent, const viewParms_t *viewParms, o
  ** GL wrapper/helper functions
  */
 void GL_Bind(image_t *image);
+void GL_BindCube(image_t *image);
+void GL_BindCubeTexnum(int texnum);
+void GL_BindTexnum(int texnum);
 void GL_SetDefaultState(void);
 void GL_SelectTexture(int unit);
 void GL_TextureMode(const char *string);
 void GL_CheckErrors(void);
 void GL_State(unsigned long stateVector);
+void SetViewportAndScissor(void);
 void GL_TexEnv(int env);
 void GL_Cull(int cullType);
 
@@ -1219,10 +1526,16 @@ qboolean R_GetEntityToken(char *buffer, int size);
 model_t *R_AllocModel(void);
 
 void R_Init(void);
-image_t *R_FindImageFile(const char *name, qboolean mipmap, qboolean allowPicmip, int glWrapClampMode);
+image_t *R_FindImageFile(const char *name, qboolean mipmap, qboolean allowPicmip, int glWrapClampMode, qboolean cubemap, qboolean normals, qboolean forcealpha);
+
+image_t *R_BuildNormalsFromBump(const char *name, qboolean UseAlphaInFile);
 
 image_t *R_CreateImage(const char *name, const byte *pic, int width, int height, qboolean mipmap
-        , qboolean allowPicmip, int wrapClampMode);
+        , qboolean allowPicmip, int wrapClampMode, qboolean normals, qboolean forcealpha);
+
+image_t *R_CreateCubeImage(const char *name, const byte *pic, int width, int height,
+        qboolean mipmap, qboolean allowPicmip, int glWrapClampMode, int CubemapFace, image_t *cubemapParent);
+
 qboolean R_GetModeInfo(int *width, int *height, float *windowAspect, int mode);
 
 void R_SetColorMappings(void);
@@ -1258,6 +1571,7 @@ shader_t *R_FindShader(const char *name, int lightmapIndex, qboolean mipRawImage
 shader_t *R_GetShaderByHandle(qhandle_t hShader);
 shader_t *R_GetShaderByState(int index, long *cycleTime);
 shader_t *R_FindShaderByName(const char *name);
+shader_t *R_FindShaderByNameHashAndLightmap(long hash, int lightmapIndex);
 void R_InitShaders(void);
 void R_ShaderList_f(void);
 void R_RemapShader(const char *oldShader, const char *newShader, const char *timeOffset);
@@ -1287,6 +1601,7 @@ void GLimp_SetGamma(unsigned char red[256],
         unsigned char green[256],
         unsigned char blue[256]);
 
+void GL_ResolveHardwareType(void);
 
 /*
 ====================================================================
@@ -1327,10 +1642,18 @@ typedef struct shaderCommands_s {
     int numPasses;
     void (*currentStageIteratorFunc)(void);
     shaderStage_t **xstages;
+
+
+    //27 array of surfaces to render at EndSurface
+    //(remember that the texture setup calls all occur during EndFrame.. So we have to que these
+    srfSurfaceStatic_t * StaticSurfs[2048];
+    int numStaticSurfs;
+
 } shaderCommands_t;
 
 extern shaderCommands_t tess;
 
+void RB_SetGL2D(void);
 void RB_BeginSurface(shader_t *shader, int fogNum);
 void RB_EndSurface(void);
 void RB_CheckOverflow(int verts, int indexes);
@@ -1340,6 +1663,12 @@ void RB_StageIteratorGeneric(void);
 void RB_StageIteratorSky(void);
 void RB_StageIteratorVertexLitTexture(void);
 void RB_StageIteratorLightmappedMultitexture(void);
+
+//New
+void RB_StageIteratorWater_GLSL(void);
+void RB_StageIteratorLightmappedMultitexture_GLSL(void);
+void RB_StageIteratorLightmappedTerrain_GLSL(void);
+void RB_StageIteratorCheapFancyWater_GLSL(void);
 
 void RB_AddQuadStamp(vec3_t origin, vec3_t left, vec3_t up, byte *color);
 void RB_AddQuadStampExt(vec3_t origin, vec3_t left, vec3_t up, byte *color, float s1, float t1, float s2, float t2);
@@ -1517,6 +1846,9 @@ void R_LoadTGA(const char *name, byte **pic, int *width, int *height);
 void R_TransformModelToClip(const vec3_t src, const float *modelMatrix, const float *projectionMatrix,
         vec4_t eye, vec4_t dst);
 void R_TransformClipToWindow(const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window);
+
+void myGlMultVector(const float *matrix, vec3_t point);
+void myGlMultVectorRot(const float *matrix, vec3_t point);
 
 void RB_DeformTessGeometry(void);
 
@@ -1705,10 +2037,48 @@ int SaveJPGToBuffer(byte *buffer, int quality,
 void RE_TakeVideoFrame(int width, int height,
         byte *captureBuffer, byte *encodeBuffer, qboolean motionJpeg);
 
+void R_BuildCubeMaps(void);
+
 // font stuff
 void R_InitFreeType(void);
 void R_DoneFreeType(void);
 void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font);
 
+void RB_SetupFragment(fragShader_t* frag, shader_t *shader);
 
-#endif //TR_LOCAL_H
+void RB_BindFragmentTextures(fragShader_t *frag, int diffuse0, int normal0, int bump0,
+        int diffuse1, int normal1, int bump1,
+        int cubemapA, int cubemapB);
+
+void RB_Blur(unsigned int source, renderbuffer_t *tempx, renderbuffer_t *dest, qboolean hdrclip, float HdrCut);
+void RB_SetFrameBuffer(renderbuffer_t *buffer);
+void RB_PostProcess(void);
+void GL_BindVBO(int Mode);
+void GL_UnBindVBO(void);
+
+void R_StoreDecalSurf(vec3_t v0, vec3_t v1, vec3_t v2, msurface_t *match);
+void R_AddDecalSurfs(void);
+
+void myGlMultPlane(const float *m, vec4_t plane, float* out);
+
+qboolean R_ParseEntitysForKey(char* classname, char* key, char *storage, int sizeofstore, int num);
+
+#define WATER_RES_X 512
+#define WATER_RES_Y 512
+
+#define GEOMETRY_INDEX_OFFSET(index) (const void *)((index * sizeof(unsigned int)))
+#define GEOMETRY_VERTEX_OFFSET(number, vertex, field) (const void *)((number * sizeof(vertex)) + (long int)&(((vertex*)0)->field))
+
+shader_t *GLSLMakeCloneOfShader(shader_t* checkshader);
+shader_t *GLSLOptimizeShader(shader_t *checkshader);
+shader_t *GLSLOptimizeShader_Simple(shader_t *checkshader);
+void GLSLLoadImplicitStages(shader_t* checkshader);
+qboolean R_LoadWorldFragShader(fragShader_t *frag, char* vertexprog, char* fragprog);
+
+cubemapProbe_t *R_FindBestCubeMap(vec3_t origin);
+float R_FindBestTwoCubeMaps(vec3_t origin, cubemapProbe_t **A, cubemapProbe_t **B);
+
+image_t *R_CreateCubeImage(const char *name, const byte *pic, int width, int height,
+        qboolean mipmap, qboolean allowPicmip, int glWrapClampMode, int CubemapFace, image_t *cubemapParent);
+
+#endif
