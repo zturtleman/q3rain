@@ -851,7 +851,7 @@ void Weapon_Hands_Fire(gentity_t *ent) {
         G_PushBack(ent, HANDS_KNOCKBACK);
     }
 
-    traceEnt = &g_entities[ tr.entityNum ];
+    traceEnt = &g_entities[tr.entityNum];
 
     // send blood impact
     if (traceEnt->takedamage && traceEnt->client) {

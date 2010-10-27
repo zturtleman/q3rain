@@ -254,6 +254,40 @@ void G_UseTargets(gentity_t *ent, gentity_t *activator) {
         }
     }
 }
+void G_UseTarget(gentity_t *ent, char *target, gentity_t *activator) {
+    gentity_t *t;
+
+    Com_Printf("G_UseTarget(): ^3target = %s\n", target);
+
+    if (!ent) {
+        return;
+    }
+
+    if (ent->targetShaderName && ent->targetShaderNewName) {
+        float f = level.time * 0.001;
+        AddRemap(ent->targetShaderName, ent->targetShaderNewName, f);
+        trap_SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+    }
+
+    if (!target) {
+        return;
+    }
+
+    t = NULL;
+    while ((t = G_Find(t, FOFS(targetname), target)) != NULL) {
+        if (t == ent) {
+            G_Printf("WARNING: Entity used itself.\n");
+        } else {
+            if (t->use) {
+                t->use(t, ent, activator);
+            }
+        }
+        if (!ent->inuse) {
+            G_Printf("entity was removed while using targets\n");
+            return;
+        }
+    }
+}
 
 /*
 =============

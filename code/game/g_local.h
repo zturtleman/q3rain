@@ -175,6 +175,26 @@ struct gentity_s {
     float random;
 
     gitem_t *item; // for bonus items
+
+    // RAIN ENTITY VARIABLES
+    qboolean standalone;
+    qboolean invert;
+    int has_weapon;
+    int has_powerup;
+    int health_lower;
+    int health_higher;
+    qboolean is_human;
+    qboolean is_walking;
+    int mates_equal;
+    int mates_higher;
+    int mates_lower;
+    int gametype;
+    int leveltime_equal;
+    int leveltime_higher;
+    int leveltime_lower;
+    char *cvar;
+    char *cvar_value;
+    int active_weapon;
 };
 
 typedef enum {
@@ -472,6 +492,7 @@ void G_KillBox(gentity_t *ent);
 gentity_t *G_Find(gentity_t *from, int fieldofs, const char *match);
 gentity_t *G_PickTarget(char *targetname);
 void G_UseTargets(gentity_t *ent, gentity_t *activator);
+void G_UseTarget(gentity_t *ent, char *target, gentity_t *activator);
 void G_SetMovedir(vec3_t angles, vec3_t movedir);
 
 void G_InitGentity(gentity_t *e);

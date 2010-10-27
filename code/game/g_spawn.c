@@ -190,6 +190,10 @@ void SP_team_CTF_bluespawn(gentity_t *ent);
 void SP_item_botroam(gentity_t *ent) {
 }
 
+// RAIN ENTITY DECLARATIONS
+void SP_target_win(gentity_t *ent);
+void SP_target_condition(gentity_t *ent);
+
 spawn_t spawns[] = {
     // info entities don't do anything at all, but provide positional
     // information for things controlled by other processes
@@ -210,8 +214,6 @@ spawn_t spawns[] = {
     {"func_train", SP_func_train},
     {"func_group", SP_info_null},
     {"func_timer", SP_func_timer}, // rename trigger_timer?
-
-    {"func_breakable", SP_func_breakable},
 
     // Triggers are brush objects that cause an effect when contacted
     // by a living player, usually involving firing targets.
@@ -259,6 +261,26 @@ spawn_t spawns[] = {
     {"team_CTF_bluespawn", SP_team_CTF_bluespawn},
 
     {"item_botroam", SP_item_botroam},
+
+    //{"", 0},
+
+    // RAIN ENTITIES
+    // func_* section
+    {"func_breakable", SP_func_breakable},
+
+    // info_* section
+    {"info_enemy", 0},
+
+    // trigger_* section
+
+    // target_* section
+    {"target_win", SP_target_win},
+    {"target_stopwatch", 0},
+    {"target_condition", SP_target_condition},
+    {"target_text", 0},
+    {"target_remove", 0},
+    {"target_health", 0},
+    {"target_random", 0},
 
     {NULL, 0}
 };

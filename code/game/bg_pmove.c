@@ -37,21 +37,26 @@ float pm_stopspeed = 100.0f;
 float pm_duckScale = 0.25f;
 float pm_swimScale = 0.50f;
 float pm_wadeScale = 0.70f;
-float pm_ladderScale = 0.50f;
 
 float pm_accelerate = 10.0f;
 float pm_airaccelerate = 1.0f;
 float pm_wateraccelerate = 4.0f;
 float pm_flyaccelerate = 8.0f;
-float pm_ladderaccelerate = 5000.0f;
-
-float pm_mooraccelerate = 3.0f;
 
 float pm_friction = 6.0f;
 float pm_waterfriction = 1.0f;
 float pm_flightfriction = 3.0f;
 float pm_spectatorfriction = 5.0f;
+
+float pm_mooraccelerate = 3.0f;
+
+float pm_ladderScale = 0.50f;
+float pm_ladderaccelerate = 5000.0f;
 float pm_ladderfriction = 5000.0f;
+
+float pm_snowScale = 1.0f;
+float pm_snowaccelerate = 15.0f;
+float pm_snowfriction = 2.0f;
 
 int c_pmove = 0;
 
@@ -548,16 +553,16 @@ void CheckMoor(void) {
 
     pml.moor = qfalse;
 
-    flatforward[0] = pml.forward[0];
-    flatforward[1] = pml.forward[1];
-    flatforward[2] = 0;
+    //flatforward[0] = pml.forward[0];
+    //flatforward[1] = pml.forward[1];
+    flatforward[2] = 20;
     VectorNormalize(flatforward);
 
     VectorMA(pm->ps->origin, 1, flatforward, spot);
     cont = pm->pointcontents(spot, pm->ps->clientNum);
     if (cont & MASK_MOOR) {
         pml.moor = qtrue;
-        pm->ps->wallclimbs = MAX_WALLCLIMBS; // avoid glitching
+        pm->ps->wallclimbs = MAX_WALLCLIMBS + 1; // avoid glitching
         return;
     }
 }
@@ -569,10 +574,6 @@ Totally ignore user input and suck the player down :D
 ===================
  */
 static void PM_MoorMove(void) {
-    float wishspeed;
-    vec3_t wishdir;
-    vec3_t velvec;
-
     PM_Friction();
 
     pm->ps->velocity[0] = 0;
@@ -956,6 +957,9 @@ static void PM_WalkMove(pmove_t *pmove) {
     // full control, which allows them to be moved a bit
     if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
         accelerate = pm_airaccelerate;
+    } else if (pml.groundTrace.surfaceFlags & SURF_SNOW) {
+        //accelerate = pm_snowaccelerate;
+        accelerate = 1000000000.0f;
     } else {
         accelerate = pm_accelerate;
     }
@@ -965,7 +969,7 @@ static void PM_WalkMove(pmove_t *pmove) {
     //Com_Printf("velocity = %1.1f %1.1f %1.1f\n", pm->ps->velocity[0], pm->ps->velocity[1], pm->ps->velocity[2]);
     //Com_Printf("velocity1 = %1.1f\n", VectorLength(pm->ps->velocity));
 
-    if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
+    if ((pml.groundTrace.surfaceFlags & SURF_SNOW) || (pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
         pm->ps->velocity[2] -= pm->ps->gravity * pml.frametime;
     } else {
         // don't reset the z velocity for slopes
@@ -989,8 +993,130 @@ static void PM_WalkMove(pmove_t *pmove) {
 
     PM_StepSlideMove(qfalse);
 
-    //Com_Printf("velocity2 = %1.1f\n", VectorLength(pm->ps->velocity));
+    //Com_Printf("snow: %i slick: %i surf: %i\n", SURF_SNOW, SURF_SLICK, pml.groundTrace.surfaceFlags);
 
+    if (pml.groundTrace.surfaceFlags & SURF_SNOW) {
+        //pm->ps->velocity[2] = 100000;
+    }
+
+    //Com_Printf("velocity2 = %1.1f\n", VectorLength(pm->ps->velocity));
+}
+
+/*
+===================
+PM_SnowMove
+===================
+ */
+static void PM_SnowMove(pmove_t *pmove) {
+    int i;
+    vec3_t wishvel;
+    float fmove, smove;
+    vec3_t wishdir;
+    float wishspeed;
+    float scale;
+    usercmd_t cmd;
+    float accelerate;
+    float vel;
+
+    pmove->ps->wallclimbs = 0;
+
+    if (pm->waterlevel > 2 && DotProduct(pml.forward, pml.groundTrace.plane.normal) > 0) {
+        PM_WaterMove();
+        return;
+    }
+
+    if (PM_CheckJump()) {
+        PM_AirMove(pmove);
+        return;
+    }
+
+    PM_Friction();
+
+    fmove = pm->cmd.forwardmove;
+    smove = pm->cmd.rightmove;
+
+    cmd = pm->cmd;
+    scale = PM_CmdScale(&cmd);
+
+    // set the movementDir so clients can rotate the legs for strafing
+    PM_SetMovementDir();
+
+    // project moves down to flat plane
+    pml.forward[2] = 0;
+    pml.right[2] = 0;
+
+    // project the forward and right directions onto the ground plane
+    PM_ClipVelocity(pml.forward, pml.groundTrace.plane.normal, pml.forward, OVERCLIP);
+    PM_ClipVelocity(pml.right, pml.groundTrace.plane.normal, pml.right, OVERCLIP);
+    //
+    VectorNormalize(pml.forward);
+    VectorNormalize(pml.right);
+
+    for (i = 0; i < 3; i++) {
+        wishvel[i] = pml.forward[i] * fmove + pml.right[i] * smove;
+    }
+    // when going up or down slopes the wish velocity should Not be zero
+    //  wishvel[2] = 0;
+
+    VectorCopy(wishvel, wishdir);
+    wishspeed = VectorNormalize(wishdir);
+    wishspeed *= scale;
+
+    // clamp the speed lower if ducking
+    if (pm->ps->pm_flags & PMF_DUCKED) {
+        if (wishspeed > pm->ps->speed * pm_duckScale) {
+            wishspeed = pm->ps->speed * pm_duckScale;
+        }
+    }
+
+    // clamp the speed lower if wading or walking on the bottom
+    if (pm->waterlevel) {
+        float waterScale;
+
+        waterScale = pm->waterlevel / 3.0;
+        waterScale = 1.0 - (1.0 - pm_swimScale) * waterScale;
+        if (wishspeed > pm->ps->speed * waterScale) {
+            wishspeed = pm->ps->speed * waterScale;
+        }
+    }
+
+    // when a player gets hit, they temporarily lose
+    // full control, which allows them to be moved a bit
+    if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
+        accelerate = pm_airaccelerate;
+    } else {
+        accelerate = pm_snowaccelerate;
+    }
+
+    PM_Accelerate(wishdir, wishspeed, accelerate);
+
+    //Com_Printf("velocity = %1.1f %1.1f %1.1f\n", pm->ps->velocity[0], pm->ps->velocity[1], pm->ps->velocity[2]);
+    //Com_Printf("velocity1 = %1.1f\n", VectorLength(pm->ps->velocity));
+
+    if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
+        pm->ps->velocity[2] -= pm->ps->gravity * pml.frametime;
+    } else {
+        // don't reset the z velocity for slopes
+        //    pm->ps->velocity[2] = 0;
+    }
+
+    vel = VectorLength(pm->ps->velocity);
+
+    // slide along the ground plane
+    PM_ClipVelocity(pm->ps->velocity, pml.groundTrace.plane.normal, pm->ps->velocity, OVERCLIP);
+
+    // don't decrease velocity when going up or down a slope
+    VectorNormalize(pm->ps->velocity);
+    VectorScale(pm->ps->velocity, vel, pm->ps->velocity);
+
+    // don't do anything if standing still
+    if (!pm->ps->velocity[0] && !pm->ps->velocity[1]) {
+        return;
+    }
+
+    PM_StepSlideMove(qfalse);
+
+    //Com_Printf("velocity2 = %1.1f\n", VectorLength(pm->ps->velocity));
 }
 
 /*
