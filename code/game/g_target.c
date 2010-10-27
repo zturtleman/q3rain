@@ -603,6 +603,87 @@ void condition_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
         }
         return;
     }
+
+    if (self->health >= 0) {
+        if (self->health <= 0 || self->health > 100) {
+            G_Printf("^3WARNING: Entity %s: health_equal <= 0 or > 100, will never trigger\n", self->targetname);
+        }
+        if (!activator->client) {
+            return;
+        }
+        if (activator->client->ps.stats[STAT_HEALTH] == self->health) {
+            if (self->invert != qtrue) {
+                condition_triggertargets(self, activator);
+            }
+        } else {
+            if (self->invert == qtrue) {
+                condition_triggertargets(self, activator);
+            }
+        }
+        return;
+    }
+
+    if (self->health_lower > 0) {
+        if (!activator->client) {
+            return;
+        }
+        if (activator->client->ps.stats[STAT_HEALTH] < self->health_lower) {
+            if (self->invert != qtrue) {
+                condition_triggertargets(self, activator);
+            }
+        } else {
+            if (self->invert == qtrue) {
+                condition_triggertargets(self, activator);
+            }
+        }
+        return;
+    }
+
+    if (self->health_higher >= 0) {
+        if (!activator->client) {
+            return;
+        }
+        if (self->health_higher > 100) {
+            G_Printf("^3WARNING: Entity %s: health_higher > 100, will never trigger\n", self->targetname);
+            return;
+        }
+        if (activator->client->ps.stats[STAT_HEALTH] > self->health_higher) {
+            if (self->invert != qtrue) {
+                condition_triggertargets(self, activator);
+            }
+        } else {
+            if (self->invert == qtrue) {
+                condition_triggertargets(self, activator);
+            }
+        }
+        return;
+    }
+
+    if (self->leveltime_lower > 0) {
+        if (level.time < self->leveltime_lower) {
+            if (self->invert != qtrue) {
+                condition_triggertargets(self, activator);
+            }
+        } else {
+            if (self->invert == qtrue) {
+                condition_triggertargets(self, activator);
+            }
+        }
+        return;
+    }
+
+    if (self->leveltime_higher >= 0) {
+        if (level.time > self->leveltime_higher) {
+            if (self->invert != qtrue) {
+                condition_triggertargets(self, activator);
+            }
+        } else {
+            if (self->invert == qtrue) {
+                condition_triggertargets(self, activator);
+            }
+        }
+        return;
+    }
 }
 
 void SP_target_condition(gentity_t *self) {
@@ -632,17 +713,17 @@ void SP_target_condition(gentity_t *self) {
     G_SpawnInt("has_powerup", "-1", &self->has_powerup); // done
     G_SpawnInt("is_human", "0", &self->is_human); // done
     G_SpawnInt("is_walking", "0", &self->is_walking); // done
-    G_SpawnInt("active_weapon", "-1", &self->active_weapon); // FIXME
-    G_SpawnInt("health_equal", "", &self->health);
-    G_SpawnInt("health_lower", "", &self->health_lower);
-    G_SpawnInt("health_higher", "", &self->health_higher);
+    G_SpawnInt("health_equal", "-1", &self->health); // done
+    G_SpawnInt("health_lower", "-1", &self->health_lower); // done
+    G_SpawnInt("health_higher", "-1", &self->health_higher); // done
+    G_SpawnInt("leveltime_equal", "0", &self->leveltime_equal); // done
+    G_SpawnInt("leveltime_lower", "0", &self->leveltime_lower); // done
+    G_SpawnInt("leveltime_higher", "0", &self->leveltime_higher); // done
     G_SpawnInt("mates_equal", "0", &self->mates_equal);
     G_SpawnInt("mates_lower", "0", &self->mates_lower);
     G_SpawnInt("mates_higher", "0", &self->mates_higher);
     G_SpawnInt("g_gametype", "0", &self->gametype);
-    G_SpawnInt("leveltime_equal", "0", &self->leveltime_equal);
-    G_SpawnInt("leveltime_lower", "0", &self->leveltime_lower);
-    G_SpawnInt("leveltime_higher", "0", &self->leveltime_higher);
     G_SpawnString("cvar", NULL, &self->cvar);
     G_SpawnString("cvar_value", NULL, &self->cvar_value);
+    G_SpawnInt("active_weapon", "-1", &self->active_weapon); // FIXME
 }
