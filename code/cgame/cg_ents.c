@@ -750,7 +750,7 @@ static void CG_TeamBase(centity_t *cent) {
 #else
 #endif
 #ifdef MISSIONPACK
-    else if (cgs.gametype == GT_OBELISK) {
+else if (cgs.gametype == GT_OBELISK) {
         // show the obelisk
         memset(&model, 0, sizeof (model));
         model.reType = RT_MODEL;

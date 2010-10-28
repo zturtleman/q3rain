@@ -223,7 +223,7 @@ void GL_ResolveHardwareType(void) {
 
             if (strstr(buf, "rage 128") || strstr(buf, "rage128")) {
                 ri.Cvar_Set("r_finish", "0");
-            }                // Savage3D and Savage4 should always have trilinear enabled
+            }// Savage3D and Savage4 should always have trilinear enabled
             else if (strstr(buf, "savage3d") || strstr(buf, "s3 savage4")) {
                 ri.Cvar_Set("r_texturemode", "GL_LINEAR_MIPMAP_LINEAR");
             }
@@ -236,7 +236,7 @@ void GL_ResolveHardwareType(void) {
     //
     if (strstr(buf, "banshee") || strstr(buf, "voodoo3")) {
         glConfig.hardwareType = GLHW_3DFX_2D3D;
-    }        // VOODOO GRAPHICS w/ 2MB
+    }// VOODOO GRAPHICS w/ 2MB
     else if (strstr(buf, "voodoo graphics/1 tmu/2 mb")) {
     } else if (strstr(buf, "glzicd")) {
     } else if (strstr(buf, "rage pro") ||
@@ -360,7 +360,7 @@ typedef struct vidmode_s {
     float pixelAspect; // pixel width / height
 } vidmode_t;
 
-vidmode_t r_vidModes[] ={
+vidmode_t r_vidModes[] = {
     { "Mode  0: 320x240", 320, 240, 1},
     { "Mode  1: 400x300", 400, 300, 1},
     { "Mode  2: 512x384", 512, 384, 1},
@@ -866,11 +866,11 @@ GfxInfo_f
 ================
  */
 void GfxInfo_f(void) {
-    const char *enablestrings[] ={
+    const char *enablestrings[] = {
         "disabled",
         "enabled"
     };
-    const char *fsstrings[] ={
+    const char *fsstrings[] = {
         "windowed",
         "fullscreen"
     };
@@ -1010,7 +1010,7 @@ void R_Register(void) {
     //ri.Cvar_Alias(r_ext_vertex_buffer_object, "r_vbo");
 
     // both 1
-    r_ext_framebuffer_object = ri.Cvar_Get("r_ext_framebuffer_object", "1", CVAR_ARCHIVE | CVAR_LATCH);
+    r_ext_framebuffer_object = ri.Cvar_Get("r_ext_framebuffer_object", "0", CVAR_ARCHIVE | CVAR_LATCH);
     r_ext_vertex_shader = ri.Cvar_Get("r_ext_vertex_shader", "0", CVAR_ARCHIVE | CVAR_LATCH);
 
     //ri.Cvar_Alias(r_ext_vertex_shader, "r_glsl");
@@ -1099,7 +1099,7 @@ void R_Register(void) {
     r_bloom = ri.Cvar_Get("r_glslbloom", "0", CVAR_ARCHIVE);
     r_autobump = ri.Cvar_Get("r_autobump", "0", CVAR_ARCHIVE | CVAR_LATCH);
 
-    
+
     r_dof = ri.Cvar_Get("r_dof", "0", CVAR_ARCHIVE | CVAR_LATCH);
     r_dofscale = ri.Cvar_Get("r_dofscale", "2", CVAR_ARCHIVE);
     ri.Cvar_CheckRange(r_dofscale, 0.0f, 10.0f, qfalse);
@@ -1233,13 +1233,10 @@ void R_Init(void) {
     }
 
     R_InitFogTable();
-    Com_Printf("finished fogtable\n");
 
     R_NoiseInit();
-    Com_Printf("finished noise\n");
 
     R_Register();
-    Com_Printf("finished register\n");
 
     max_polys = r_maxpolys->integer;
     if (max_polys < MAX_POLYS)
@@ -1290,7 +1287,7 @@ RE_Shutdown
  */
 void RE_Shutdown(qboolean destroyWindow) {
 
-    ri.Printf(PRINT_DEVELOPER, "RE_Shutdown( %i )\n", destroyWindow);
+    ri.Printf(PRINT_DEVELOPER, "RE_Shutdown(%i)\n", destroyWindow);
 
     ri.Cmd_RemoveCommand("modellist");
     ri.Cmd_RemoveCommand("screenshotJPEG");

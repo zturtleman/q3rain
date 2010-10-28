@@ -188,13 +188,13 @@ struct gentity_s {
     int mates_equal;
     int mates_higher;
     int mates_lower;
-    int gametype;
     int leveltime_equal;
     int leveltime_higher;
     int leveltime_lower;
     char *cvar;
-    char *cvar_value;
+    int cvar_value;
     int active_weapon;
+    char *teamchar;
 };
 
 typedef enum {

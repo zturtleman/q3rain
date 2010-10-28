@@ -591,7 +591,6 @@ void condition_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
         if (!activator->client) {
             return;
         }
-        Com_Printf("client: %i entity: %i\n", activator->client->ps.weapon, self->active_weapon);
         if (activator->client->ps.weapon == self->active_weapon) {
             if (self->invert != qtrue) {
                 condition_triggertargets(self, activator);
@@ -684,6 +683,23 @@ void condition_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
         }
         return;
     }
+
+    if (self->cvar) {
+        if (self->cvar_value) {
+            if (trap_Cvar_VariableIntegerValue(self->cvar) == self->cvar_value) {
+                if (self->invert != qtrue) {
+                    condition_triggertargets(self, activator);
+                }
+            } else {
+                if (self->invert == qtrue) {
+                    condition_triggertargets(self, activator);
+                }
+            }
+        } else {
+            G_Printf("^3WARNING: Entity %s: cvar set but no cvar_value, will never trigger\n", self->targetname);
+        }
+        return;
+    }
 }
 
 void SP_target_condition(gentity_t *self) {
@@ -719,11 +735,11 @@ void SP_target_condition(gentity_t *self) {
     G_SpawnInt("leveltime_equal", "0", &self->leveltime_equal); // done
     G_SpawnInt("leveltime_lower", "0", &self->leveltime_lower); // done
     G_SpawnInt("leveltime_higher", "0", &self->leveltime_higher); // done
+    G_SpawnString("cvar", NULL, &self->cvar); // done
+    G_SpawnInt("cvar_value", NULL, &self->cvar_value); // done
+    G_SpawnInt("active_weapon", "-1", &self->active_weapon); // done
+    G_SpawnString("team", "NONE", &self->teamchar);
     G_SpawnInt("mates_equal", "0", &self->mates_equal);
     G_SpawnInt("mates_lower", "0", &self->mates_lower);
     G_SpawnInt("mates_higher", "0", &self->mates_higher);
-    G_SpawnInt("g_gametype", "0", &self->gametype);
-    G_SpawnString("cvar", NULL, &self->cvar);
-    G_SpawnString("cvar_value", NULL, &self->cvar_value);
-    G_SpawnInt("active_weapon", "-1", &self->active_weapon); // FIXME
 }
