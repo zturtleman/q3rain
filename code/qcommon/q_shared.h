@@ -28,13 +28,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef STANDALONE
   #define PRODUCT_NAME			"Rain"
-  #define BASEGAME			"baseq3"
+  #define BASEGAME			"rain"
   #define CLIENT_WINDOW_TITLE     	"Rain"
   #define CLIENT_WINDOW_MIN_TITLE 	"Rain"
   #define GAMENAME_FOR_MASTER		"rain"	// must NOT contain whitespaces
 #else
   #define PRODUCT_NAME			"Rain"
-  #define BASEGAME			"baseq3"
+  #define BASEGAME			"rain"
   #define CLIENT_WINDOW_TITLE     	"Rain"
   #define CLIENT_WINDOW_MIN_TITLE 	"Rain"
   #define GAMENAME_FOR_MASTER		"Quake3Arena"

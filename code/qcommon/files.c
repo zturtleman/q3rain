@@ -2581,10 +2581,10 @@ qboolean FS_ComparePaks(char *neededpaks, int len, qboolean dlstring) {
         havepak = qfalse;
 
         // never autodownload any of the id paks
-        if (FS_idPak(fs_serverReferencedPakNames[i], "baseq3")
+        /*if (FS_idPak(fs_serverReferencedPakNames[i], "baseq3")
                 || FS_idPak(fs_serverReferencedPakNames[i], "missionpack")) {
             continue;
-        }
+        }*/
 
         // Make sure the server cannot make us write to non-quake3 directories.
         if (FS_CheckDirTraversal(fs_serverReferencedPakNames[i])) {

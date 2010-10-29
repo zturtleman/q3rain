@@ -344,6 +344,44 @@ void CG_DrawTeamBackground(int x, int y, int w, int h, float alpha, int team) {
 
 /*
 ================
+ CG_DrawDamagePic
+
+================
+ */
+static void CG_DrawDamagePic(void) {
+    float x, y, w, h;
+    playerState_t *ps;
+    int health, time;
+
+    ps = &cg.snap->ps;
+    health = ps->stats[STAT_HEALTH];
+
+    if (cg_blood.integer == 1) {
+        if (health > 0) {
+            x = y = 0;
+            w = 640;
+            h = 480;
+            CG_AdjustFrom640(&x, &y, &w, &h);
+            if (health < 80) {
+                trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.viewBloodSpurts);
+            }
+            if (cg.predictedPlayerState.powerups[PW_ADRENALINE] == 0) {
+                if (health <= 20) {
+                    trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.viewNearDeathShader);
+                } else if (health <= 40) {
+                    trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.viewLowHealthShader);
+                }
+            }
+        }
+        if (cg.damageTime > 0) {
+            time = cg.time - cg.damageTime;
+            Com_Printf("time: %i\n", time);
+        }
+    }
+}
+
+/*
+================
 CG_DrawStatusBar
 
 ================
@@ -2123,6 +2161,9 @@ static void CG_Draw2D(stereoFrame_t stereoFrame) {
     if (cg.levelShot) {
         return;
     }
+
+    // ignore any cvar settings, this needs to be drawn all the time
+    CG_DrawDamagePic();
 
     if (cg_draw2D.integer == 0) {
         return;

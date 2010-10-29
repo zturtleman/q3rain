@@ -592,19 +592,19 @@ void Con_DrawNotify(void) {
     }
 
     // draw the chat line
+    // skip should be text drawn + 1
     if (Key_GetCatcher() & KEYCATCH_MESSAGE) {
         if (chat_team) {
-            SCR_DrawBigString(8, v, "say_team:", 1.0f, qfalse);
-            skip = 10;
+            SCR_DrawBigString(BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "Team:", 1.0f, qfalse);
+            skip = 6;
         } else {
-            SCR_DrawBigString(8, v, "say:", 1.0f, qfalse);
+            SCR_DrawBigString(BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "Say:", 1.0f, qfalse);
             skip = 5;
         }
 
-        Field_BigDraw(&chatField, skip * BIGCHAR_WIDTH, v,
-                SCREEN_WIDTH - (skip + 1) * BIGCHAR_WIDTH, qtrue, qtrue);
+        Field_BigDraw(&chatField, BIGCHAR_WIDTH + (BIGCHAR_WIDTH * skip), BIGCHAR_HEIGHT, SCREEN_WIDTH - (skip + 1) * BIGCHAR_WIDTH, qtrue, qtrue);
 
-        v += BIGCHAR_HEIGHT;
+        //v += BIGCHAR_HEIGHT;
     }
 }
 
@@ -624,6 +624,7 @@ void Con_DrawSolidConsole(float frac) {
     //	qhandle_t		conShader;
     int currentColor;
     vec4_t color;
+    vec4_t barcolor;
 
     lines = cls.glconfig.vidHeight * frac;
     if (lines <= 0)
@@ -648,12 +649,17 @@ void Con_DrawSolidConsole(float frac) {
     color[1] = 0;
     color[2] = 0;
     color[3] = 1;
-    SCR_FillRect(0, y, SCREEN_WIDTH, 2, color);
+    barcolor[0] = 0.3f;
+    barcolor[1] = 0.3f;
+    barcolor[2] = 1;
+    barcolor[3] = 1;
+    SCR_FillRect(0, y, SCREEN_WIDTH, 2, barcolor);
 
 
     // draw the version number
 
-    re.SetColor(g_color_table[ColorIndex(COLOR_RED)]);
+    //re.SetColor(g_color_table[ColorIndex(COLOR_RED)]);
+    re.SetColor(barcolor);
 
     i = strlen(Q3_VERSION);
 
@@ -672,7 +678,8 @@ void Con_DrawSolidConsole(float frac) {
     // draw from the bottom up
     if (con.display != con.current) {
         // draw arrows to show the buffer is backscrolled
-        re.SetColor(g_color_table[ColorIndex(COLOR_RED)]);
+        //re.SetColor(g_color_table[ColorIndex(COLOR_RED)]);
+        re.SetColor(barcolor);
         for (x = 0; x < con.linewidth; x += 4)
             SCR_DrawSmallChar(con.xadjust + (x + 1) * SMALLCHAR_WIDTH, y, '^');
         y -= SMALLCHAR_HEIGHT;

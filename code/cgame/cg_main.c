@@ -249,7 +249,7 @@ static cvarTable_t cvarTable[] = {
     // but we also reference them here
     { &cg_buildScript, "com_buildScript", "0", 0}, // force loading of all possible data amd error on failures
     { &cg_paused, "cl_paused", "0", CVAR_ROM},
-    { &cg_blood, "com_blood", "1", CVAR_ARCHIVE},
+    { &cg_blood, "com_blood", "1", CVAR_CHEAT},
     { &cg_synchronousClients, "g_synchronousClients", "0", 0}, // communicated by systeminfo
     { &cg_cameraOrbit, "cg_cameraOrbit", "0", CVAR_CHEAT},
     { &cg_cameraOrbitDelay, "cg_cameraOrbitDelay", "50", CVAR_ARCHIVE},
@@ -537,8 +537,6 @@ static void CG_RegisterSounds(void) {
     cgs.media.excellentSound = trap_S_RegisterSound("sound/feedback/excellent.wav", qtrue);
     cgs.media.deniedSound = trap_S_RegisterSound("sound/feedback/denied.wav", qtrue);
     cgs.media.humiliationSound = trap_S_RegisterSound("sound/feedback/humiliation.wav", qtrue);
-    cgs.media.assistSound = trap_S_RegisterSound("sound/feedback/assist.wav", qtrue);
-    cgs.media.defendSound = trap_S_RegisterSound("sound/feedback/defense.wav", qtrue);
 
     cgs.media.takenLeadSound = trap_S_RegisterSound("sound/feedback/takenlead.wav", qtrue);
     cgs.media.tiedLeadSound = trap_S_RegisterSound("sound/feedback/tiedlead.wav", qtrue);
@@ -661,6 +659,9 @@ static void CG_RegisterGraphics(void) {
     cgs.media.botSkillShaders[4] = trap_R_RegisterShader("menu/art/skill5.tga");
 
     cgs.media.viewBloodShader = trap_R_RegisterShader("viewBloodBlend");
+    cgs.media.viewLowHealthShader = trap_R_RegisterShader("viewLowHealth");
+    cgs.media.viewNearDeathShader = trap_R_RegisterShader("viewNearDeath");
+    cgs.media.viewBloodSpurts = trap_R_RegisterShader("viewBloodSpurts");
 
     cgs.media.deferShader = trap_R_RegisterShaderNoMip("gfx/2d/defer.tga");
 

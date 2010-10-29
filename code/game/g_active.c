@@ -935,6 +935,9 @@ void ClientEndFrame(gentity_t *ent) {
             ent->client->ps.powerups[ i ] = 0;
         }
     }
+    if (ent->client->ps.powerups[PW_ADRENALINE] < level.time) {
+        ent->client->ps.powerups[PW_ADRENALINE] = 0;
+    }
 
     // save network bandwidth
 #if 0

@@ -645,7 +645,7 @@ gitem_t bg_itemlist[] ={
 
     /*QUAKED holdable_bomb (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
      */
-    {
+    /*{
         "holdable_bomb",
         "sound/items/holdable.wav",
         {
@@ -653,14 +653,14 @@ gitem_t bg_itemlist[] ={
             "models/powerups/holdable/bomb_sphere.md3",
             NULL, NULL
         },
-        /* icon */ "icons/bomb",
-        /* pickup */ "Bomb",
+        "icons/bomb", // icon
+        "Bomb", // pickup
         60,
         IT_HOLDABLE,
         HI_BOMB,
-        /* precache */ "",
-        /* sounds */ "sound/items/use_bomb.wav"
-    },
+        "", // precache
+        "sound/items/use_bomb.wav" // sounds
+    },*/
 
     //
     // POWERUP ITEMS

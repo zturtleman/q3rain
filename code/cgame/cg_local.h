@@ -704,6 +704,9 @@ typedef struct {
 
     qhandle_t selectShader;
     qhandle_t viewBloodShader;
+    qhandle_t viewLowHealthShader;
+    qhandle_t viewNearDeathShader;
+    qhandle_t viewBloodSpurts;
     qhandle_t tracerShader;
     qhandle_t crosshairShader[NUM_CROSSHAIRS];
     qhandle_t lagometerShader;
@@ -755,6 +758,7 @@ typedef struct {
     qhandle_t bulletExplosionShader;
     qhandle_t rocketExplosionShader;
     qhandle_t grenadeExplosionShader;
+    qhandle_t grenadeSmokeShader;
     qhandle_t bfgExplosionShader;
     qhandle_t bloodExplosionShader;
 

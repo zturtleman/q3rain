@@ -510,7 +510,7 @@ void CG_ExplosionParticles(int weapon, vec3_t origin) {
     qhandle_t shader; // shader to use for the particles
     int index;
     vec3_t randVec, tempVec;
-
+    vec3_t up;
     // set defaults
     number = 32;
     jump = 50;
@@ -524,8 +524,9 @@ void CG_ExplosionParticles(int weapon, vec3_t origin) {
     switch (weapon) {
         case WP_HE:
             number = 128;
-            jump = 300;
-            light = 300;
+            jump = 100;
+            speed = 400;
+            light = 0;
             lColor[0] = 1.0f;
             lColor[1] = 0.56f;
             lColor[2] = 0.0f;
@@ -535,19 +536,20 @@ void CG_ExplosionParticles(int weapon, vec3_t origin) {
             return;
     }
 
-    for (index = 0; index < number / 2; index++) {
+    for (index = 0; index < number; index++) {
         localEntity_t *le;
         refEntity_t *re;
+        int msec;
 
         le = CG_AllocLocalEntity(); //allocate a local entity
         re = &le->refEntity;
         le->leFlags = LEF_PUFF_DONT_SCALE; //don't change the particle size
         le->leType = LE_MOVE_SCALE_FADE; // particle should fade over time
-        le->startTime = cg.time; // set the start time of the particle to the current time
+        le->startTime = cg.time - random()*100; // set the start time of the particle to the current time
         le->endTime = cg.time + 3000 + random() * 250; //set the end time
         le->lifeRate = 1.0 / (le->endTime - le->startTime);
         re = &le->refEntity;
-        re->shaderTime = cg.time / 1000.0f;
+        re->shaderTime = cg.time / 5.0f;
         re->reType = RT_SPRITE;
         re->rotation = 0;
         re->radius = 3;
@@ -563,50 +565,28 @@ void CG_ExplosionParticles(int weapon, vec3_t origin) {
         le->pos.trTime = cg.time;
         VectorCopy(origin, le->pos.trBase);
 
-        tempVec[0] = crandom(); //between 1 and -1
-        tempVec[1] = crandom();
+        tempVec[0] = crandom()*2; //between 1 and -1
+        tempVec[1] = crandom()*2;
         tempVec[2] = crandom();
+        // dont let them go down too much, most nades explode on the ground
+        if (tempVec[2] < -0.5f) {
+            tempVec[2] *= -1.0f;
+        }
         VectorNormalize(tempVec);
         VectorScale(tempVec, speed, randVec);
         randVec[2] += jump; //nudge the particles up a bit
         VectorCopy(randVec, le->pos.trDelta);
-    }
-
-    for (index = 0; index < number / 2; index++) {
-        localEntity_t *le;
-        refEntity_t *re;
-
-        le = CG_AllocLocalEntity(); //allocate a local entity
-        re = &le->refEntity;
-        le->leFlags = LEF_PUFF_DONT_SCALE; //don't change the particle size
-        le->leType = LE_MOVE_SCALE_FADE; // particle should fade over time
-        le->startTime = cg.time; // set the start time of the particle to the current time
-        le->endTime = cg.time + 1000 + random() * 250; //set the end time
-        le->lifeRate = 0.75 / (le->endTime - le->startTime);
-        re = &le->refEntity;
-        re->shaderTime = cg.time / 1000.0f;
-        re->reType = RT_SPRITE;
-        re->rotation = 0;
-        re->radius = 3;
-        re->customShader = shader;
-        re->shaderRGBA[0] = 0xff;
-        re->shaderRGBA[1] = 0xff;
-        re->shaderRGBA[2] = 0xff;
-        re->shaderRGBA[3] = 0xff;
-        le->light = light;
-        VectorCopy(lColor, le->lightColor);
-        le->color[3] = 1.0;
-        le->pos.trType = TR_LINEAR;
-        le->pos.trTime = cg.time;
-        VectorCopy(origin, le->pos.trBase);
-
-        tempVec[0] = crandom(); //between 1 and -1
-        tempVec[1] = crandom();
-        tempVec[2] = crandom();
-        VectorNormalize(tempVec);
-        VectorScale(tempVec, speed, randVec);
-        randVec[2] += jump * 2; //nudge the particles up a bit
-        VectorCopy(randVec, le->pos.trDelta);
+        up[0] = crandom()*10;
+        up[1] = crandom()*10;
+        up[2] = crandom()*7.5f;
+        msec = 1000+crandom()*1000;
+        if (msec < 0) {
+            msec *= -1;
+        } else if (msec == 0) {
+            msec = 1000;
+        }
+        // smoke dat shit up
+        CG_MakeExplosion(origin, up, cgs.media.dishFlashModel, cgs.media.grenadeSmokeShader, msec, qtrue);
     }
 
 }
@@ -733,11 +713,12 @@ void CG_RegisterWeapon(int weaponNum) {
 
         case WP_HE:
             weaponInfo->missileModel = trap_R_RegisterModel("models/ammo/grenade1.md3");
-            weaponInfo->missileTrailFunc = CG_GrenadeTrail;
-            weaponInfo->wiTrailTime = 700;
-            weaponInfo->trailRadius = 32;
+            //weaponInfo->missileTrailFunc = CG_GrenadeTrail;
+            //weaponInfo->wiTrailTime = 700;
+            //weaponInfo->trailRadius = 32;
             weaponInfo->flashSound[0] = trap_S_RegisterSound("sound/weapons/grenade/grenlf1a.wav", qfalse);
             cgs.media.grenadeExplosionShader = trap_R_RegisterShader("grenadeExplosion");
+            cgs.media.grenadeSmokeShader = trap_R_RegisterShader("grenadeSmoke");
             break;
 
         case WP_ACR:
@@ -2095,11 +2076,11 @@ void CG_Bullet(vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, i
             // do a complete bubble trail if necessary
             if ((sourceContentType == destContentType) && (sourceContentType & CONTENTS_WATER)) {
                 CG_BubbleTrail(start, end, 32);
-            }                // bubble trail from water into air
+            }// bubble trail from water into air
             else if ((sourceContentType & CONTENTS_WATER)) {
                 trap_CM_BoxTrace(&trace, end, start, NULL, NULL, 0, CONTENTS_WATER);
                 CG_BubbleTrail(start, trace.endpos, 32);
-            }                // bubble trail from air into water
+            }// bubble trail from air into water
             else if ((destContentType & CONTENTS_WATER)) {
                 trap_CM_BoxTrace(&trace, start, end, NULL, NULL, 0, CONTENTS_WATER);
                 CG_BubbleTrail(trace.endpos, end, 32);

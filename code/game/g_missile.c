@@ -44,7 +44,12 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
     VectorMA(velocity, -2 * dot, trace->plane.normal, ent->s.pos.trDelta);
 
     if (ent->s.eFlags & EF_BOUNCE_HALF) {
-        VectorScale(ent->s.pos.trDelta, 0.65, ent->s.pos.trDelta);
+        if (strcmp(ent->classname, "grenade") == 0) {
+            // grenades shouldnt bounce that much
+            VectorScale(ent->s.pos.trDelta, 0.4, ent->s.pos.trDelta);
+        } else {
+            VectorScale(ent->s.pos.trDelta, 0.65, ent->s.pos.trDelta);
+        }
         // check for stop
         if (trace->plane.normal[2] > 0.2 && VectorLength(ent->s.pos.trDelta) < 40) {
             G_SetOrigin(ent, trace->endpos);
@@ -404,10 +409,10 @@ gentity_t *fire_he(gentity_t *self, vec3_t start, vec3_t dir) {
     bolt->target_ent = NULL;
 
     // Lancer SHOOTNADES
-    bolt->health = 2; // dont use 1, else it will die if collided with other nade :D
+    bolt->health = 1; // dont use 1, else it will die if collided with other nade :D
     bolt->takedamage = qtrue;
     bolt->die = G_MissileDie;
-    bolt->r.contents = CONTENTS_BODY;
+    bolt->r.contents = CONTENTS_CORPSE;
     VectorSet(bolt->r.mins, -10, -5, 0);
     VectorCopy(bolt->r.mins, bolt->r.absmin);
     VectorSet(bolt->r.maxs, 10, 5, 6);
@@ -416,7 +421,7 @@ gentity_t *fire_he(gentity_t *self, vec3_t start, vec3_t dir) {
     bolt->s.pos.trType = TR_GRAVITY;
     bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME; // move a bit on the very first frame
     VectorCopy(start, bolt->s.pos.trBase);
-    VectorScale(dir, 800, bolt->s.pos.trDelta);
+    VectorScale(dir, 1000, bolt->s.pos.trDelta);
     SnapVector(bolt->s.pos.trDelta); // save net bandwidth
 
     VectorCopy(start, bolt->r.currentOrigin);

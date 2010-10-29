@@ -2683,7 +2683,7 @@ void Com_Init(char *commandLine) {
     //
     com_altivec = Cvar_Get("com_altivec", "1", CVAR_ARCHIVE);
     com_maxfps = Cvar_Get("com_maxfps", "85", CVAR_ARCHIVE);
-    com_blood = Cvar_Get("com_blood", "1", CVAR_ARCHIVE);
+    com_blood = Cvar_Get("com_blood", "1", CVAR_CHEAT);
 
     com_developer = Cvar_Get("developer", "0", CVAR_TEMP);
     com_logfile = Cvar_Get("logfile", "0", CVAR_TEMP);
