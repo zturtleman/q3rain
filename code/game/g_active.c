@@ -554,22 +554,28 @@ void ThrowWeapon(gentity_t *ent) {
     gitem_t *xr_item;
     gentity_t *xr_drop;
     byte i;
-    int amount;
+    int ammo, clipammo;
 
     client = ent->client;
     ucmd = &ent->client->pers.cmd;
 
     if (client->ps.weapon == WP_KNIFE
             || client->ps.weapon == WP_NONE
+            || client->ps.weapon == WP_HANDS
             || (ucmd->buttons & BUTTON_ATTACK))
         return;
 
     xr_item = BG_FindItemForWeapon(client->ps.weapon);
 
     //amount = client->ps.ammo[client->ps.weapon]; // XRAY save amount
-    amount = client->clipammo[client->ps.weapon] + client->ps.ammo[client->ps.weapon];
-    if (amount == 0) {
-        amount = -1;
+    clipammo = client->ps.ammo[client->ps.weapon];
+    ammo = client->clipammo[client->ps.weapon];
+    ;
+    if (ammo == 0) {
+        ammo = -1;
+    }
+    if (clipammo == 0) {
+        clipammo = -1;
     }
     client->ps.ammo[client->ps.weapon] = 0;
     client->clipammo[client->ps.weapon] = 0;
@@ -584,11 +590,9 @@ void ThrowWeapon(gentity_t *ent) {
     }
 
     xr_drop = dropWeapon(ent, xr_item, 0, FL_DROPPED_ITEM | FL_THROWN_ITEM);
-    if (amount > 0) {
-        xr_drop->count = amount;
-    } else {
-        xr_drop->count = -1; // XRAY FMJ 0 is already taken, -1 means no ammo
-    }
+    xr_drop->ammo = ammo;
+    xr_drop->clipammo = clipammo;
+    //Com_Printf("dn: ammo: %i clipammo: %i\n", xr_drop->ammo, xr_drop->clipammo);
 }
 
 void BotTestSolid(vec3_t origin);

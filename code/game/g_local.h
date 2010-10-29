@@ -195,6 +195,10 @@ struct gentity_s {
     int cvar_value;
     int active_weapon;
     char *teamchar;
+
+    // RAIN AMMO VARIABLES
+    int ammo; // ammo in weapon
+    int clipammo; // bullets in all clips together
 };
 
 typedef enum {

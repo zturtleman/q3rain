@@ -266,15 +266,21 @@ static void CG_Item(centity_t *cent) {
         VectorCopy(cg.autoAnglesFast, cent->lerpAngles);
         AxisCopy(cg.autoAxisFast, ent.axis);
     } else {
-        VectorCopy(cg.autoAngles, cent->lerpAngles);
-        AxisCopy(cg.autoAxis, ent.axis);
-    }*/
+        VectorCopy(cg.autoAngles, cent->lerpAngles);*/
+    //AxisCopy(cg.autoAxis, ent.axis);
+    //}
+    cg.autoAngles[0] = 0;
+    cg.autoAngles[1] = 0;
+    cg.autoAngles[2] = 0;
+
+    AnglesToAxis(cg.autoAngles, cg.autoAxis);
+    AxisCopy(cg.autoAxis, ent.axis);
 
     wi = NULL;
     // the weapons have their origin where they attatch to player
     // models, so we need to offset them or they will rotate
     // eccentricly
-    if (item->giType == IT_WEAPON) {
+    /*if (item->giType == IT_WEAPON) {
         wi = &cg_weapons[item->giTag];
         cent->lerpOrigin[0] -=
                 wi->weaponMidpoint[0] * ent.axis[0][0] +
@@ -290,18 +296,18 @@ static void CG_Item(centity_t *cent) {
                 wi->weaponMidpoint[2] * ent.axis[2][2];
 
         cent->lerpOrigin[2] += 8; // an extra height boost
-    }
+    }*/
 
     ent.hModel = cg_items[es->modelindex].models[0];
 
     VectorCopy(cent->lerpOrigin, ent.origin);
-    VectorCopy(cent->lerpOrigin, ent.oldorigin);
+    //VectorCopy(cent->lerpOrigin, ent.oldorigin);
 
     ent.nonNormalizedAxes = qfalse;
 
     // if just respawned, slowly scale up
     msec = cg.time - cent->miscTime;
-    if (msec >= 0 && msec < ITEM_SCALEUP_TIME) {
+    /*if (msec >= 0 && msec < ITEM_SCALEUP_TIME) {
         frac = (float) msec / ITEM_SCALEUP_TIME;
         VectorScale(ent.axis[0], frac, ent.axis[0]);
         VectorScale(ent.axis[1], frac, ent.axis[1]);
@@ -309,7 +315,7 @@ static void CG_Item(centity_t *cent) {
         ent.nonNormalizedAxes = qtrue;
     } else {
         frac = 1.0;
-    }
+    }*/
 
     // items without glow textures need to keep a minimum light value
     // so they are always visible
@@ -320,47 +326,14 @@ static void CG_Item(centity_t *cent) {
 
     // increase the size of the weapons when they are presented as items
     if (item->giType == IT_WEAPON) {
-        VectorScale(ent.axis[0], 1.5, ent.axis[0]);
+        /*VectorScale(ent.axis[0], 1.5, ent.axis[0]);
         VectorScale(ent.axis[1], 1.5, ent.axis[1]);
-        VectorScale(ent.axis[2], 1.5, ent.axis[2]);
-        ent.nonNormalizedAxes = qtrue;
-#ifdef MISSIONPACK
-        trap_S_AddLoopingSound(cent->currentState.number, cent->lerpOrigin, vec3_origin, cgs.media.weaponHoverSound);
-#endif
-    }
-
-#ifdef MISSIONPACK
-    if (item->giType == IT_HOLDABLE && item->giTag == HI_KAMIKAZE) {
-        VectorScale(ent.axis[0], 2, ent.axis[0]);
-        VectorScale(ent.axis[1], 2, ent.axis[1]);
-        VectorScale(ent.axis[2], 2, ent.axis[2]);
+        VectorScale(ent.axis[2], 1.5, ent.axis[2]);*/
         ent.nonNormalizedAxes = qtrue;
     }
-#endif
 
     // add to refresh list
     trap_R_AddRefEntityToScene(&ent);
-
-#ifdef MISSIONPACK
-    if (item->giType == IT_WEAPON && wi->barrelModel) {
-        refEntity_t barrel;
-
-        memset(&barrel, 0, sizeof ( barrel));
-
-        barrel.hModel = wi->barrelModel;
-
-        VectorCopy(ent.lightingOrigin, barrel.lightingOrigin);
-        barrel.shadowPlane = ent.shadowPlane;
-        barrel.renderfx = ent.renderfx;
-
-        CG_PositionRotatedEntityOnTag(&barrel, &ent, wi->weaponModel, "tag_barrel");
-
-        AxisCopy(ent.axis, barrel.axis);
-        barrel.nonNormalizedAxes = ent.nonNormalizedAxes;
-
-        trap_R_AddRefEntityToScene(&barrel);
-    }
-#endif
 
     // accompanying rings / spheres for powerups
     if (!cg_simpleItems.integer) {
@@ -750,7 +723,7 @@ static void CG_TeamBase(centity_t *cent) {
 #else
 #endif
 #ifdef MISSIONPACK
-else if (cgs.gametype == GT_OBELISK) {
+    else if (cgs.gametype == GT_OBELISK) {
         // show the obelisk
         memset(&model, 0, sizeof (model));
         model.reType = RT_MODEL;

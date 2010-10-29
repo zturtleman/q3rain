@@ -1553,7 +1553,14 @@ void Cmd_Reload(gentity_t *ent) {
 
     weapon = ent->client->ps.weapon;
 
-    if (weapon == WP_HE || weapon == WP_KNIFE || weapon == WP_BOMB) return;
+    if (weapon == WP_HE
+            || weapon == WP_KNIFE
+            || weapon == WP_BOMB
+            || weapon == WP_NONE
+            || weapon == WP_HANDS
+            || weapon == WP_INJECTOR) {
+        return;
+    }
 
     amt = ClipAmountForWeapon(weapon);
     ammotoadd = amt;

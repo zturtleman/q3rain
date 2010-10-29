@@ -152,29 +152,33 @@ int Pickup_Ammo(gentity_t *ent, gentity_t *other) {
 //======================================================================
 
 int Pickup_Weapon(gentity_t *ent, gentity_t *other) {
-    int quantity;
     int clipammo;
     int ammo;
     int clipsize;
 
-    if (ent->count < 0) {
-        quantity = 0; // None for you, sir!
+    if (ent->ammo < 0) {
+        ammo = 0; // None for you, sir!
     } else {
-        if (ent->count) {
-            quantity = ent->count;
+        if (ent->ammo) {
+            ammo = ent->ammo;
         } else {
-            quantity = ent->item->quantity;
+            ammo = ent->item->quantity;
+        }
+    }
+    if (ent->clipammo < 0) {
+        clipammo = 0; // None for you, sir!
+    } else {
+        if (ent->clipammo) {
+            clipammo = ent->clipammo;
+        } else {
+            clipammo = ent->item->quantity;
         }
     }
     // add the weapon
     other->client->ps.stats[STAT_WEAPONS] |= (1 << ent->item->giTag);
 
     clipsize = ClipAmountForWeapon(ent->item->giTag);
-    if (quantity > clipsize) {
-        ammo = quantity - clipsize;
-        clipammo = clipsize;
-    }
-    Com_Printf("quant = %i\nammo = %i\nclips = %i\n", quantity, ammo, clipammo);
+    //Com_Printf("up: ammo: %i clipammo: %i\n", ammo, clipammo);
     //Add_Ammo(other, ent->item->giTag, ammo);
     other->client->ps.ammo[ent->item->giTag] = clipammo;
     other->client->clipammo[ent->item->giTag] = ammo;
@@ -425,6 +429,11 @@ Ray, [SuB]paranoid
 Spawns an item and tosses it forward
 ================
  */
+
+static void Set_Touch_Item(gentity_t * ent) {
+    ent->touch = Touch_Item;
+}
+
 gentity_t *LaunchItem(gitem_t *item, vec3_t origin, vec3_t velocity, int xr_flags) { // XRAY FMJ WEAPONDROP
     gentity_t *dropped;
 
@@ -440,6 +449,8 @@ gentity_t *LaunchItem(gitem_t *item, vec3_t origin, vec3_t velocity, int xr_flag
     VectorSet(dropped->r.maxs, ITEM_RADIUS, ITEM_RADIUS, ITEM_RADIUS);
     dropped->r.contents = CONTENTS_TRIGGER;
 
+    //dropped->think = Set_Touch_Item;
+    //dropped->nextthink = level.time + 1000;
     dropped->touch = Touch_Item;
 
     G_SetOrigin(dropped, origin);
