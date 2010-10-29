@@ -375,7 +375,6 @@ static void CG_DrawDamagePic(void) {
         }
         if (cg.damageTime > 0) {
             time = cg.time - cg.damageTime;
-            Com_Printf("time: %i\n", time);
         }
     }
 }

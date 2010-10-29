@@ -180,10 +180,10 @@ typedef struct {
 
 static cvarTable_t cvarTable[] = {
     { &cg_ignore, "cg_ignore", "0", 0}, // used for debugging
-    { &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE},
+    { &cg_autoswitch, "cg_autoswitch", "0", CVAR_ARCHIVE},
     { &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE},
-    { &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE},
-    { &cg_fov, "cg_fov", "90", CVAR_ARCHIVE | CVAR_CHEAT},
+    { &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE | CVAR_CHEAT},
+    { &cg_fov, "cg_fov", "100", CVAR_ARCHIVE | CVAR_CHEAT},
     { &cg_viewsize, "cg_viewsize", "100", CVAR_ARCHIVE},
     { &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE},
     { &cg_gibs, "cg_gibs", "1", CVAR_ARCHIVE},
@@ -214,9 +214,9 @@ static cvarTable_t cvarTable[] = {
     { &cg_centertime, "cg_centertime", "3", CVAR_CHEAT},
     { &cg_runpitch, "cg_runpitch", "0.002", CVAR_ARCHIVE},
     { &cg_runroll, "cg_runroll", "0.005", CVAR_ARCHIVE},
-    { &cg_bobup, "cg_bobup", "0.005", CVAR_CHEAT},
-    { &cg_bobpitch, "cg_bobpitch", "0.002", CVAR_ARCHIVE},
-    { &cg_bobroll, "cg_bobroll", "0.002", CVAR_ARCHIVE},
+    { &cg_bobup, "cg_bobup", "0.0", CVAR_CHEAT},
+    { &cg_bobpitch, "cg_bobpitch", "0.0", CVAR_CHEAT},
+    { &cg_bobroll, "cg_bobroll", "0.002", CVAR_CHEAT},
     { &cg_swingSpeed, "cg_swingSpeed", "0.3", CVAR_CHEAT},
     { &cg_animSpeed, "cg_animspeed", "1", CVAR_CHEAT},
     { &cg_debugAnim, "cg_debuganim", "0", CVAR_CHEAT},

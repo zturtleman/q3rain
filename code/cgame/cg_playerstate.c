@@ -97,7 +97,7 @@ void CG_DamageFeedback(int yawByte, int pitchByte, int damage) {
     int fov;
 
     // show the attacking player's head and name in corner
-    cg.attackerTime = cg.time;
+    //cg.attackerTime = cg.time;
 
     // the lower on health you are, the greater the view kick will be
     health = cg.snap->ps.stats[STAT_HEALTH];

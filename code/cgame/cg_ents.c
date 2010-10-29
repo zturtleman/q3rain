@@ -256,19 +256,19 @@ static void CG_Item(centity_t *cent) {
     }
 
     // items bob up and down continuously
-    scale = 0.005 + cent->currentState.number * 0.00001;
-    cent->lerpOrigin[2] += 4 + cos((cg.time + 1000) * scale) * 4;
+    //scale = 0.005 + cent->currentState.number * 0.00001;
+    //cent->lerpOrigin[2] += 4 + cos((cg.time + 1000) * scale) * 4;
 
     memset(&ent, 0, sizeof (ent));
 
     // autorotate at one of two speeds
-    if (item->giType == IT_HEALTH) {
+    /*if (item->giType == IT_HEALTH) {
         VectorCopy(cg.autoAnglesFast, cent->lerpAngles);
         AxisCopy(cg.autoAxisFast, ent.axis);
     } else {
         VectorCopy(cg.autoAngles, cent->lerpAngles);
         AxisCopy(cg.autoAxis, ent.axis);
-    }
+    }*/
 
     wi = NULL;
     // the weapons have their origin where they attatch to player

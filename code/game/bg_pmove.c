@@ -436,11 +436,12 @@ PM_CheckJump
 =============
  */
 static qboolean PM_CheckJump(void) {
+    float vel;
     if (pm->ps->pm_flags & PMF_RESPAWNED) {
         return qfalse; // don't allow jump until all buttons are up
     }
 
-    if (pm->cmd.upmove < 10) {
+    if (pm->cmd.upmove < 5) {
         // not holding jump
         return qfalse;
     }
@@ -457,7 +458,15 @@ static qboolean PM_CheckJump(void) {
     pm->ps->pm_flags |= PMF_JUMP_HELD;
 
     pm->ps->groundEntityNum = ENTITYNUM_NONE;
-    pm->ps->velocity[2] = JUMP_VELOCITY;
+    if (pm->ps->powerups[PW_ADRENALINE] == 0) {
+        vel = JUMP_VELOCITY / pm->ps->legsfactor;
+        if (vel < JUMP_VELOCITY / 1.5) {
+            vel = JUMP_VELOCITY / 1.5;
+        }
+        pm->ps->velocity[2] = vel;
+    } else {
+        pm->ps->velocity[2] = JUMP_VELOCITY;
+    }
     PM_AddEvent(EV_JUMP);
 
     if (pm->cmd.forwardmove >= 0) {
@@ -914,6 +923,21 @@ static void PM_WalkMove(pmove_t *pmove) {
     // set the movementDir so clients can rotate the legs for strafing
     PM_SetMovementDir();
 
+    if ((pm->ps->stats[STAT_HEALTH] <= 20) && ((int) (pm->ps->torsoTimer + pm->ps->commandTime * crandom()) % 5) == 0) {
+        if (pml.right[0] != 0 && pml.right[1] != 0) {
+            if (crandom() < 0)
+                pml.forward[0] = crandom()*10000;
+            else
+                pml.forward[1] = crandom()*10000;
+        }
+        if (pml.forward[0] != 0 && pml.forward[1] != 0) {
+            if (crandom() < 0)
+                pml.right[0] = crandom()*10000;
+            else
+                pml.right[1] = crandom()*10000;
+        }
+    }
+
     // project moves down to flat plane
     pml.forward[2] = 0;
     pml.right[2] = 0;
@@ -940,6 +964,9 @@ static void PM_WalkMove(pmove_t *pmove) {
         if (wishspeed > pm->ps->speed * pm_duckScale) {
             wishspeed = pm->ps->speed * pm_duckScale;
         }
+    }
+    if (wishspeed < PLAYER_SPEED / 3) {
+        wishspeed = PLAYER_SPEED / 3;
     }
 
     // clamp the speed lower if wading or walking on the bottom
@@ -1007,7 +1034,7 @@ static void PM_WalkMove(pmove_t *pmove) {
 PM_SnowMove
 ===================
  */
-static void PM_SnowMove(pmove_t *pmove) {
+static void PM_SnowMove(pmove_t * pmove) {
     int i;
     vec3_t wishvel;
     float fmove, smove;
@@ -1370,7 +1397,7 @@ void PM_CheckStuck(void) {
 PM_CorrectAllSolid
 =============
  */
-static int PM_CorrectAllSolid(trace_t *trace) {
+static int PM_CorrectAllSolid(trace_t * trace) {
     int i, j, k;
     vec3_t point;
 
@@ -2060,7 +2087,7 @@ This can be used as another entry point when only the viewangles
 are being updated isntead of a full move
 ================
  */
-void PM_UpdateViewAngles(playerState_t *ps, const usercmd_t *cmd) {
+void PM_UpdateViewAngles(playerState_t *ps, const usercmd_t * cmd) {
     short temp;
     int i;
 
@@ -2099,7 +2126,7 @@ PmoveSingle
  */
 void trap_SnapVector(float *v);
 
-void PmoveSingle(pmove_t *pmove) {
+void PmoveSingle(pmove_t * pmove) {
     pm = pmove;
 
     // this counter lets us debug movement problems with a journal
@@ -2280,7 +2307,7 @@ Pmove
 Can be called by either the server or the client
 ================
  */
-void Pmove(pmove_t *pmove) {
+void Pmove(pmove_t * pmove) {
     int finalTime;
 
     finalTime = pmove->cmd.serverTime;

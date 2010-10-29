@@ -88,6 +88,17 @@ void P_DamageFeedback(gentity_t *player) {
     client->damage_knockback = 0;
 }
 
+static void P_KickBack(gentity_t *player, int pitch, int yaw, int damage) {
+    gclient_t *client;
+
+    client = player->client;
+    client->ps.damagePitch = pitch;
+    client->ps.damageYaw = yaw;
+    client->damage_fromWorld = qfalse;
+    client->ps.damageCount = damage;
+    client->ps.damageEvent = ((int) level.time / 100) + 100;
+}
+
 /*
 =============
 P_WorldEffects
@@ -809,6 +820,10 @@ void ClientThink_real(gentity_t *ent) {
     client->oldbuttons = client->buttons;
     client->buttons = ucmd->buttons;
     client->latched_buttons |= client->buttons & ~client->oldbuttons;
+
+    if (client->ps.stats[STAT_HEALTH] > 0 && client->ps.stats[STAT_HEALTH] <= 20 && (level.time % 53 == 0) && (client->ps.powerups[PW_ADRENALINE] == 0)) {
+        P_KickBack(ent, (int) crandom()*10, (int) crandom()*10, 3);
+    }
 
     // check for respawning
     if (client->ps.stats[STAT_HEALTH] <= 0) {
