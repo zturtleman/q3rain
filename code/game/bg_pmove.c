@@ -1962,16 +1962,21 @@ static void PM_Weapon(void) {
     // check for fire
     // if they are pressing attack and their current weapon is the nade launcher
     if (pm->cmd.buttons & 1) {
-        if (pm->ps->weapon == WP_HE) {
+        if (pm->ps->weapon == WP_HE && pm->ps->weaponstate != WEAPON_COCKED) {
             pm->ps->weaponTime = 0;
             // put it in the "cocked" position
             pm->ps->weaponstate = WEAPON_COCKED;
+            pm->ps->grenadetime = pm->ps->levelTime + 3000;
+            return;
+        }
+        if (pm->ps->weaponstate == WEAPON_COCKED) {
             return;
         }
     }
     // check for fire release
     // if they aren't pressing attack
     if (!(pm->cmd.buttons & 1)) {
+        pm->ps->spammed = 0;
         if (pm->ps->weaponstate == WEAPON_COCKED) {
             pm->ps->weaponstate = WEAPON_READY;
         } else {

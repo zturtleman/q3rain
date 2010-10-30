@@ -1103,6 +1103,9 @@ void ClientSpawn(gentity_t *ent) {
     client->ps.persistant[PERS_SPAWN_COUNT]++;
     client->ps.persistant[PERS_TEAM] = client->sess.sessionTeam;
 
+    client->ps.grenadetime = -1337;
+    client->ps.levelTime = level.time;
+
     client->airOutTime = level.time + 12000;
 
     trap_GetUserinfo(index, userinfo, sizeof (userinfo));

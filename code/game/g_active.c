@@ -570,7 +570,6 @@ void ThrowWeapon(gentity_t *ent) {
     //amount = client->ps.ammo[client->ps.weapon]; // XRAY save amount
     clipammo = client->ps.ammo[client->ps.weapon];
     ammo = client->clipammo[client->ps.weapon];
-    ;
     if (ammo == 0) {
         ammo = -1;
     }
@@ -629,6 +628,18 @@ void SendPendingPredictableEvents(playerState_t *ps) {
         t->r.singleClient = ps->clientNum;
         // set back external event
         ps->externalEvent = extEvent;
+    }
+}
+
+static void G_ExplodeClient(gclient_t *client, gentity_t *ent) {
+    ent->client->ps.weaponTime = 200;
+    ent->client->ps.weaponstate = WEAPON_READY;
+    // dont splode when there are no nades :X
+    if (client->clipammo[WP_HE] > 0) {
+        FireGrenade(ent, 0);
+        client->clipammo[WP_HE] = 0;
+    } else {
+        return;
     }
 }
 
@@ -740,6 +751,15 @@ void ClientThink_real(gentity_t *ent) {
         client->ps.speed = PLAYER_SPEED * 1.3;
     } else {
         client->ps.speed = PLAYER_SPEED / client->ps.legsfactor;
+    }
+
+    ent->client->ps.levelTime = level.time;
+
+    if (client->ps.grenadetime <= ent->client->ps.levelTime) {
+        if (client->ps.grenadetime != -1337) {
+            G_ExplodeClient(client, ent);
+            client->ps.grenadetime = -1337;
+        }
     }
 
     // set up for pmove

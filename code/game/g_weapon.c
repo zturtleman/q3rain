@@ -526,7 +526,7 @@ void Weapon_Barrett_Fire(gentity_t *ent, int count) {
         return;
     }
 
-    VectorMA(muzzle, 8192, forward, end);
+    VectorMA(muzzle, BARRETT_RANGE, forward, end);
 
     unlinked = 0;
     hits = 0;
@@ -878,7 +878,7 @@ Weapon_HE_Fire
 #define HE_SPLASHDAMAGE 250
 #define HE_RADIUS 300
 
-void Weapon_HE_Fire(gentity_t *ent) {
+void Weapon_HE_Fire(gentity_t *ent, int time) {
     gentity_t *m;
 
     forward[2] += 0.2f;
@@ -888,6 +888,10 @@ void Weapon_HE_Fire(gentity_t *ent) {
     m->damage = HE_DAMAGE;
     m->splashDamage = HE_SPLASHDAMAGE;
     m->splashRadius = HE_RADIUS;
+    if (time < 0 || time > 3000) {
+        time = 3000;
+    }
+    m->nextthink = level.time + time;
 }
 
 /*
@@ -896,12 +900,89 @@ Weapon_Intervention_Fire
 
 ===============
  */
+#define MAX_INTERVENTION_HITS    2
+#define MAX_INTERVENTION_WALLS   1
+#define MAX_INTERVENTION_UNITS   64
 #define INTERVENTION_DAMAGE 100
 #define INTERVENTION_RANGE 8192
 
-void Weapon_Intervention_Fire(gentity_t *ent) {
-    // TODO stub
-    weapon_railgun_fire(ent, 0);
+void Weapon_Intervention_Fire(gentity_t *ent, int count) {
+    vec3_t end, oldmuzzle;
+    trace_t trace, trace2;
+    gentity_t *tent;
+    gentity_t *traceEnt;
+    int damage;
+    int i;
+    int hits;
+    int unlinked;
+    gentity_t * unlinkedEntities[MAX_INTERVENTION_HITS];
+    damage = 100;
+
+    count++;
+
+    if (count > MAX_INTERVENTION_WALLS) {
+        return;
+    } else if (count >= 2) {
+        damage = damage / 1.5;
+    }
+
+    VectorMA(muzzle, INTERVENTION_RANGE, forward, end);
+
+    unlinked = 0;
+    hits = 0;
+    do {
+        trap_Trace(&trace, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
+        if (trace.entityNum >= ENTITYNUM_MAX_NORMAL) {
+            break;
+        }
+        traceEnt = &g_entities[ trace.entityNum ];
+        if (traceEnt->takedamage) {
+            if (LogAccuracyHit(traceEnt, ent)) {
+                hits++;
+            }
+            G_Damage(traceEnt, ent, ent, forward, trace.endpos, damage, 0, MOD_INTERVENTION);
+        }
+        if (trace.contents & CONTENTS_SOLID) {
+            break;
+        }
+        // unlink this entity, so the next trace will go past it
+        trap_UnlinkEntity(traceEnt);
+        unlinkedEntities[unlinked] = traceEnt;
+        unlinked++;
+    } while (unlinked < MAX_INTERVENTION_HITS);
+
+    // link back in any entities we unlinked
+    for (i = 0; i < unlinked; i++) {
+        trap_LinkEntity(unlinkedEntities[i]);
+    }
+
+    SnapVectorTowards(trace.endpos, muzzle);
+
+    tent = G_TempEntity(trace.endpos, EV_RAILTRAIL);
+
+    VectorCopy(muzzle, tent->s.origin2);
+    VectorMA(tent->s.origin2, 4, right, tent->s.origin2);
+    VectorMA(tent->s.origin2, -1, up, tent->s.origin2);
+
+    if (trace.surfaceFlags & SURF_NOIMPACT) {
+        tent->s.eventParm = 255; // don't make the explosion at the end
+    } else {
+        tent->s.eventParm = DirToByte(trace.plane.normal);
+    }
+
+    // prepare for firing through the wall
+    VectorCopy(muzzle, oldmuzzle);
+    VectorCopy(trace.endpos, muzzle);
+    VectorMA(muzzle, MAX_INTERVENTION_UNITS, forward, muzzle);
+
+    if (!(trap_PointContents(muzzle, -1) & CONTENTS_SOLID)) {
+        trap_Trace(&trace2, muzzle, NULL, NULL, trace.endpos, ent->s.number, MASK_SHOT);
+        VectorCopy(trace2.endpos, muzzle);
+
+        Weapon_Intervention_Fire(ent, count);
+    }
+
+    VectorCopy(oldmuzzle, muzzle);
 }
 
 /*
@@ -910,8 +991,11 @@ Weapon_ACR_Fire
 
 ===============
  */
-#define ACR_SPREAD 300
+#define ACR_MINSPREAD 0
+#define ACR_MAXSPREAD 200
+#define ACR_SPREADADD 7.5f
 #define ACR_DAMAGE 10
+#define ACR_RANGE 8192
 
 void Weapon_ACR_Fire(gentity_t *ent) {
     trace_t tr;
@@ -922,10 +1006,16 @@ void Weapon_ACR_Fire(gentity_t *ent) {
     gentity_t *traceEnt;
     int i, passent;
 
+    ent->client->ps.spammed++;
+    ent->client->ps.spread = ACR_MINSPREAD + (ACR_SPREADADD * (ent->client->ps.spammed - 1));
+    if (ent->client->ps.spread > ACR_MAXSPREAD) {
+        ent->client->ps.spread = ACR_MAXSPREAD;
+    }
+
     r = random() * M_PI * 2.0f;
-    u = sin(r) * crandom() * ACR_SPREAD * 16;
-    r = cos(r) * crandom() * ACR_SPREAD * 16;
-    VectorMA(muzzle, 8192 * 16, forward, end);
+    u = sin(r) * crandom() * (ent->client->ps.spread + ACR_SPREADADD) * 16;
+    r = cos(r) * crandom() * (ent->client->ps.spread + ACR_SPREADADD) * 16;
+    VectorMA(muzzle, ACR_RANGE, forward, end);
     VectorMA(end, r, right, end);
     VectorMA(end, u, up, end);
 
@@ -937,7 +1027,7 @@ void Weapon_ACR_Fire(gentity_t *ent) {
             return;
         }
 
-        traceEnt = &g_entities[ tr.entityNum ];
+        traceEnt = &g_entities[tr.entityNum];
 
         // snap the endpos to integers, but nudged towards the line
         SnapVectorTowards(tr.endpos, muzzle);
@@ -1086,13 +1176,17 @@ void FireWeapon(gentity_t *ent) {
             Weapon_Knife_Fire(ent);
             break;
         case WP_HE:
-            Weapon_HE_Fire(ent);
+            Weapon_HE_Fire(ent, ent->client->ps.grenadetime - ent->client->ps.levelTime);
+            if (ent->client->clipammo[WP_HE] == 0) {
+                ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_HE);
+                ent->client->ps.weapon = WP_HANDS;
+            }
             break;
         case WP_BARRETT:
             Weapon_Barrett_Fire(ent, 0);
             break;
         case WP_INTERVENTION:
-            Weapon_Intervention_Fire(ent);
+            Weapon_Intervention_Fire(ent, 0);
             break;
         case WP_CROSSBOW:
             Weapon_Crossbow_Fire(ent);
@@ -1107,11 +1201,43 @@ void FireWeapon(gentity_t *ent) {
             Weapon_Injector_Fire(ent);
             break;
         case WP_BOMB:
-            Com_Printf("^3FireWeapon: ent->s.weapon == WP_BOMB: ^1STUB!\n");
+            Com_Printf("^3FireWeapon() ent->s.weapon == WP_BOMB: ^1STUB!\n");
             break;
         default:
-            // FIXME		G_Error( "Bad ent->s.weapon" );
+            //G_Error( "Bad ent->s.weapon" );
             break;
     }
+
+    ent->client->ps.grenadetime = -1337;
 }
 
+static void FireGrenade(gentity_t *ent, int time) {
+    gentity_t *m;
+    vec3_t dir;
+
+    if (ent->client->ps.grenadetime == -1337) {
+        return;
+    }
+    //Com_Printf("FireGrenade() time: %i\n", time);
+    ent->client->clipammo[ent->client->ps.weapon]--;
+
+    forward[2] += 0.2f;
+    VectorNormalize(forward);
+
+    m = fire_he(ent, muzzle, forward);
+    m->damage = HE_DAMAGE;
+    m->splashDamage = HE_SPLASHDAMAGE;
+    m->splashRadius = HE_RADIUS;
+    if (time < 0 || time > 3000) {
+        time = 3000;
+    }
+    m->nextthink = level.time + time;
+
+    dir[0] = 0;
+    dir[1] = 0;
+    dir[2] = 0;
+
+    VectorCopy(ent->client->oldOrigin, m->s.pos.trBase);
+    VectorScale(dir, 0, m->s.pos.trDelta);
+    VectorCopy(ent->client->oldOrigin, m->r.currentOrigin);
+}
