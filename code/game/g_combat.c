@@ -202,6 +202,7 @@ char *modNames[] = {
     "MOD_INTERVENTION",
     "MOD_CROSSBOW",
     "MOD_ACR",
+    "MOD_WALTHER",
     // env
     "MOD_WATER",
     "MOD_SLIME",
@@ -209,14 +210,16 @@ char *modNames[] = {
     "MOD_CRUSH",
     "MOD_MOOR",
     "MOD_FALLING",
-    "MOD_TELEFRAG",
+    "MOD_TELEFRAG,"
     "MOD_SUICIDE",
     "MOD_TARGET_LASER",
     "MOD_TRIGGER_HURT",
-    "MOD_GLASS",
+    "MOD_WINDOW",
+    "MOD_NADELOVE",
     // misc
     "MOD_ADMIN",
     "MOD_BOMB",
+    "MOD_NUKE",
 };
 
 /*
@@ -769,7 +772,11 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
     }
 
     if (damage < 1) {
-        damage = 1;
+        if (damage == -1) {
+            damage = 0;
+        } else {
+            damage = 1;
+        }
     }
 
     take = damage;
@@ -812,7 +819,7 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
         targ->client->lasthurt_mod = mod;
 
         // LOCATIONS
-        if (point && targ && targ->health > 0 && attacker && take && mod != MOD_WINDOW) {
+        if (point && targ && targ->health > 0 && attacker && take && mod != MOD_WINDOW && dflags != DAMAGE_RADIUS) {
             take = G_LocationDamage(point, targ, attacker, take);
         } else {
             targ->client->lasthurt_location = LOCATION_NONE;
@@ -962,7 +969,12 @@ qboolean G_RadiusDamage(vec3_t origin, gentity_t *attacker, float damage, float 
             // push the center of mass higher than the origin so players
             // get knocked into the air more
             dir[2] += 24;
-            G_Damage(ent, NULL, attacker, dir, origin, (int) points, DAMAGE_RADIUS, mod);
+            if (mod == MOD_NUKE && damage == -1) {
+                ent->client->ps.blindTime = ent->client->ps.levelTime + 10000;
+                Com_Printf("^1Blinding\n");
+            } else {
+                G_Damage(ent, NULL, attacker, dir, origin, (int) points, DAMAGE_RADIUS, mod);
+            }
         }
     }
 

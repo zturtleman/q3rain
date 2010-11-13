@@ -43,7 +43,7 @@ An item fires all of its targets when it is picked up.  If the toucher can't car
 "count" override quantity or duration on most items.
  */
 
-gitem_t bg_itemlist[] ={
+gitem_t bg_itemlist[] = {
     {
         NULL,
         NULL,
@@ -505,6 +505,22 @@ gitem_t bg_itemlist[] ={
         WP_BOMB,
         /* precache */ "",
         /* sounds */ "sound/weapons/grenade/hgrenb1a.wav sound/weapons/grenade/hgrenb2a.wav"
+    },
+
+    /*QUAKED weapon_nuke (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+     */
+    {
+        "weapon_nuke",
+        "sound/misc/w_pkup.wav",
+        { "models/weapons2/rocketl/rocketl.md3",
+            NULL, NULL, NULL},
+        "icons/iconw_rocket", /* icon */
+        "Nuke", /* pickup */
+        1,
+        IT_WEAPON,
+        WP_NUKE,
+        "", /* precache */
+        "", /* sounds */
     },
 
     //

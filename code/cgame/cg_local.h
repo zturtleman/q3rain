@@ -761,6 +761,8 @@ typedef struct {
     qhandle_t grenadeSmokeShader;
     qhandle_t bfgExplosionShader;
     qhandle_t bloodExplosionShader;
+    qhandle_t nukeSmokeShader;
+    qhandle_t flameShader;
 
     // special effects models
     qhandle_t teleportEffectModel;
@@ -1323,6 +1325,8 @@ void CG_Bleed(vec3_t origin, int entityNum);
 localEntity_t *CG_MakeExplosion(vec3_t origin, vec3_t dir,
         qhandle_t hModel, qhandle_t shader, int msec,
         qboolean isSprite);
+
+localEntity_t *CG_MakeNukeSmoke(vec3_t origin, vec3_t dir, int msec);
 
 //
 // cg_snapshot.c

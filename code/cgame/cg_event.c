@@ -151,6 +151,9 @@ static void CG_Obituary(entityState_t *ent) {
         case MOD_ADMIN:
             message = "wasn't nice to the admin";
             break;
+        case MOD_NUKE:
+            message = "was blasted by a nuke";
+            break;
         default:
             message = NULL;
             break;
@@ -167,6 +170,13 @@ static void CG_Obituary(entityState_t *ent) {
                 break;
             case MOD_WINDOW:
                 message = "hit it too hard";
+                break;
+            case MOD_NADELOVE:
+                if (gender == GENDER_FEMALE) {
+                    message = "was attached a bit too much to her grenade";
+                } else {
+                    message = "was attached a bit too much to his grenade";
+                }
                 break;
             default:
                 if (gender == GENDER_FEMALE)
@@ -882,9 +892,44 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
             CG_Beam(cent);
             break;
 
+        case EV_NUKE_1:
+            DEBUGNAME("EV_NUKE_1");
+            CG_Nuke(position, 1);
+            break;
+
+        case EV_NUKE_2:
+            DEBUGNAME("EV_NUKE_2");
+            CG_Nuke(position, 2);
+            break;
+
+        case EV_NUKE_3:
+            DEBUGNAME("EV_NUKE_3");
+            CG_Nuke(position, 3);
+            break;
+
+        case EV_NUKE_4:
+            DEBUGNAME("EV_NUKE_4");
+            CG_Nuke(position, 4);
+            break;
+
+        case EV_NUKE_5:
+            DEBUGNAME("EV_NUKE_5");
+            CG_Nuke(position, 5);
+            break;
+
+        case EV_NUKE_6:
+            DEBUGNAME("EV_NUKE_6");
+            CG_Nuke(position, 6);
+            break;
+
+        case EV_NUKE_7:
+            DEBUGNAME("EV_NUKE_7");
+            CG_Nuke(position, 7);
+            break;
+
         default:
             DEBUGNAME("UNKNOWN");
-            CG_Error("Unknown event: %i", event);
+            CG_Error("Unknown event: %i\nEV_NUKE_7 = %i", event, EV_NUKE_7);
             break;
     }
 

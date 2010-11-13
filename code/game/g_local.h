@@ -520,6 +520,10 @@ void G_SetOrigin(gentity_t *ent, vec3_t origin);
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset);
 const char *BuildShaderStateConfig(void);
 
+qboolean EntVisible(gentity_t *ent1, gentity_t *ent2);
+gentity_t *EntInRadius(gentity_t *from, vec3_t org, float rad);
+gentity_t *PlayerInRadius(gentity_t *from, vec3_t org, float rad);
+
 //
 // g_combat.c
 //
@@ -546,9 +550,14 @@ gentity_t *fire_blaster(gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_plasma(gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_grenade(gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_he(gentity_t *self, vec3_t start, vec3_t aimdir);
+gentity_t *fire_nuke(gentity_t *self, vec3_t start, vec3_t dir);
 gentity_t *fire_rocket(gentity_t *self, vec3_t start, vec3_t dir);
 gentity_t *fire_bfg(gentity_t *self, vec3_t start, vec3_t dir);
 gentity_t *fire_grapple(gentity_t *self, vec3_t start, vec3_t dir);
+
+void G_ExplodeNuke(gentity_t *ent);
+void G_NukeTouch(gentity_t *ent, gentity_t *otherent, trace_t *trace);
+void G_NukeNextStage(gentity_t *ent);
 
 //
 // g_mover.c

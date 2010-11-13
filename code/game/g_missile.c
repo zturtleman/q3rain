@@ -97,6 +97,98 @@ void G_ExplodeMissile(gentity_t *ent) {
     trap_LinkEntity(ent);
 }
 
+void G_NukeBlindPlayers(gentity_t *self) {
+    vec3_t origin;
+
+    BG_EvaluateTrajectory(&self->s.pos, level.time, origin);
+    SnapVector(origin);
+
+    G_RadiusDamage(origin, self, -1, 64000, self, MOD_NUKE);
+}
+
+#define STAGE_DIFF 200
+
+/*
+================
+G_ExplodeNuke
+
+ Nuke Explosion stuff
+================
+ */
+void G_ExplodeNuke(gentity_t *ent) {
+    vec3_t dir;
+    vec3_t origin;
+
+    BG_EvaluateTrajectory(&ent->s.pos, level.time, origin);
+    SnapVector(origin);
+    G_SetOrigin(ent, origin);
+
+    dir[0] = dir[1] = 0;
+    dir[2] = 1;
+
+    if (ent->count < 1) {
+        ent->count++;
+    }
+
+    if (ent->count == 1) {
+        G_NukeBlindPlayers(ent);
+        G_RadiusDamage(ent->r.currentOrigin, ent->parent, 10000, 500, ent, ent->splashMethodOfDeath);
+        ent->think = G_NukeNextStage;
+        ent->nextthink = level.time + STAGE_DIFF;
+        G_AddEvent(ent, EV_NUKE_1, 0);
+    } else if (ent->count == 2) { //                      dmg   range
+        G_RadiusDamage(ent->r.currentOrigin, ent->parent, 3000, 1000, ent, ent->splashMethodOfDeath);
+        ent->think = G_NukeNextStage;
+        ent->nextthink = level.time + STAGE_DIFF;
+        G_AddEvent(ent, EV_NUKE_2, 0);
+    } else if (ent->count == 3) { //                      dmg   range
+        G_RadiusDamage(ent->r.currentOrigin, ent->parent, 1000, 2000, ent, ent->splashMethodOfDeath);
+        ent->think = G_NukeNextStage;
+        ent->nextthink = level.time + STAGE_DIFF;
+        G_AddEvent(ent, EV_NUKE_3, 0);
+    } else if (ent->count == 4) { //                      dmg   range
+        G_RadiusDamage(ent->r.currentOrigin, ent->parent, 500, 4000, ent, ent->splashMethodOfDeath);
+        ent->think = G_NukeNextStage;
+        ent->nextthink = level.time + STAGE_DIFF;
+        G_AddEvent(ent, EV_NUKE_4, 0);
+    } else if (ent->count == 5) { //                      dmg   range
+        G_RadiusDamage(ent->r.currentOrigin, ent->parent, 250, 8000, ent, ent->splashMethodOfDeath);
+        ent->think = G_NukeNextStage;
+        ent->nextthink = level.time + STAGE_DIFF;
+        G_AddEvent(ent, EV_NUKE_5, 0);
+    } else if (ent->count == 6) { //                      dmg   range
+        G_RadiusDamage(ent->r.currentOrigin, ent->parent, 75, 16000, ent, ent->splashMethodOfDeath);
+        ent->think = G_NukeNextStage;
+        ent->nextthink = level.time + STAGE_DIFF;
+        G_AddEvent(ent, EV_NUKE_6, 0);
+    } else {
+        if (ent->count > 6) {
+            G_RadiusDamage(ent->r.currentOrigin, ent->parent, 50, 32000, ent, ent->splashMethodOfDeath);
+            ent->freeAfterEvent = qtrue;
+            G_AddEvent(ent, EV_NUKE_7, 0);
+        }
+    }
+
+    trap_LinkEntity(ent);
+}
+
+/*
+================
+G_NukeTouch
+
+Explode a nuke on touch
+================
+ */
+void G_NukeTouch(gentity_t *ent, gentity_t *otherent, trace_t *trace) {
+    G_ExplodeNuke(ent);
+}
+
+void G_NukeNextStage(gentity_t *ent) {
+    ent->count++;
+    ent->think = G_ExplodeNuke;
+    ent->nextthink = level.time + 10;
+}
+
 /*
 ================
 G_MissileDie
@@ -117,7 +209,7 @@ void G_MissileDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, in
 G_MissileImpact
 ================
  */
-void G_MissileImpact(gentity_t *ent, trace_t *trace) {
+void G_MissileImpact(gentity_t *ent, trace_t * trace) {
     gentity_t *other;
     qboolean hitClient = qfalse;
     other = &g_entities[trace->entityNum];
@@ -240,7 +332,7 @@ void G_MissileImpact(gentity_t *ent, trace_t *trace) {
 G_RunMissile
 ================
  */
-void G_RunMissile(gentity_t *ent) {
+void G_RunMissile(gentity_t * ent) {
     vec3_t origin;
     trace_t tr;
     int passent;
@@ -296,7 +388,7 @@ fire_plasma
 
 =================
  */
-gentity_t *fire_plasma(gentity_t *self, vec3_t start, vec3_t dir) {
+gentity_t * fire_plasma(gentity_t *self, vec3_t start, vec3_t dir) {
     gentity_t *bolt;
 
     VectorNormalize(dir);
@@ -336,7 +428,7 @@ gentity_t *fire_plasma(gentity_t *self, vec3_t start, vec3_t dir) {
 fire_grenade
 =================
  */
-gentity_t *fire_grenade(gentity_t *self, vec3_t start, vec3_t dir) {
+gentity_t * fire_grenade(gentity_t *self, vec3_t start, vec3_t dir) {
     gentity_t *bolt;
 
     VectorNormalize(dir);
@@ -385,7 +477,7 @@ gentity_t *fire_grenade(gentity_t *self, vec3_t start, vec3_t dir) {
 fire_he
 =================
  */
-gentity_t *fire_he(gentity_t *self, vec3_t start, vec3_t dir) {
+gentity_t * fire_he(gentity_t *self, vec3_t start, vec3_t dir) {
     gentity_t *bolt;
 
     VectorNormalize(dir);
@@ -429,6 +521,52 @@ gentity_t *fire_he(gentity_t *self, vec3_t start, vec3_t dir) {
     return bolt;
 }
 
+/*
+=================
+fire_nuke
+=================
+ */
+gentity_t *fire_nuke(gentity_t *self, vec3_t start, vec3_t dir) {
+    gentity_t *bolt;
+
+    VectorNormalize(dir);
+
+    bolt = G_Spawn();
+    bolt->classname = "nuke";
+    bolt->nextthink = level.time + 10;
+    bolt->think = G_ExplodeNuke;
+    bolt->s.eType = ET_MISSILE;
+    bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+    bolt->s.weapon = WP_NUKE;
+    bolt->touch = G_NukeTouch;
+    bolt->s.eFlags = EF_BOUNCE_HALF;
+    bolt->r.ownerNum = self->s.number;
+    bolt->parent = self;
+    bolt->damage = 0;
+    bolt->splashDamage = 5000;
+    bolt->splashRadius = 500;
+    bolt->splashMethodOfDeath = MOD_NUKE;
+    bolt->clipmask = MASK_SHOT;
+    bolt->target_ent = NULL;
+
+    bolt->r.contents = CONTENTS_CORPSE;
+    VectorSet(bolt->r.mins, -10, -5, 0);
+    VectorCopy(bolt->r.mins, bolt->r.absmin);
+    VectorSet(bolt->r.maxs, 10, 5, 6);
+    VectorCopy(bolt->r.maxs, bolt->r.absmax);
+
+    bolt->s.pos.trType = TR_GRAVITY;
+    bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;
+    VectorCopy(start, bolt->s.pos.trBase);
+    SnapVector(bolt->s.pos.trDelta);
+
+    VectorCopy(start, bolt->r.currentOrigin);
+
+    bolt->count = 0;
+
+    return bolt;
+}
+
 //=============================================================================
 
 /*
@@ -436,7 +574,7 @@ gentity_t *fire_he(gentity_t *self, vec3_t start, vec3_t dir) {
 fire_bfg
 =================
  */
-gentity_t *fire_bfg(gentity_t *self, vec3_t start, vec3_t dir) {
+gentity_t * fire_bfg(gentity_t *self, vec3_t start, vec3_t dir) {
     gentity_t *bolt;
 
     VectorNormalize(dir);
@@ -475,7 +613,7 @@ gentity_t *fire_bfg(gentity_t *self, vec3_t start, vec3_t dir) {
 fire_rocket
 =================
  */
-gentity_t *fire_rocket(gentity_t *self, vec3_t start, vec3_t dir) {
+gentity_t * fire_rocket(gentity_t *self, vec3_t start, vec3_t dir) {
     gentity_t *bolt;
 
     VectorNormalize(dir);
@@ -512,7 +650,7 @@ gentity_t *fire_rocket(gentity_t *self, vec3_t start, vec3_t dir) {
 fire_grapple
 =================
  */
-gentity_t *fire_grapple(gentity_t *self, vec3_t start, vec3_t dir) {
+gentity_t * fire_grapple(gentity_t *self, vec3_t start, vec3_t dir) {
     gentity_t *hook;
 
     VectorNormalize(dir);

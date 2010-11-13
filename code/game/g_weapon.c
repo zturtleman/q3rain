@@ -1147,6 +1147,24 @@ void Weapon_Walther_Fire(gentity_t *ent) {
 
 /*
 ===============
+Weapon_Nuke_Fire
+
+===============
+ */
+#define NUKE_STAGE1_DAMAGE 5000
+#define NUKE_STAGE1_RADIUS 500
+
+void Weapon_Nuke_Fire(gentity_t *ent) {
+    gentity_t *m;
+
+    m = fire_nuke(ent, muzzle, forward);
+    m->damage = 0;
+    m->splashDamage = NUKE_STAGE1_DAMAGE;
+    m->splashRadius = NUKE_STAGE1_RADIUS;
+}
+
+/*
+===============
 FireWeapon
 ===============
  */
@@ -1203,6 +1221,9 @@ void FireWeapon(gentity_t *ent) {
         case WP_BOMB:
             Com_Printf("^3FireWeapon() ent->s.weapon == WP_BOMB: ^1STUB!\n");
             break;
+        case WP_NUKE:
+            Weapon_Nuke_Fire(ent);
+            break;
         default:
             //G_Error( "Bad ent->s.weapon" );
             break;
@@ -1211,7 +1232,7 @@ void FireWeapon(gentity_t *ent) {
     ent->client->ps.grenadetime = -1337;
 }
 
-static void FireGrenade(gentity_t *ent, int time) {
+static void FireGrenade(gentity_t *ent, int time, int mod) {
     gentity_t *m;
     vec3_t dir;
 
@@ -1232,6 +1253,7 @@ static void FireGrenade(gentity_t *ent, int time) {
         time = 3000;
     }
     m->nextthink = level.time + time;
+    m->splashMethodOfDeath = mod;
 
     dir[0] = 0;
     dir[1] = 0;

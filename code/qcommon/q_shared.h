@@ -1112,6 +1112,8 @@ typedef struct playerState_s {
     // nade cooking
     int grenadetime;
     int levelTime;
+    // nuke
+    int blindTime;
 } playerState_t;
 
 

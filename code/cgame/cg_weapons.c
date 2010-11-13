@@ -522,7 +522,11 @@ void CG_ExplosionParticles(int weapon, vec3_t origin) {
     lColor[3] = 1.0f; // alpha
 
     switch (weapon) {
+        case WP_NUKE:
+            return;
+            break;
         case WP_HE:
+            shader = cgs.media.sparkShader;
             number = 128;
             jump = 100;
             speed = 400;
@@ -530,7 +534,6 @@ void CG_ExplosionParticles(int weapon, vec3_t origin) {
             lColor[0] = 1.0f;
             lColor[1] = 0.56f;
             lColor[2] = 0.0f;
-            shader = cgs.media.sparkShader;
             break;
         default:
             return;
@@ -719,6 +722,14 @@ void CG_RegisterWeapon(int weaponNum) {
             weaponInfo->flashSound[0] = trap_S_RegisterSound("sound/weapons/grenade/grenlf1a.wav", qfalse);
             cgs.media.grenadeExplosionShader = trap_R_RegisterShader("grenadeExplosion");
             cgs.media.grenadeSmokeShader = trap_R_RegisterShader("grenadeSmoke");
+            break;
+
+        case WP_NUKE:
+            weaponInfo->missileModel = trap_R_RegisterModel("models/ammo/grenade1.md3");
+            weaponInfo->flashSound[0] = trap_S_RegisterSound("sound/weapons/grenade/grenlf1a.wav", qfalse);
+            cgs.media.grenadeExplosionShader = trap_R_RegisterShader("grenadeExplosion");
+            cgs.media.nukeSmokeShader = trap_R_RegisterShader("nukeSmoke");
+            cgs.media.flameShader = trap_R_RegisterShader("nukeFlame");
             break;
 
         case WP_ACR:
@@ -1661,11 +1672,10 @@ void CG_MissileHitWall(int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
     vec3_t lightColor;
     localEntity_t *le;
     int r;
+    int msec;
     qboolean alphaFade;
     qboolean isSprite;
-    int duration;
-    vec3_t sprOrg;
-    vec3_t sprVel;
+    int duration, offset;
 
     mark = 0;
     radius = 32;
@@ -1735,6 +1745,18 @@ void CG_MissileHitWall(int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
             }
             radius = 2;
             break;
+        case WP_NUKE:
+            mod = cgs.media.dishFlashModel;
+            shader = cgs.media.grenadeExplosionShader;
+            sfx = cgs.media.sfx_rockexp;
+            mark = cgs.media.burnMarkShader;
+            radius = 512;
+            light = 3000;
+            isSprite = qtrue;
+            lightColor[0] = 1;
+            lightColor[1] = 0.4;
+            lightColor[2] = 0.3;
+            break;
         case -1 :
             mod = cgs.media.bulletFlashModel;
             shader = cgs.media.bulletExplosionShader;
@@ -1759,15 +1781,29 @@ void CG_MissileHitWall(int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
     // create the explosion
     //
     if (mod) {
-        le = CG_MakeExplosion(origin, dir,
-                mod, shader,
-                duration, isSprite);
+        if (weapon != WP_NUKE) {
+            le = CG_MakeExplosion(origin, dir, mod, shader, duration, isSprite);
+        } else {
+            le = CG_AllocLocalEntity();
+            offset = rand() & 63;
+            msec = 1000+crandom()*1000;
+            if (msec < 0) {
+                msec *= -1;
+            } else if (msec == 0) {
+                msec = 1000;
+            }
+            le->leType = LE_SPRITE_EXPLOSION;
+            le->refEntity.hModel = mod;
+            le->refEntity.customShader = shader;
+            le->startTime = cg.time - offset;
+            le->endTime = le->startTime + msec;
+            le->refEntity.shaderTime = le->startTime / 1000.0f;
+            VectorCopy(origin, le->refEntity.origin);
+            VectorCopy(origin, le->refEntity.oldorigin);
+            le->color[0] = le->color[1] = le->color[2] = 1.0;
+        }
         le->light = light;
         VectorCopy(lightColor, le->lightColor);
-        /*if ( weapon == WP_RAILGUN ) {
-                // colorize with client color
-                VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
-        }*/
     }
 
     //

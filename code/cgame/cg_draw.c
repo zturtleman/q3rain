@@ -373,9 +373,25 @@ static void CG_DrawDamagePic(void) {
                 }
             }
         }
+        // wtf does this even do
         if (cg.damageTime > 0) {
             time = cg.time - cg.damageTime;
         }
+    }
+    if (health > 0 && ps->blindTime > ps->levelTime) {
+        vec4_t color;
+        int time;
+        float alpha;
+        time = ps->levelTime - ps->blindTime;
+        time += 10000;
+        if (time <= 0 || time >= 10000) {
+            return;
+        }
+        color[0] = 1.0f;
+        color[1] = 1.0f;
+        color[2] = 1.0f;
+        color[3] = 1.0 - ((float) time / 10000);
+        CG_FillRect(0, 0, 640, 480, color);
     }
 }
 

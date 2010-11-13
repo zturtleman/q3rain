@@ -299,6 +299,137 @@ localEntity_t *CG_MakeExplosion(vec3_t origin, vec3_t dir,
 }
 
 /*
+====================
+CG_MakeNukeSmoke
+====================
+ */
+localEntity_t *CG_MakeNukeSmoke(vec3_t origin, vec3_t dir, int msec) {
+    float ang;
+    localEntity_t *ex;
+    int offset;
+    vec3_t tmpVec, newOrigin;
+
+    if (msec <= 0) {
+        CG_Error("CG_MakeExplosion: msec = %i", msec);
+    }
+
+    // skew the time a bit so they aren't all in sync
+    offset = rand() & 63;
+
+    ex = CG_AllocLocalEntity();
+    ex->leType = LE_SPRITE_EXPLOSION;
+
+    // randomly rotate sprite orientation
+    ex->refEntity.rotation = rand() % 360;
+    VectorScale(dir, 16, tmpVec);
+    VectorAdd(tmpVec, origin, newOrigin);
+
+    ex->startTime = cg.time - offset;
+    ex->endTime = ex->startTime + msec;
+
+    // bias the time so all shader effects start correctly
+    ex->refEntity.shaderTime = ex->startTime / 1000.0f;
+
+    ex->refEntity.hModel = cgs.media.dishFlashModel;
+    ex->refEntity.customShader = cgs.media.nukeSmokeShader;
+
+    // set origin
+    VectorCopy(newOrigin, ex->refEntity.origin);
+    VectorCopy(newOrigin, ex->refEntity.oldorigin);
+
+    ex->color[0] = ex->color[1] = ex->color[2] = 1.0;
+
+    return ex;
+}
+
+void CG_Nuke(vec3_t origin, int stage) {
+    int number, index, light;
+    float stagefactor;
+    vec3_t up, lightColor;
+    localEntity_t *le;
+    int offset, msec;
+
+    Com_Printf("CG_Nuke stage = %i\n", stage);
+
+    number = 128;
+    stagefactor = 1.0f;
+    light = 20000;
+    lightColor[0] = 1;
+    lightColor[1] = 0.4;
+    lightColor[2] = 0.3;
+
+    switch (stage) {
+        case 1:
+            number = 512;
+            stagefactor = 3.0f;
+            break;
+        case 2:
+            number = 256;
+            origin[2] += 250;
+            stagefactor = 2.0f;
+            break;
+        case 3:
+            origin[2] += 500;
+            stagefactor = 1.5f;
+            break;
+        case 4:
+            origin[2] += 750;
+            break;
+        case 5:
+            origin[2] += 1000;
+            break;
+        case 6:
+            origin[2] += 1250;
+            break;
+        case 7:
+            origin[2] += 1500;
+            break;
+        default:
+            break;
+    }
+
+    for (index = 0; index < number; index++) {
+        int msec;
+        localEntity_t *ent;
+        up[0] = crandom()*10 * stagefactor;
+        up[1] = crandom()*10 * stagefactor;
+        up[2] = crandom()*7.5f * stagefactor;
+        msec = 5000 + crandom()*5000;
+        if (msec < 0) {
+            msec *= -1;
+        } else if (msec == 0) {
+            msec = 5000;
+        }
+        // smoke dat shit up
+        ent = CG_MakeNukeSmoke(origin, up, msec);
+    }
+    for (index = 0; index < 3; index++) {
+        le = CG_AllocLocalEntity();
+        offset = rand() & 63;
+        msec = 1000 + crandom()*1000;
+        if (msec < 0) {
+            msec *= -1;
+        } else if (msec == 0) {
+            msec = 1000;
+        }
+        le->leType = LE_SPRITE_EXPLOSION;
+        le->refEntity.hModel = cgs.media.dishFlashModel;
+        le->refEntity.customShader = cgs.media.nukeSmokeShader;
+        le->startTime = cg.time - offset;
+        le->endTime = le->startTime + msec;
+        le->refEntity.shaderTime = le->startTime / 1000.0f;
+        VectorCopy(origin, le->refEntity.origin);
+        VectorCopy(origin, le->refEntity.oldorigin);
+        le->color[0] = le->color[1] = le->color[2] = 1.0;
+        le->light = light / stage;
+        if (le->light < 5000) {
+            le->light = 5000;
+        }
+        VectorCopy(lightColor, le->lightColor);
+    }
+}
+
+/*
 =================
 CG_Bleed
 

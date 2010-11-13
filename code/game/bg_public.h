@@ -315,6 +315,7 @@ typedef enum {
     WP_ACR,
     WP_BOMB,
     WP_INJECTOR,
+    WP_NUKE,
 
     // TODO remove
     WP_GAUNTLET,
@@ -453,7 +454,15 @@ typedef enum {
 
     EV_WALLJUMP,
     EV_GRAB,
-    EV_FALL_MINIMAL
+    EV_FALL_MINIMAL,
+
+    EV_NUKE_1,
+    EV_NUKE_2,
+    EV_NUKE_3,
+    EV_NUKE_4,
+    EV_NUKE_5,
+    EV_NUKE_6,
+    EV_NUKE_7,
 } entity_event_t;
 
 // animations
@@ -617,9 +626,11 @@ typedef enum {
     MOD_TARGET_LASER,
     MOD_TRIGGER_HURT,
     MOD_WINDOW,
+    MOD_NADELOVE,
     // misc
     MOD_ADMIN,
     MOD_BOMB,
+    MOD_NUKE,
 } meansOfDeath_t;
 
 

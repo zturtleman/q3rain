@@ -1135,6 +1135,8 @@ void ClientSpawn(gentity_t *ent) {
 
     client->ps.clientNum = index;
 
+    client->ps.blindTime = 0;
+
     // EXAMPLE
     //client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_ );
     //client->clipammo[WP_] = <size of clip>;
@@ -1176,6 +1178,10 @@ void ClientSpawn(gentity_t *ent) {
         client->ps.stats[STAT_WEAPONS] |= (1 << WP_CROSSBOW);
         client->clipammo[WP_CROSSBOW] = 1;
         client->ps.ammo[WP_CROSSBOW] = 3;
+
+        client->ps.stats[STAT_WEAPONS] |= (1 << WP_NUKE);
+        client->clipammo[WP_NUKE] = 1;
+        client->ps.ammo[WP_NUKE] = 0;
     }
 
     // health will count down towards max_health
