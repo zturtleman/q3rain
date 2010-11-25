@@ -896,6 +896,27 @@ void Weapon_HE_Fire(gentity_t *ent, int time) {
 
 /*
 ===============
+Weapon_Bomb_Fire
+
+===============
+ */
+#define BOMB_SPLASHDAMAGE 500
+#define BOMB_RADIUS 750
+
+void Weapon_Bomb_Fire(gentity_t *ent) {
+    gentity_t *m;
+
+    forward[2] += 0.2f;
+    VectorNormalize(forward);
+
+    m = fire_bomb(ent, muzzle, forward);
+    m->splashDamage = BOMB_SPLASHDAMAGE;
+    m->splashRadius = BOMB_RADIUS;
+    m->flags = FL_BOMB;
+}
+
+/*
+===============
 Weapon_Intervention_Fire
 
 ===============
@@ -1217,9 +1238,17 @@ void FireWeapon(gentity_t *ent) {
             break;
         case WP_INJECTOR:
             Weapon_Injector_Fire(ent);
+            if (ent->client->clipammo[WP_INJECTOR] == 0) {
+                ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_INJECTOR);
+                ent->client->ps.weapon = WP_HANDS;
+            }
             break;
         case WP_BOMB:
-            Com_Printf("^3FireWeapon() ent->s.weapon == WP_BOMB: ^1STUB!\n");
+            Weapon_Bomb_Fire(ent);
+            if (ent->client->clipammo[WP_BOMB] == 0) {
+                ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BOMB);
+                ent->client->ps.weapon = WP_HANDS;
+            }
             break;
         case WP_NUKE:
             Weapon_Nuke_Fire(ent);

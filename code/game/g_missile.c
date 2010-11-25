@@ -22,9 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 #include "g_local.h"
 
-#define	MISSILE_PRESTEP_TIME	50
-
-#undef MISSIONPACK
+#define	MISSILE_PRESTEP_TIME 50
 
 /*
 ================
@@ -33,9 +31,11 @@ G_BounceMissile
 ================
  */
 void G_BounceMissile(gentity_t *ent, trace_t *trace) {
-    vec3_t velocity;
+    vec3_t velocity, old;
     float dot;
     int hitTime;
+
+    VectorCopy(ent->s.pos.trBase, old);
 
     // reflect the velocity on the trace plane
     hitTime = level.previousTime + (level.time - level.previousTime) * trace->fraction;
@@ -43,9 +43,18 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
     dot = DotProduct(velocity, trace->plane.normal);
     VectorMA(velocity, -2 * dot, trace->plane.normal, ent->s.pos.trDelta);
 
+    if (ent->s.eFlags & EF_BOUNCE) {
+        G_AddEvent(ent, EV_GRENADE_BOUNCE, 0);
+    }
+
     if (ent->s.eFlags & EF_BOUNCE_HALF) {
+        if (trace->allsolid == qtrue) {
+            G_SetOrigin(ent, trace->endpos);
+            return;
+        }
+        G_AddEvent(ent, EV_GRENADE_BOUNCE, 0);
+        // grenades shouldnt bounce that much
         if (strcmp(ent->classname, "grenade") == 0) {
-            // grenades shouldnt bounce that much
             VectorScale(ent->s.pos.trDelta, 0.4, ent->s.pos.trDelta);
         } else {
             VectorScale(ent->s.pos.trDelta, 0.65, ent->s.pos.trDelta);
@@ -57,9 +66,69 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
         }
     }
 
+    if (ent->s.eFlags & EF_STATIC) {
+        if (trace->allsolid == qtrue) {
+            // bomb sticks in wall, keep it there
+            G_SetOrigin(ent, old);
+            return;
+        }
+        if (trace->plane.normal[2] > 0.2) {
+            G_SetOrigin(ent, trace->endpos);
+            return;
+        }
+    }
+
     VectorAdd(ent->r.currentOrigin, trace->plane.normal, ent->r.currentOrigin);
     VectorCopy(ent->r.currentOrigin, ent->s.pos.trBase);
     ent->s.pos.trTime = level.time;
+}
+
+/*
+================
+G_CreateShraphnels
+
+================
+ */
+void G_CreateShrapnels(gentity_t *ent, vec3_t origin) {
+    vec3_t random;
+    int i = 0;
+    //Com_Printf("Creating shrapnels...\n");
+    while (i < 10) {
+        random[0] = crandom()*10;
+        random[1] = crandom()*10;
+        random[2] = crandom()*7.5;
+        fire_shrapnel(ent, origin, random);
+        i++;
+    }
+}
+
+void G_BlockedShrapnel(gentity_t *shrapnel, gentity_t *ent) {
+    Com_Printf("G_BlockedShrapnel\n");
+    G_Damage(ent, shrapnel, shrapnel, NULL, NULL, shrapnel->damage, 0, MOD_SHRAPNEL);
+    trap_UnlinkEntity(shrapnel);
+}
+
+void G_TouchShrapnel(gentity_t *shrapnel, gentity_t *ent, trace_t *trace) {
+    Com_Printf("G_TouchShrapnel\n");
+    G_Damage(ent, shrapnel, shrapnel, NULL, NULL, shrapnel->damage, 0, MOD_SHRAPNEL);
+    trap_UnlinkEntity(shrapnel);
+}
+
+void G_PainShrapnel(gentity_t *shrapnel, gentity_t *ent, int amount) {
+    //Com_Printf("G_PainShrapnel\n");
+    G_Damage(ent, shrapnel, shrapnel, NULL, NULL, shrapnel->damage, 0, MOD_SHRAPNEL);
+    trap_UnlinkEntity(shrapnel);
+}
+
+/*
+================
+G_FadeShrapnel
+
+Explode a missile without an impact
+================
+ */
+void G_FadeShrapnel(gentity_t *ent) {
+    trap_UnlinkEntity(ent);
 }
 
 /*
@@ -94,10 +163,47 @@ void G_ExplodeMissile(gentity_t *ent) {
         }
     }
 
+    G_CreateShrapnels(ent, origin);
+
     trap_LinkEntity(ent);
 }
 
-void G_NukeBlindPlayers(gentity_t *self) {
+/*
+================
+G_ExplodeBomb
+
+Explode a bomb
+================
+ */
+void G_ExplodeBomb(gentity_t * ent) {
+    vec3_t dir;
+    vec3_t origin;
+
+    BG_EvaluateTrajectory(&ent->s.pos, level.time, origin);
+    SnapVector(origin);
+    G_SetOrigin(ent, origin);
+
+    // we don't have a valid direction, so just point straight up
+    dir[0] = dir[1] = 0;
+    dir[2] = 1;
+
+    ent->s.eType = ET_GENERAL;
+    G_AddEvent(ent, EV_MISSILE_MISS, DirToByte(dir));
+
+    ent->freeAfterEvent = qtrue;
+
+    // splash damage
+    if (ent->splashDamage) {
+        if (G_RadiusDamage(ent->r.currentOrigin, ent->parent, ent->splashDamage, ent->splashRadius, ent
+                , ent->splashMethodOfDeath)) {
+            g_entities[ent->r.ownerNum].client->accuracy_hits++;
+        }
+    }
+
+    trap_LinkEntity(ent);
+}
+
+void G_NukeBlindPlayers(gentity_t * self) {
     vec3_t origin;
 
     BG_EvaluateTrajectory(&self->s.pos, level.time, origin);
@@ -115,7 +221,7 @@ G_ExplodeNuke
  Nuke Explosion stuff
 ================
  */
-void G_ExplodeNuke(gentity_t *ent) {
+void G_ExplodeNuke(gentity_t * ent) {
     vec3_t dir;
     vec3_t origin;
 
@@ -179,11 +285,11 @@ G_NukeTouch
 Explode a nuke on touch
 ================
  */
-void G_NukeTouch(gentity_t *ent, gentity_t *otherent, trace_t *trace) {
+void G_NukeTouch(gentity_t *ent, gentity_t *otherent, trace_t * trace) {
     G_ExplodeNuke(ent);
 }
 
-void G_NukeNextStage(gentity_t *ent) {
+void G_NukeNextStage(gentity_t * ent) {
     ent->count++;
     ent->think = G_ExplodeNuke;
     ent->nextthink = level.time + 10;
@@ -214,18 +320,21 @@ void G_MissileImpact(gentity_t *ent, trace_t * trace) {
     qboolean hitClient = qfalse;
     other = &g_entities[trace->entityNum];
 
+    if (ent->s.eFlags == EF_SHRAPNEL) {
+        trap_UnlinkEntity(ent);
+        G_FreeEntity(ent);
+    }
+
     // check for bounce
-    if (!other->takedamage &&
-            (ent->s.eFlags & (EF_BOUNCE | EF_BOUNCE_HALF))) {
+    if (!other->takedamage && (ent->s.eFlags & (EF_BOUNCE | EF_BOUNCE_HALF | EF_STATIC))) {
         G_BounceMissile(ent, trace);
-        G_AddEvent(ent, EV_GRENADE_BOUNCE, 0);
         return;
     }
 
     // impact damage
     if (other->takedamage) {
         // nades dont explode on impact
-        if (ent->s.eFlags & (EF_BOUNCE | EF_BOUNCE_HALF)) {
+        if (ent->s.eFlags & (EF_BOUNCE | EF_BOUNCE_HALF | EF_STATIC)) {
             vec3_t velocity;
             G_Damage(other, ent, &g_entities[ent->r.ownerNum], velocity,
                     ent->s.origin, 1, 0, ent->methodOfDeath);
@@ -523,10 +632,56 @@ gentity_t * fire_he(gentity_t *self, vec3_t start, vec3_t dir) {
 
 /*
 =================
+fire_shrapnel
+=================
+ */
+gentity_t * fire_shrapnel(gentity_t *self, vec3_t start, vec3_t dir) {
+    gentity_t *bolt;
+
+    VectorNormalize(dir);
+
+    bolt = G_Spawn();
+    bolt->classname = "shrapnel";
+    bolt->nextthink = level.time + 3000;
+    bolt->think = G_FadeShrapnel;
+    bolt->blocked = G_BlockedShrapnel;
+    bolt->touch = G_TouchShrapnel;
+    bolt->pain = G_PainShrapnel;
+    bolt->takedamage = qtrue;
+    bolt->health = 99999;
+    bolt->s.eType = ET_MISSILE;
+    bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+    bolt->s.weapon = WP_HE;
+    bolt->s.eFlags = EF_SHRAPNEL;
+    bolt->r.ownerNum = self->s.number;
+    bolt->parent = self;
+    bolt->damage = 40;
+    bolt->methodOfDeath = MOD_SHRAPNEL;
+    bolt->clipmask = MASK_SHOT;
+    bolt->target_ent = NULL;
+
+    VectorSet(bolt->r.mins, -10, -5, 6);
+    VectorCopy(bolt->r.mins, bolt->r.absmin);
+    VectorSet(bolt->r.maxs, 10, 5, 6);
+    VectorCopy(bolt->r.maxs, bolt->r.absmax);
+
+    bolt->s.pos.trType = TR_LINEAR;
+    bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;
+    VectorCopy(start, bolt->s.pos.trBase);
+    VectorScale(dir, 2000, bolt->s.pos.trDelta);
+    SnapVector(bolt->s.pos.trDelta);
+
+    VectorCopy(start, bolt->r.currentOrigin);
+
+    return bolt;
+}
+
+/*
+=================
 fire_nuke
 =================
  */
-gentity_t *fire_nuke(gentity_t *self, vec3_t start, vec3_t dir) {
+gentity_t * fire_nuke(gentity_t *self, vec3_t start, vec3_t dir) {
     gentity_t *bolt;
 
     VectorNormalize(dir);
@@ -679,5 +834,46 @@ gentity_t * fire_grapple(gentity_t *self, vec3_t start, vec3_t dir) {
     self->client->hook = hook;
 
     return hook;
+}
+
+/*
+=================
+fire_bomb
+=================
+ */
+gentity_t * fire_bomb(gentity_t *self, vec3_t start, vec3_t dir) {
+    gentity_t *bolt;
+
+    VectorNormalize(dir);
+
+    bolt = G_Spawn();
+    bolt->classname = "c4";
+    bolt->s.eType = ET_MISSILE;
+    bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+    bolt->s.weapon = WP_BOMB;
+    bolt->s.eFlags = EF_STATIC;
+    bolt->r.ownerNum = self->s.number;
+    bolt->parent = self;
+    bolt->damage = 0;
+    bolt->splashDamage = 1000;
+    bolt->splashRadius = 500;
+    bolt->methodOfDeath = MOD_BOMB;
+    bolt->splashMethodOfDeath = MOD_BOMB;
+    bolt->clipmask = MASK_SHOT;
+    bolt->target_ent = NULL;
+
+    VectorSet(bolt->r.mins, -10, -5, -6);
+    VectorCopy(bolt->r.mins, bolt->r.absmin);
+    VectorSet(bolt->r.maxs, 10, 5, 6);
+    VectorCopy(bolt->r.maxs, bolt->r.absmax);
+
+    bolt->s.pos.trType = TR_GRAVITY;
+    bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME; // move a bit on the very first frame
+    VectorCopy(start, bolt->s.pos.trBase);
+    SnapVector(bolt->s.pos.trDelta); // save net bandwidth
+
+    VectorCopy(start, bolt->r.currentOrigin);
+
+    return bolt;
 }
 

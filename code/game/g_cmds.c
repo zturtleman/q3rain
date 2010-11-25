@@ -1623,6 +1623,23 @@ void Cmd_Drop_f(gentity_t *ent) {
 
 /*
 =================
+Cmd_Detonate_f
+=================
+ */
+void Cmd_Detonate_f(gentity_t *ent) {
+    gentity_t *bomb;
+    int i;
+    for (i = 0; i < MAX_GENTITIES; i++) {
+        bomb = &g_entities[i];
+        if (bomb->flags == FL_BOMB && bomb->r.ownerNum == ent->s.number) {
+            bomb->think = G_ExplodeBomb;
+            bomb->nextthink = level.time + 10;
+        }
+    }
+}
+
+/*
+=================
 ClientCommand
 =================
  */
@@ -1733,6 +1750,8 @@ void ClientCommand(int clientNum) {
         Cmd_Drop_f(ent);
     else if (Q_stricmp(cmd, "stats") == 0)
         Cmd_Stats_f(ent);
+    else if (Q_stricmp(cmd, "detonate") == 0)
+        Cmd_Detonate_f(ent);
     else
         trap_SendServerCommand(clientNum, va("print \"unknown cmd %s\n\"", cmd));
 }

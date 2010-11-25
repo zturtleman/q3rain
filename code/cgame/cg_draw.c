@@ -478,8 +478,8 @@ static void CG_DrawStatusBar(void) {
                 case WP_WALTHER:
                     value = value / 10;
                     break;
-                case WP_BOMB:
-                    return;
+                /*case WP_BOMB:
+                    return;*/
             }
             if (cg.predictedPlayerState.weaponstate == WEAPON_FIRING
                     && cg.predictedPlayerState.weaponTime > 100) {

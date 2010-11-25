@@ -178,6 +178,13 @@ static void CG_Obituary(entityState_t *ent) {
                     message = "was attached a bit too much to his grenade";
                 }
                 break;
+            case MOD_BOMB:
+                if (gender == GENDER_FEMALE) {
+                    message = "was blasted by her own bomb";
+                } else {
+                    message = "was blasted by his own bomb";
+                }
+                break;
             default:
                 if (gender == GENDER_FEMALE)
                     message = "killed herself";
@@ -251,6 +258,10 @@ static void CG_Obituary(entityState_t *ent) {
                 break;
             case MOD_HANDS:
                 message = "was beaten to death by";
+                break;
+            case MOD_BOMB:
+                message = "was lacerated by";
+                message2 = "'s C4";
                 break;
             default:
                 message = "was killed by";

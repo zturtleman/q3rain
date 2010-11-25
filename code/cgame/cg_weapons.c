@@ -743,6 +743,8 @@ void CG_RegisterWeapon(int weaponNum) {
             break;
 
         case WP_BOMB:
+            weaponInfo->missileModel = trap_R_RegisterModel("models/ammo/grenade1.md3");
+            weaponInfo->flashSound[0] = trap_S_RegisterSound("sound/weapons/grenade/grenlf1a.wav", qfalse);
             break;
 
         case WP_WALTHER:
@@ -1757,6 +1759,18 @@ void CG_MissileHitWall(int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
             lightColor[1] = 0.4;
             lightColor[2] = 0.3;
             break;
+        case WP_BOMB:
+            mod = cgs.media.glass03;
+            shader = cgs.media.grenadeExplosionShader;
+            sfx = cgs.media.sfx_bombexp;
+            mark = cgs.media.burnMarkShader;
+            radius = 256;
+            light = 2000;
+            isSprite = qtrue;
+            lightColor[0] = 1;
+            lightColor[1] = 0.4;
+            lightColor[2] = 0.3;
+            break;
         case -1 :
             mod = cgs.media.bulletFlashModel;
             shader = cgs.media.bulletExplosionShader;
@@ -1782,6 +1796,23 @@ void CG_MissileHitWall(int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
     //
     if (mod) {
         if (weapon != WP_NUKE) {
+            if (weapon == WP_BOMB) {
+                int i = 0;
+                vec3_t up;
+                while (i < 128) {
+                    msec = 5000+crandom()*1000;
+                    if (msec < 0) {
+                        msec *= -1;
+                    } else if (msec == 0) {
+                        msec = 1000;
+                    }
+                    up[0] = crandom()*10;
+                    up[1] = crandom()*10;
+                    up[2] = crandom()*7.5f;
+                    CG_MakeExplosion(origin, up, cgs.media.dishFlashModel, cgs.media.grenadeSmokeShader, msec, qtrue);
+                    i++;
+                }
+            }
             le = CG_MakeExplosion(origin, dir, mod, shader, duration, isSprite);
         } else {
             le = CG_AllocLocalEntity();

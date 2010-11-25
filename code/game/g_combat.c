@@ -289,6 +289,12 @@ void player_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
         obit = modNames[meansOfDeath];
     }
 
+    // toss nades if cooking
+    if (self->client->ps.weaponstate == WEAPON_COCKED && self->client->ps.weapon == WP_HE) {
+        //Weapon_HE_Fire(self, self->client->ps.grenadetime - self->client->ps.levelTime);
+        FireGrenade(self, self->client->ps.grenadetime - self->client->ps.levelTime, MOD_HE_SPLASH);
+    }
+
     G_LogPrintf("Kill: %i %i %i: %s killed %s by %s\n",
             killer, self->s.number, meansOfDeath, killerName,
             self->client->pers.netname, obit);

@@ -799,6 +799,7 @@ typedef struct {
     sfxHandle_t sfx_ric3;
     sfxHandle_t sfx_railg;
     sfxHandle_t sfx_rockexp;
+    sfxHandle_t sfx_bombexp;
     sfxHandle_t sfx_plasmaexp;
     sfxHandle_t gibSound;
     sfxHandle_t gibBounce1Sound;

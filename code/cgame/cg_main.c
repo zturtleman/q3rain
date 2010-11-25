@@ -602,6 +602,8 @@ static void CG_RegisterSounds(void) {
     cgs.media.sfx_rockexp = trap_S_RegisterSound("sound/weapons/rocket/rocklx1a.wav", qfalse);
     cgs.media.sfx_plasmaexp = trap_S_RegisterSound("sound/weapons/plasma/plasmx1a.wav", qfalse);
 
+    cgs.media.sfx_bombexp = trap_S_RegisterSound("sound/weapons/bomb/bomb_expl_1.ogg", qfalse);
+
     cgs.media.regenSound = trap_S_RegisterSound("sound/items/regen.wav", qfalse);
     cgs.media.protectSound = trap_S_RegisterSound("sound/items/protect3.wav", qfalse);
     cgs.media.n_healthSound = trap_S_RegisterSound("sound/items/n_health.wav", qfalse);

@@ -55,6 +55,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define FL_TARGET_SPAWN                 0x00032000
 #define FL_POLICE_SPAWN                 0x00064000
 #define FL_CIVIL_SPAWN                  0x00128000
+#define FL_BOMB                         0x00256000 // bawmbs
 
 // movers are things like doors, plats, buttons, etc
 
@@ -550,10 +551,15 @@ gentity_t *fire_blaster(gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_plasma(gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_grenade(gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_he(gentity_t *self, vec3_t start, vec3_t aimdir);
+gentity_t *fire_bomb(gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_nuke(gentity_t *self, vec3_t start, vec3_t dir);
 gentity_t *fire_rocket(gentity_t *self, vec3_t start, vec3_t dir);
 gentity_t *fire_bfg(gentity_t *self, vec3_t start, vec3_t dir);
 gentity_t *fire_grapple(gentity_t *self, vec3_t start, vec3_t dir);
+gentity_t *fire_shrapnel(gentity_t *self, vec3_t start, vec3_t aimdir);
+
+
+void G_ExplodeBomb(gentity_t *ent);
 
 void G_ExplodeNuke(gentity_t *ent);
 void G_NukeTouch(gentity_t *ent, gentity_t *otherent, trace_t *trace);

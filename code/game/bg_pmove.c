@@ -1887,7 +1887,7 @@ static void PM_TorsoAnimation(void) {
 ==============
 PM_Weapon
 
-Generates weapon events and modifes the weapon counter
+Generates weapon events and modifies the weapon counter
 ==============
  */
 #define SEMI_DELAY 50
@@ -2028,6 +2028,9 @@ static void PM_Weapon(void) {
             break;
         case WP_INJECTOR:
             addTime = 600;
+            break;
+        case WP_BOMB:
+            addTime = 500;
             break;
         case WP_WALTHER:
             addTime = INFINITE;
