@@ -380,9 +380,13 @@ void CG_Nuke(vec3_t origin, int stage) {
             break;
         case 6:
             origin[2] += 1250;
+            number = 512;
+            stagefactor = 2.0f;
             break;
         case 7:
             origin[2] += 1500;
+            number = 512;
+            stagefactor = 5.0f;
             break;
         default:
             break;
@@ -393,12 +397,16 @@ void CG_Nuke(vec3_t origin, int stage) {
         localEntity_t *ent;
         up[0] = crandom()*10 * stagefactor;
         up[1] = crandom()*10 * stagefactor;
-        up[2] = crandom()*7.5f * stagefactor;
-        msec = 5000 + crandom()*5000;
+        if (stage != 7) {
+            up[2] = crandom()*7.5f * stagefactor;
+        } else {
+            up[2] = crandom()*7.5f;
+        }
+        msec = 50000 + crandom()*50000;
         if (msec < 0) {
             msec *= -1;
         } else if (msec == 0) {
-            msec = 5000;
+            msec = 50000;
         }
         // smoke dat shit up
         ent = CG_MakeNukeSmoke(origin, up, msec);

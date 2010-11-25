@@ -1746,7 +1746,7 @@ void CG_MissileHitWall(int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
             radius = 2;
             break;
         case WP_NUKE:
-            mod = cgs.media.dishFlashModel;
+            mod = cgs.media.dishFlashModelBig;
             shader = cgs.media.grenadeExplosionShader;
             sfx = cgs.media.sfx_rockexp;
             mark = cgs.media.burnMarkShader;
