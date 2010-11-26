@@ -1631,7 +1631,8 @@ void Cmd_Detonate_f(gentity_t *ent) {
     int i;
     if (ent->client->ps.stats[STAT_HEALTH] > 0
             && ent->health > 0
-            && ent->client->ps.weapon != WP_NONE) {
+            && ent->client->ps.weapon != WP_NONE
+            && ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
         for (i = 0; i < MAX_GENTITIES; i++) {
             bomb = &g_entities[i];
             if (bomb->flags == FL_BOMB && bomb->r.ownerNum == ent->s.number) {

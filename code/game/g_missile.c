@@ -73,7 +73,7 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
         }
     }
 
-    if (ent->s.eFlags & EF_STATIC) {
+    if (strcmp(ent->classname, "c4") == 0) {
         if (trace->allsolid == qtrue) {
             // bomb sticks in wall, keep it there
             G_SetOrigin(ent, old);
@@ -329,10 +329,23 @@ void G_MissileImpact(gentity_t *ent, trace_t * trace) {
         G_BounceMissile(ent, trace);
         return;
     }
+    if (strcmp(ent->classname, "c4") == 0) {
+        G_BounceMissile(ent, trace);
+        return;
+    }
+    if (strcmp(ent->classname, "grenade") == 0) {
+        if (other->s.eType = ET_BREAKABLE && other->takedamage && ent->damage > other->health_higher) {
+            other->health = 0;
+            if (G_BreakGlass(other, ent->s.origin, MOD_HE_SPLASH) == qtrue) {
+                return;
+            }
+        }
+        G_BounceMissile(ent, trace);
+        return;
+    }
 
     // impact damage
     if (other->takedamage) {
-        // nades dont explode on impact
         if (ent->s.eFlags & (EF_BOUNCE | EF_BOUNCE_HALF | EF_STATIC)) {
             vec3_t velocity;
             G_Damage(other, ent, &g_entities[ent->r.ownerNum], velocity, ent->s.origin, ent->damage, 0, ent->methodOfDeath);
@@ -357,51 +370,6 @@ void G_MissileImpact(gentity_t *ent, trace_t * trace) {
                     ent->s.origin, ent->damage,
                     0, ent->methodOfDeath);
         }
-    }
-
-    if (!strcmp(ent->classname, "hook")) {
-        gentity_t *nent;
-        vec3_t v;
-
-        nent = G_Spawn();
-        if (other->takedamage && other->client) {
-
-            G_AddEvent(nent, EV_MISSILE_HIT, DirToByte(trace->plane.normal));
-            nent->s.otherEntityNum = other->s.number;
-
-            ent->enemy = other;
-
-            v[0] = other->r.currentOrigin[0] + (other->r.mins[0] + other->r.maxs[0]) * 0.5;
-            v[1] = other->r.currentOrigin[1] + (other->r.mins[1] + other->r.maxs[1]) * 0.5;
-            v[2] = other->r.currentOrigin[2] + (other->r.mins[2] + other->r.maxs[2]) * 0.5;
-
-            SnapVectorTowards(v, ent->s.pos.trBase); // save net bandwidth
-        } else {
-            VectorCopy(trace->endpos, v);
-            G_AddEvent(nent, EV_MISSILE_MISS, DirToByte(trace->plane.normal));
-            ent->enemy = NULL;
-        }
-
-        SnapVectorTowards(v, ent->s.pos.trBase); // save net bandwidth
-
-        nent->freeAfterEvent = qtrue;
-        // change over to a normal entity right at the point of impact
-        nent->s.eType = ET_GENERAL;
-        ent->s.eType = ET_GRAPPLE;
-
-        G_SetOrigin(ent, v);
-        G_SetOrigin(nent, v);
-
-        ent->think = Weapon_HookThink;
-        ent->nextthink = level.time + FRAMETIME;
-
-        ent->parent->client->ps.pm_flags |= PMF_GRAPPLE_PULL;
-        VectorCopy(ent->r.currentOrigin, ent->parent->client->ps.grapplePoint);
-
-        trap_LinkEntity(ent);
-        trap_LinkEntity(nent);
-
-        return;
     }
 
     // is it cheaper in bandwidth to just remove this ent and create a new
@@ -562,7 +530,7 @@ gentity_t * fire_grenade(gentity_t *self, vec3_t start, vec3_t dir) {
     bolt->target_ent = NULL;
 
     // Lancer SHOOTNADES
-    bolt->health = 2; // dont use 1, else it will die if collided with other nade :D
+    bolt->health = 2;
     bolt->takedamage = qtrue;
     bolt->die = G_MissileDie;
     bolt->r.contents = CONTENTS_BODY;
@@ -602,7 +570,7 @@ gentity_t * fire_he(gentity_t *self, vec3_t start, vec3_t dir) {
     bolt->s.eFlags = EF_BOUNCE_HALF;
     bolt->r.ownerNum = self->s.number;
     bolt->parent = self;
-    bolt->damage = 150;
+    bolt->damage = 5;
     bolt->splashDamage = 250;
     bolt->splashRadius = 300;
     bolt->methodOfDeath = MOD_HE;

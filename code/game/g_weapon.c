@@ -874,7 +874,7 @@ Weapon_HE_Fire
 
 ===============
  */
-#define HE_DAMAGE 150
+#define HE_DAMAGE 5
 #define HE_SPLASHDAMAGE 250
 #define HE_RADIUS 300
 

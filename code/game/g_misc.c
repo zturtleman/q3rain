@@ -402,7 +402,6 @@ qboolean G_BreakGlass(gentity_t *ent, vec3_t point, int mod) {
                     tent = G_TempEntity(point, EV_BREAK_GLASS);
                 }
                 break;
-                break;
         }
         G_FreeEntity(ent);
         tent->s.eventParm = 0;
