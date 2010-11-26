@@ -302,8 +302,7 @@ static void CG_DrawStatusBarHead(float x) {
     angles[YAW] = cg.headStartYaw + (cg.headEndYaw - cg.headStartYaw) * frac;
     angles[PITCH] = cg.headStartPitch + (cg.headEndPitch - cg.headStartPitch) * frac;
 
-    CG_DrawHead(x, 480 - size, size, size,
-            cg.snap->ps.clientNum, angles);
+    CG_DrawHead(x, 480 - size, size, size, cg.snap->ps.clientNum, angles);
 }
 
 /*
@@ -478,8 +477,8 @@ static void CG_DrawStatusBar(void) {
                 case WP_WALTHER:
                     value = value / 10;
                     break;
-                /*case WP_BOMB:
-                    return;*/
+                    /*case WP_BOMB:
+                        return;*/
             }
             if (cg.predictedPlayerState.weaponstate == WEAPON_FIRING
                     && cg.predictedPlayerState.weaponTime > 100) {

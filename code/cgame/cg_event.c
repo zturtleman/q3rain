@@ -188,6 +188,13 @@ static void CG_Obituary(entityState_t *ent) {
                     message = "was blasted by his own bomb";
                 }
                 break;
+            case MOD_SHRAPNEL:
+                if (gender == GENDER_FEMALE) {
+                    message = "was pierced by her own shrapnel";
+                } else {
+                    message = "was blasted by his own shrapnel";
+                }
+                break;
             default:
                 if (gender == GENDER_FEMALE)
                     message = "killed herself";
@@ -265,6 +272,10 @@ static void CG_Obituary(entityState_t *ent) {
             case MOD_BOMB:
                 message = "was lacerated by";
                 message2 = "'s C4";
+                break;
+            case MOD_SHRAPNEL:
+                message = "was pierced by";
+                message2 = "'s shrapnel";
                 break;
             default:
                 message = "was killed by";
@@ -948,7 +959,7 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
 
         default:
             DEBUGNAME("UNKNOWN");
-            CG_Error("Unknown event: %i\nEV_NUKE_7 = %i", event, EV_NUKE_7);
+            CG_Error("Unknown event: %i\n", event);
             break;
     }
 

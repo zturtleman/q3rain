@@ -902,6 +902,9 @@ typedef struct {
 
     qhandle_t sparkShader; // SPARK
 
+    qhandle_t mod_pda;
+    qhandle_t sha_pda;
+    qhandle_t sha_pdaMinimap;
 } cgMedia_t;
 
 

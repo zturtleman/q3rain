@@ -750,7 +750,6 @@ static void CG_RegisterGraphics(void) {
     cgs.media.medalAssist = trap_R_RegisterShaderNoMip("medal_assist");
     cgs.media.medalCapture = trap_R_RegisterShaderNoMip("medal_capture");
 
-
     memset(cg_items, 0, sizeof ( cg_items));
     memset(cg_weapons, 0, sizeof ( cg_weapons));
 
@@ -763,6 +762,11 @@ static void CG_RegisterGraphics(void) {
             CG_RegisterItemVisuals(i);
         }
     }
+
+    // pda
+    cgs.media.mod_pda = trap_R_RegisterModel("models/pda/pda.md3");
+    cgs.media.sha_pda = trap_R_RegisterShader("models/pda/pda.png");
+    cgs.media.sha_pdaMinimap = trap_R_RegisterShader("models/pda/empty.png");
 
     // wall marks
     cgs.media.bulletMarkShader = trap_R_RegisterShader("gfx/damage/bullet_mrk");

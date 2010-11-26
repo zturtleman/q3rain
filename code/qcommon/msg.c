@@ -1184,7 +1184,8 @@ netField_t playerStateFields[] = {
     { PSF(spread), 16},
     { PSF(grenadetime), 16},
     { PSF(levelTime), 32},
-    { PSF(blindTime), 32}
+    { PSF(blindTime), 32},
+    { PSF(pdaState), 8},
 };
 
 /*

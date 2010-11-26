@@ -1116,6 +1116,8 @@ typedef struct playerState_s {
     int levelTime;
     // nuke
     int blindTime;
+    // pda
+    int pdaState;
 } playerState_t;
 
 
