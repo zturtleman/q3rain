@@ -465,6 +465,8 @@ typedef enum {
     EV_NUKE_5,
     EV_NUKE_6,
     EV_NUKE_7,
+
+    EV_SHRAPNEL_IMPACT,
 } entity_event_t;
 
 // animations

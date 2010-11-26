@@ -1953,6 +1953,8 @@ static void PM_Weapon(void) {
 
     // change weapon if time
     if (pm->ps->weaponstate == WEAPON_DROPPING) {
+        // put back in inventory
+        pm->ps->grenadetime = -1337;
         PM_FinishWeaponChange();
         return;
     }

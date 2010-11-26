@@ -630,7 +630,7 @@ int G_LocationDamage(vec3_t point, gentity_t* targ, gentity_t* attacker, int tak
 
 /*
 ============
-T_Damage
+G_Damage
 
 targ		entity that is being damaged
 inflictor	entity that is causing the damage
@@ -640,15 +640,17 @@ attacker	entity that caused the inflictor to damage targ
 dir			direction of the attack for knockback
 point		point at which the damage is being inflicted, used for headshots
 damage		amount of damage being inflicted
-knockback	force to be applied against targ as a result of the damage
 
 inflictor, attacker, dir, and point can be NULL for environmental effects
 
-dflags		these flags are used to control how T_Damage works
+dflags		these flags are used to control how G_Damage works
         DAMAGE_RADIUS			damage was indirect (from a nearby explosion)
         DAMAGE_NO_ARMOR			armor does not protect from this damage
         DAMAGE_NO_KNOCKBACK		do not affect velocity, just view angles
         DAMAGE_NO_PROTECTION	kills godmode, armor, everything
+
+
+knockback	force to be applied against targ as a result of the damage
 ============
  */
 
@@ -686,12 +688,16 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
     // If we shot a breakable item subtract the damage from its health and try to break it
     if (targ->s.eType == ET_BREAKABLE) {
-        targ->health -= damage;
-        if (G_BreakGlass(targ, point, mod) && attacker->client->ps.weapon == WP_HANDS && mod != MOD_HE_SPLASH) {
-            damage = 5;
-            //inflictor = attacker;
-            targ = attacker;
-            mod = MOD_WINDOW;
+        if (damage > targ->health_higher) {
+            targ->health -= damage;
+            if (G_BreakGlass(targ, point, mod) && attacker->client->ps.weapon == WP_HANDS && mod != MOD_HE_SPLASH) {
+                damage = 5;
+                //inflictor = attacker;
+                targ = attacker;
+                mod = MOD_WINDOW;
+            } else {
+                return;
+            }
         } else {
             return;
         }

@@ -537,14 +537,17 @@ void TossClientItems(gentity_t *self);
 void TossClientCubes(gentity_t *self);
 
 // damage flags
-#define DAMAGE_RADIUS				0x00000001	// damage was indirect
-#define DAMAGE_NO_ARMOR				0x00000002	// armour does not protect from this damage
-#define DAMAGE_NO_KNOCKBACK			0x00000004	// do not affect velocity, just view angles
-#define DAMAGE_NO_PROTECTION		0x00000008  // armor, shields, invulnerability, and godmode have no effect
+#define DAMAGE_RADIUS		0x00000001  // damage was indirect
+#define DAMAGE_NO_ARMOR		0x00000002  // armour does not protect from this damage
+#define DAMAGE_NO_KNOCKBACK	0x00000004  // do not affect velocity, just view angles
+#define DAMAGE_NO_PROTECTION	0x00000008  // armor, shields, invulnerability, and godmode have no effect
 
 //
 // g_missile.c
 //
+
+void G_FadeShrapnel(gentity_t *ent);
+
 void G_RunMissile(gentity_t *ent);
 
 gentity_t *fire_blaster(gentity_t *self, vec3_t start, vec3_t aimdir);

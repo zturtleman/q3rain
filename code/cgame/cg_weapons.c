@@ -1760,7 +1760,7 @@ void CG_MissileHitWall(int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
             lightColor[2] = 0.3;
             break;
         case WP_BOMB:
-            mod = cgs.media.glass03;
+            mod = cgs.media.dishFlashModel;
             shader = cgs.media.grenadeExplosionShader;
             sfx = cgs.media.sfx_bombexp;
             mark = cgs.media.burnMarkShader;
@@ -1784,6 +1784,13 @@ void CG_MissileHitWall(int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
                 sfx = cgs.media.sfx_ric3;
             }
             radius = 2;
+            break;
+        case -2 :
+            mod = cgs.media.bulletFlashModel;
+            shader = cgs.media.bulletExplosionShader;
+            sfx = cgs.media.sfx_ric1;
+            mark = cgs.media.bulletMarkShader;
+            radius = 8;
             break;
     }
 

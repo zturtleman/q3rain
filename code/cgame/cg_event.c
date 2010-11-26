@@ -154,6 +154,9 @@ static void CG_Obituary(entityState_t *ent) {
         case MOD_NUKE:
             message = "was blasted by a nuke";
             break;
+        case MOD_SHRAPNEL:
+            message = "was pierced by a shrapnel";
+            break;
         default:
             message = NULL;
             break;
@@ -936,6 +939,11 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
         case EV_NUKE_7:
             DEBUGNAME("EV_NUKE_7");
             CG_Nuke(position, 7);
+            break;
+
+        case EV_SHRAPNEL_IMPACT:
+            DEBUGNAME("EV_SHRAPNEL_IMPACT");
+            CG_MissileHitWall(-2, 0, position, dir, IMPACTSOUND_METAL);
             break;
 
         default:

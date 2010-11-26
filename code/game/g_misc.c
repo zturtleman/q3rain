@@ -310,7 +310,7 @@ void InitShooter(gentity_t *ent, int weapon) {
  Explodes glass
  */
 void SP_func_breakable(gentity_t *ent) {
-    int health;
+    int health, min;
     //int type;
     char *type;
 
@@ -318,11 +318,17 @@ void SP_func_breakable(gentity_t *ent) {
     trap_SetBrushModel(ent, ent->model);
     // Lets give it 5 health if the mapper did not set its health
     G_SpawnInt("health", "5", &health);
-    if (health <= 0)
+    if (health <= 0) {
         health = 5;
+    }
+    G_SpawnInt("minimum", "0", &min);
+    if (min < 0) {
+        min = 0;
+    }
 
     G_SpawnString("type", "glass", &type);
     ent->health = health;
+    ent->health_higher = min;
     // Let it take damage
     ent->takedamage = qtrue;
     // Let it know it is a breakable object
@@ -357,7 +363,8 @@ qboolean G_BreakGlass(gentity_t *ent, vec3_t point, int mod) {
         // Tell the program based on the gun if it has no splash dmg, no reason to ad ones with
         // splash dmg as qtrue as is that is the default
         splashdmg = qfalse;
-        if (mod == MOD_HE_SPLASH) {
+        if (mod == MOD_HE_SPLASH
+                || mod == MOD_NUKE) {
             splashdmg = qtrue;
         }
         // Call the function to show the glass shards in cgame

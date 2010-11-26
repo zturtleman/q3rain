@@ -43,6 +43,13 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
     dot = DotProduct(velocity, trace->plane.normal);
     VectorMA(velocity, -2 * dot, trace->plane.normal, ent->s.pos.trDelta);
 
+    if (strcmp(ent->classname, "shrapnel") == 0) {
+        G_SetOrigin(ent, trace->endpos);
+        G_AddEvent(ent, EV_SHRAPNEL_IMPACT, 0);
+        ent->freeAfterEvent = qtrue;
+        return;
+    }
+
     if (ent->s.eFlags & EF_BOUNCE) {
         G_AddEvent(ent, EV_GRENADE_BOUNCE, 0);
     }
@@ -91,9 +98,16 @@ G_CreateShraphnels
  */
 void G_CreateShrapnels(gentity_t *ent, vec3_t origin) {
     vec3_t random;
-    int i = 0;
-    //Com_Printf("Creating shrapnels...\n");
-    while (i < 10) {
+    int i = 0, max;
+    max = (int) (crandom()*50);
+    if (max < 0) {
+        max *= -1;
+    }
+    if (max == 0) {
+        max = 10;
+    }
+    //Com_Printf("Creating %i shrapnels...\n", max);
+    while (i < max) {
         random[0] = crandom()*10;
         random[1] = crandom()*10;
         random[2] = crandom()*7.5;
@@ -102,33 +116,17 @@ void G_CreateShrapnels(gentity_t *ent, vec3_t origin) {
     }
 }
 
-void G_BlockedShrapnel(gentity_t *shrapnel, gentity_t *ent) {
-    Com_Printf("G_BlockedShrapnel\n");
-    G_Damage(ent, shrapnel, shrapnel, NULL, NULL, shrapnel->damage, 0, MOD_SHRAPNEL);
-    trap_UnlinkEntity(shrapnel);
-}
-
-void G_TouchShrapnel(gentity_t *shrapnel, gentity_t *ent, trace_t *trace) {
-    Com_Printf("G_TouchShrapnel\n");
-    G_Damage(ent, shrapnel, shrapnel, NULL, NULL, shrapnel->damage, 0, MOD_SHRAPNEL);
-    trap_UnlinkEntity(shrapnel);
-}
-
-void G_PainShrapnel(gentity_t *shrapnel, gentity_t *ent, int amount) {
-    //Com_Printf("G_PainShrapnel\n");
-    G_Damage(ent, shrapnel, shrapnel, NULL, NULL, shrapnel->damage, 0, MOD_SHRAPNEL);
-    trap_UnlinkEntity(shrapnel);
-}
-
 /*
 ================
 G_FadeShrapnel
 
-Explode a missile without an impact
+ Remove shrapnel after flying around
 ================
  */
 void G_FadeShrapnel(gentity_t *ent) {
+    ent->inuse = qfalse;
     trap_UnlinkEntity(ent);
+    G_FreeEntity(ent);
 }
 
 /*
@@ -320,10 +318,11 @@ void G_MissileImpact(gentity_t *ent, trace_t * trace) {
     qboolean hitClient = qfalse;
     other = &g_entities[trace->entityNum];
 
-    if (ent->s.eFlags == EF_SHRAPNEL) {
-        trap_UnlinkEntity(ent);
-        G_FreeEntity(ent);
-    }
+    /*if (ent->s.eFlags == EF_SHRAPNEL) {
+        G_Damage(other, ent, NULL, NULL, NULL, ent->damage, 0, MOD_SHRAPNEL);
+        G_FadeShrapnel(ent);
+        return;
+    }*/
 
     // check for bounce
     if (!other->takedamage && (ent->s.eFlags & (EF_BOUNCE | EF_BOUNCE_HALF | EF_STATIC))) {
@@ -336,8 +335,10 @@ void G_MissileImpact(gentity_t *ent, trace_t * trace) {
         // nades dont explode on impact
         if (ent->s.eFlags & (EF_BOUNCE | EF_BOUNCE_HALF | EF_STATIC)) {
             vec3_t velocity;
-            G_Damage(other, ent, &g_entities[ent->r.ownerNum], velocity,
-                    ent->s.origin, 1, 0, ent->methodOfDeath);
+            G_Damage(other, ent, &g_entities[ent->r.ownerNum], velocity, ent->s.origin, ent->damage, 0, ent->methodOfDeath);
+            if (ent->s.eFlags == EF_SHRAPNEL) {
+                G_FadeShrapnel(ent);
+            }
             return;
         }
         // FIXME: wrong damage direction?
@@ -637,6 +638,7 @@ fire_shrapnel
  */
 gentity_t * fire_shrapnel(gentity_t *self, vec3_t start, vec3_t dir) {
     gentity_t *bolt;
+    int dmg;
 
     VectorNormalize(dir);
 
@@ -644,21 +646,23 @@ gentity_t * fire_shrapnel(gentity_t *self, vec3_t start, vec3_t dir) {
     bolt->classname = "shrapnel";
     bolt->nextthink = level.time + 3000;
     bolt->think = G_FadeShrapnel;
-    bolt->blocked = G_BlockedShrapnel;
-    bolt->touch = G_TouchShrapnel;
-    bolt->pain = G_PainShrapnel;
-    bolt->takedamage = qtrue;
-    bolt->health = 99999;
+    bolt->takedamage = qfalse;
     bolt->s.eType = ET_MISSILE;
     bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
     bolt->s.weapon = WP_HE;
     bolt->s.eFlags = EF_SHRAPNEL;
     bolt->r.ownerNum = self->s.number;
     bolt->parent = self;
-    bolt->damage = 40;
+    dmg = 40 + crandom()*10;
+    if (dmg < 30) {
+        dmg = 30;
+    }
+    bolt->damage = dmg;
     bolt->methodOfDeath = MOD_SHRAPNEL;
     bolt->clipmask = MASK_SHOT;
     bolt->target_ent = NULL;
+
+    start[2] += 1;
 
     VectorSet(bolt->r.mins, -10, -5, 6);
     VectorCopy(bolt->r.mins, bolt->r.absmin);
@@ -668,7 +672,7 @@ gentity_t * fire_shrapnel(gentity_t *self, vec3_t start, vec3_t dir) {
     bolt->s.pos.trType = TR_LINEAR;
     bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;
     VectorCopy(start, bolt->s.pos.trBase);
-    VectorScale(dir, 2000, bolt->s.pos.trDelta);
+    VectorScale(dir, 3000, bolt->s.pos.trDelta);
     SnapVector(bolt->s.pos.trDelta);
 
     VectorCopy(start, bolt->r.currentOrigin);
