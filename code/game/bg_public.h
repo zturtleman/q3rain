@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	GAME_VERSION		BASEGAME "-1"
 
 #define	DEFAULT_GRAVITY		800
-#define GIB_HEALTH -999
+#define GIB_HEALTH              -999
 #define	ARMOR_PROTECTION	0.66
 
 #define	MAX_ITEMS		256
@@ -101,7 +101,8 @@ typedef enum {
     GT_FFA, // free for all
     GT_SINGLE_PLAYER, // single player
     GT_ASSASSINS, // mission mode
-    GT_TEAMSURVIVOR, //deathmatch
+    GT_TEAMDEATHMATCH, //deathmatch
+    GT_TEAMSURVIVOR, //deathmatch, roundbased
     GT_MAX_GAME_TYPE
 } gametype_t;
 
@@ -545,8 +546,6 @@ typedef enum {
     TEAM_RED, //player
     TEAM_BLUE, //police
     TEAM_SPECTATOR,
-    TEAM_CIVIL,
-    TEAM_TARGET,
 
     TEAM_NUM_TEAMS
 } team_t;

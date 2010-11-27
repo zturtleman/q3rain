@@ -57,11 +57,11 @@ void AddScore(gentity_t *ent, vec3_t origin, int score) {
         return;
     }
     // show score plum
-    ScorePlum(ent, origin, score);
+    //ScorePlum(ent, origin, score);
     //
     ent->client->ps.persistant[PERS_SCORE] += score;
     if (g_gametype.integer >= GT_ASSASSINS) {
-        level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
+        level.teamScores[ent->client->ps.persistant[PERS_TEAM]] += score;
     }
     CalculateRanks();
 }

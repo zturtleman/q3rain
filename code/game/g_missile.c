@@ -324,12 +324,6 @@ void G_MissileImpact(gentity_t *ent, trace_t * trace) {
     qboolean hitClient = qfalse;
     other = &g_entities[trace->entityNum];
 
-    /*if (ent->s.eFlags == EF_SHRAPNEL) {
-        G_Damage(other, ent, NULL, NULL, NULL, ent->damage, 0, MOD_SHRAPNEL);
-        G_FadeShrapnel(ent);
-        return;
-    }*/
-
     // check for bounce
     if (!other->takedamage && (ent->s.eFlags & (EF_BOUNCE | EF_BOUNCE_HALF | EF_STATIC))) {
         G_BounceMissile(ent, trace);
@@ -340,7 +334,7 @@ void G_MissileImpact(gentity_t *ent, trace_t * trace) {
         return;
     }
     if (strcmp(ent->classname, "grenade") == 0) {
-        if (other->s.eType = ET_BREAKABLE && other->takedamage && ent->damage > other->health_higher) {
+        if (other->s.eType == ET_BREAKABLE && other->takedamage && ent->damage > other->health_higher) {
             other->health = 0;
             if (G_BreakGlass(other, ent->s.origin, MOD_HE_SPLASH) == qtrue) {
                 return;

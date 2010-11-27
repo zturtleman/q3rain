@@ -282,8 +282,6 @@ void G_AddRandomBot(int team) {
                 if (team == TEAM_RED) teamstr = "red";
                     // TEAMS
                 else if (team == TEAM_BLUE) teamstr = "blue";
-                else if (team == TEAM_CIVIL) teamstr = "civil";
-                else if (team == TEAM_TARGET) teamstr = "target";
                 else teamstr = "";
                 strncpy(netname, value, sizeof (netname) - 1);
                 netname[sizeof (netname) - 1] = '\0';
@@ -638,15 +636,12 @@ static void G_AddBot(const char *name, float skill, const char *team, int delay,
                 team = "blue";
             }
         } else if (g_gametype.integer == GT_ASSASSINS) {
-            if (PickTeam(clientNum) == TEAM_RED) {
+            /*if (PickTeam(clientNum) == TEAM_RED) {
                 team = "blue"; // no bots on playerteam
-            } else if (PickTeam(clientNum) == TEAM_CIVIL) {
-                team = "civil";
-            } else if (PickTeam(clientNum) == TEAM_TARGET) {
-                team = "target";
             } else {
                 team = "blue";
-            }
+            }*/
+            team = "blue";
         } else {
             team = "red";
         }

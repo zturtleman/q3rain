@@ -756,10 +756,15 @@ void CalculateRanks(void) {
     // set the rank value for all clients that are connected and not spectators
     if (g_gametype.integer == GT_ASSASSINS) {
         // in team games, rank is just the order of the teams, 0=red, 1=blue, 2=tied
-        //cl->ps.persistant[PERS_RANK] = ;
-        //level.teamScores[TEAM_]
         for (i = 0; i < level.numConnectedClients; i++) {
             cl = &level.clients[ level.sortedClients[i] ];
+            if (level.teamScores[TEAM_RED] == level.teamScores[TEAM_BLUE]) {
+                cl->ps.persistant[PERS_RANK] = 2;
+            } else if (level.teamScores[TEAM_RED] > level.teamScores[TEAM_BLUE]) {
+                cl->ps.persistant[PERS_RANK] = 0;
+            } else {
+                cl->ps.persistant[PERS_RANK] = 1;
+            }
         }
     } else if (g_gametype.integer == GT_TEAMSURVIVOR) {
         // in team games, rank is just the order of the teams, 0=red, 1=blue, 2=tied
@@ -984,8 +989,6 @@ void ExitLevel(void) {
     // reset all the scores so we don't enter the intermission again
     level.teamScores[TEAM_RED] = 0;
     level.teamScores[TEAM_BLUE] = 0;
-    level.teamScores[TEAM_CIVIL] = 0;
-    level.teamScores[TEAM_TARGET] = 0;
     for (i = 0; i < g_maxclients.integer; i++) {
         cl = level.clients + i;
         if (cl->pers.connected != CON_CONNECTED) {
@@ -1279,17 +1282,12 @@ void CheckExitRules(void) {
         }
     } else if (g_gametype.integer == GT_ASSASSINS) {
         if (level.teamScores[TEAM_RED] >= 1) {
-            trap_SendServerCommand(-1, "print \"Rain accomplished the mission.\n\"");
+            trap_SendServerCommand(-1, "print \"Hazewood accomplished the mission.\n\"");
             LogExit("Fraglimit hit.");
             return;
         }
         if (level.teamScores[TEAM_BLUE] >= 1) {
             trap_SendServerCommand(-1, "print \"Police wins.\n\"");
-            LogExit("Fraglimit hit.");
-            return;
-        }
-        if (level.teamScores[TEAM_TARGET] >= 1) {
-            trap_SendServerCommand(-1, "print \"Target wins.\n\"");
             LogExit("Fraglimit hit.");
             return;
         }
@@ -1512,10 +1510,6 @@ void CheckTeamVote(int team) {
         cs_offset = 0;
     else if (team == TEAM_BLUE)
         cs_offset = 1;
-    else if (team == TEAM_CIVIL)
-        cs_offset = 2;
-    else if (team == TEAM_TARGET)
-        cs_offset = 3;
     else
         return;
 
@@ -1704,8 +1698,6 @@ void G_RunFrame(int levelTime) {
     // check team votes
     CheckTeamVote(TEAM_RED);
     CheckTeamVote(TEAM_BLUE);
-    CheckTeamVote(TEAM_CIVIL);
-    CheckTeamVote(TEAM_TARGET);
 
     // for tracking changes
     CheckCvars();

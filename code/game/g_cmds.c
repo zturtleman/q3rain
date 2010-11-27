@@ -448,12 +448,6 @@ void BroadcastTeamChange(gclient_t *client, int oldTeam) {
     } else if (client->sess.sessionTeam == TEAM_BLUE) {
         trap_SendServerCommand(-1, va("cp \"%s" S_COLOR_WHITE " joined the police team.\n\"",
                 client->pers.netname));
-    } else if (client->sess.sessionTeam == TEAM_TARGET) {
-        trap_SendServerCommand(-1, va("cp \"%s" S_COLOR_WHITE " joined the target team.\n\"",
-                client->pers.netname));
-    } else if (client->sess.sessionTeam == TEAM_CIVIL) {
-        trap_SendServerCommand(-1, va("cp \"%s" S_COLOR_WHITE " joined the civil team.\n\"",
-                client->pers.netname));
     } else if (client->sess.sessionTeam == TEAM_SPECTATOR && oldTeam != TEAM_SPECTATOR) {
         trap_SendServerCommand(-1, va("cp \"%s" S_COLOR_WHITE " joined the spectators.\n\"",
                 client->pers.netname));
@@ -501,25 +495,22 @@ void SetTeam(gentity_t *ent, char *s) {
     } else if (g_gametype.integer == GT_ASSASSINS) {
         // if running a team game, assign player to one of the teams
         specState = SPECTATOR_NOT;
-        if (!Q_stricmp(s, "red") || !Q_stricmp(s, "r") || !Q_stricmp(s, "a") || !Q_stricmp(s, "assassin")) {
+        if (!Q_stricmp(s, "red") || !Q_stricmp(s, "r")) {
             team = TEAM_RED;
-        } else if (!Q_stricmp(s, "blue") || !Q_stricmp(s, "b") || !Q_stricmp(s, "p") || !Q_stricmp(s, "police")) {
+        } else if (!Q_stricmp(s, "blue") || !Q_stricmp(s, "b")) {
             team = TEAM_BLUE;
-        } else if (!Q_stricmp(s, "civil") || !Q_stricmp(s, "c")) {
-            team = TEAM_CIVIL;
-        } else if (!Q_stricmp(s, "target") || !Q_stricmp(s, "t")) {
-            team = TEAM_TARGET;
         } else {
             // pick the team with the least number of players
             team = PickTeam(clientNum);
+            if (ent->r.svFlags & SVF_BOT) {
+                team = TEAM_BLUE;
+            }
         }
 
-        if (g_teamForceBalance.integer) {
+        /*if (g_teamForceBalance.integer) {
             int counts[TEAM_NUM_TEAMS];
             counts[TEAM_BLUE] = TeamCount(clientNum, TEAM_BLUE);
             counts[TEAM_RED] = TeamCount(clientNum, TEAM_RED);
-            counts[TEAM_CIVIL] = TeamCount(clientNum, TEAM_CIVIL);
-            counts[TEAM_TARGET] = TeamCount(clientNum, TEAM_TARGET);
             if (team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] > 1) {
                 trap_SendServerCommand(clientNum,
                         "cp \"Red team has too many players.\n\"");
@@ -530,17 +521,7 @@ void SetTeam(gentity_t *ent, char *s) {
                         "cp \"Blue team has too many players.\n\"");
                 return; // ignore the request
             }
-            if (team == TEAM_CIVIL && counts[TEAM_CIVIL] - counts[TEAM_CIVIL] > 1) {
-                trap_SendServerCommand(clientNum,
-                        "cp \"Civil team has too many players.\n\"");
-                return; // ignore the request
-            }
-            if (team == TEAM_TARGET && counts[TEAM_TARGET] - counts[TEAM_TARGET] > 1) {
-                trap_SendServerCommand(clientNum,
-                        "cp \"Target team has too many players.\n\"");
-                return; // ignore the request
-            }
-        }
+        }*/
     } else if (g_gametype.integer == GT_TEAMSURVIVOR) {
         specState = SPECTATOR_NOT;
         if (!Q_stricmp(s, "red") || !Q_stricmp(s, "r") || !Q_stricmp(s, "a") || !Q_stricmp(s, "assassin")) {
@@ -603,7 +584,7 @@ void SetTeam(gentity_t *ent, char *s) {
     client->sess.spectatorClient = specClient;
 
     client->sess.teamLeader = qfalse;
-    if (team == TEAM_RED || team == TEAM_BLUE || team == TEAM_CIVIL || team == TEAM_TARGET) {
+    if (team == TEAM_RED || team == TEAM_BLUE) {
         teamLeader = TeamLeader(team);
         // if there is no team leader or the team leader is a bot and this client is not a bot
         if (teamLeader == -1 || (!(g_entities[clientNum].r.svFlags & SVF_BOT) && (g_entities[teamLeader].r.svFlags & SVF_BOT))) {
@@ -611,7 +592,7 @@ void SetTeam(gentity_t *ent, char *s) {
         }
     }
     // make sure there is a team leader on the team the player came from
-    if (oldTeam == TEAM_RED || oldTeam == TEAM_BLUE || oldTeam == TEAM_CIVIL || oldTeam == TEAM_TARGET) {
+    if (oldTeam == TEAM_RED || oldTeam == TEAM_BLUE) {
         CheckTeamLeader(oldTeam);
     }
 
@@ -657,12 +638,6 @@ void Cmd_Team_f(gentity_t *ent) {
                 break;
             case TEAM_RED:
                 trap_SendServerCommand(ent - g_entities, "print \"Red team\n\"");
-                break;
-            case TEAM_CIVIL:
-                trap_SendServerCommand(ent - g_entities, "print \"Civil team\n\"");
-                break;
-            case TEAM_TARGET:
-                trap_SendServerCommand(ent - g_entities, "print \"Target team\n\"");
                 break;
             case TEAM_FREE:
                 trap_SendServerCommand(ent - g_entities, "print \"Free team\n\"");
