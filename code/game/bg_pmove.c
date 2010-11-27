@@ -61,7 +61,7 @@ float pm_snowfriction = 2.0f;
 int c_pmove = 0;
 
 #define WALLJUMP_BOOST 300
-#define WALLCLIMB_BOOST 450
+#define WALLCLIMB_BOOST 400
 #define MAX_WALLCLIMBS 1
 
 /*
@@ -459,7 +459,7 @@ static qboolean PM_CheckJump(void) {
 
     pm->ps->groundEntityNum = ENTITYNUM_NONE;
     if (pm->ps->powerups[PW_ADRENALINE] == 0) {
-        vel = JUMP_VELOCITY / pm->ps->legsfactor;
+        vel = JUMP_VELOCITY / (pm->ps->legsfactor / 10);
         if (vel < JUMP_VELOCITY / 1.5) {
             vel = JUMP_VELOCITY / 1.5;
         }
@@ -717,7 +717,7 @@ static void PM_WallClimb(void) {
     pm->ps->pm_flags |= PMF_JUMP_HELD;
 
     boost = WALLCLIMB_BOOST;
-    if (pm->ps->speed < PLAYER_SPEED) {
+    if (pm->ps->speed < pm->ps->maxspeed) {
         boost /= 2;
     }
 
@@ -965,8 +965,8 @@ static void PM_WalkMove(pmove_t *pmove) {
             wishspeed = pm->ps->speed * pm_duckScale;
         }
     }
-    if (wishspeed < PLAYER_SPEED / 3) {
-        wishspeed = PLAYER_SPEED / 3;
+    if (wishspeed < pm->ps->maxspeed / 3) {
+        wishspeed = pm->ps->maxspeed / 3;
     }
 
     // clamp the speed lower if wading or walking on the bottom
@@ -1359,17 +1359,33 @@ static void PM_CrashLand(void) {
     // SURF_NODAMAGE is used for bounce pads where you don't ever
     // want to take damage or play a crunch sound
     if (!(pml.groundTrace.surfaceFlags & SURF_NODAMAGE)) {
-        if (delta > 110) {
+        //Com_Printf("delta = %f\n", delta);
+        if (delta < 50) {
+            delta -= 10;
+        } else {
+            delta += 10;
+        }
+        if (delta <= 25) {
+            if (delta > 10) {
+                PM_AddEvent(EV_FALL_MINIMAL);
+            } else {
+                PM_AddEvent(PM_FootstepForSurface());
+            }
+        } else {
+            pm->ps->fallDelta = ((int) delta);
             PM_AddEvent(EV_FALL_FAR);
-        } else if (delta > 60) {
+        }
+        /*if (delta > 100) {
+            PM_AddEvent(EV_FALL_FAR);
+        } else if (delta > 51) {
             PM_AddEvent(EV_FALL_MEDIUM);
-        } else if (delta > 30) {
+        } else if (delta > 25) {
             PM_AddEvent(EV_FALL_SHORT);
         } else if (delta > 10) {
             PM_AddEvent(EV_FALL_MINIMAL);
         } else {
             PM_AddEvent(PM_FootstepForSurface());
-        }
+        }*/
     }
 
     // start footstep cycle over

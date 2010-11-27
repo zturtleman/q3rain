@@ -462,6 +462,7 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
     //	qboolean	fired;
     gitem_t *item;
     gentity_t *drop;
+    float f;
 
     client = ent->client;
 
@@ -485,24 +486,18 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
                 if (ent->flags & FL_GODMODE) {
                     return;
                 }
-                // FALL DAMAGE
-                if (event == EV_FALL_FAR) {
-                    damage = 100;
-                } else if (event == EV_FALL_MEDIUM) {
-                    damage = 60;
-                    ent->client->ps.legsfactor = 2.5;
-                } else {
-                    damage = 20;
-                    if (ent->client->ps.legsfactor < 1.5) {
-                        ent->client->ps.legsfactor = 1.5;
-                    }
+                Com_Printf("delta = %i\n", ent->client->ps.fallDelta);
+                damage = ent->client->ps.fallDelta;
+                f = (float) (ent->client->ps.legsfactor / 10);
+                if (f < 1.0) {
+                    f = 1.0;
                 }
-                if (ent->client->ps.stats[STAT_HEALTH] - damage <= 50 && ent->client->ps.legsfactor <= 1.5) {
-                    ent->client->ps.legsfactor = 2.5;
-                }
+                f += (float) damage / 100;
                 VectorSet(dir, 0, 0, 1);
+                ent->client->ps.legsfactor = (int) (f * 10);
                 ent->pain_debounce_time = level.time + 200; // no normal pain sound
                 G_Damage(ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
+                Com_Printf("legsfactor = %i\n", ent->client->ps.legsfactor);
                 break;
 
             case EV_FIRE_WEAPON:
@@ -747,10 +742,11 @@ void ClientThink_real(gentity_t *ent) {
 
     adrenaline = client->ps.powerups[PW_ADRENALINE] > level.time;
 
+    Com_Printf("legsfactor = %i\n", client->ps.legsfactor);
     if (adrenaline) {
-        client->ps.speed = PLAYER_SPEED * 1.3;
+        client->ps.speed = client->ps.maxspeed * 1.3;
     } else {
-        client->ps.speed = PLAYER_SPEED / client->ps.legsfactor;
+        client->ps.speed = (int) ((float) client->ps.maxspeed / ((float) client->ps.legsfactor / 10));
     }
 
     ent->client->ps.levelTime = level.time;

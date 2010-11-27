@@ -1179,8 +1179,9 @@ void ClientSpawn(gentity_t *ent) {
     ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH];
 
     // restore legshot speed
-    client->ps.speed = PLAYER_SPEED;
-    client->ps.legsfactor = 1;
+    client->ps.maxspeed = g_playerspeed.integer;
+    client->ps.speed = client->ps.maxspeed;
+    client->ps.legsfactor = 10;
 
     G_SetOrigin(ent, spawn_origin);
     VectorCopy(spawn_origin, client->ps.origin);

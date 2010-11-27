@@ -1040,11 +1040,6 @@ typedef struct playerState_s {
     int pm_flags; // ducked, jump_held, etc
     int pm_time;
 
-    // RAIN wallclimbs
-    int wallclimbs;
-
-    int legsfactor;
-
     vec3_t origin;
     vec3_t velocity;
     int weaponTime;
@@ -1120,6 +1115,11 @@ typedef struct playerState_s {
     int pdaState;
     // zoom
     int zoomFov; // how much to subtract from cg_fov
+    // movement
+    int legsfactor;
+    int wallclimbs;
+    int maxspeed;
+    int fallDelta;
 } playerState_t;
 
 

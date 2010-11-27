@@ -1187,6 +1187,8 @@ netField_t playerStateFields[] = {
     { PSF(blindTime), 32},
     { PSF(pdaState), 8},
     { PSF(zoomFov), 8},
+    { PSF(maxspeed), 8},
+    { PSF(fallDelta), 8},
 };
 
 /*

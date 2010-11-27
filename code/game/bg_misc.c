@@ -1107,7 +1107,7 @@ char *eventnames[] = {
     "EV_FALL_MEDIUM",
     "EV_FALL_FAR",
 
-    "EV_JUMP_PAD", // boing sound at origin", jump sound on player
+    "EV_JUMP_PAD", // boing sound at origin, jump sound on player
 
     "EV_JUMP",
     "EV_WATER_TOUCH", // foot touches
@@ -1173,20 +1173,29 @@ char *eventnames[] = {
     "EV_GIB_PLAYER", // gib a previously living player
     "EV_SCOREPLUM", // score plum
 
-    //#ifdef MISSIONPACK
-    "EV_PROXIMITY_MINE_STICK",
-    "EV_PROXIMITY_MINE_TRIGGER",
-    "EV_KAMIKAZE", // kamikaze explodes
-    "EV_OBELISKEXPLODE", // obelisk explodes
-    "EV_INVUL_IMPACT", // invulnerability sphere impact
-    "EV_JUICED", // invulnerability juiced effect
-    "EV_LIGHTNINGBOLT", // lightning bolt bounced of invulnerability sphere
-    //#endif
-
     "EV_DEBUG_LINE",
     "EV_STOPLOOPINGSOUND",
-    "EV_TAUNT"
+    "EV_TAUNT",
+    "EV_TAUNT_YES",
+    "EV_TAUNT_NO",
+    "EV_TAUNT_FOLLOWME",
+    "EV_TAUNT_GETFLAG",
+    "EV_TAUNT_GUARDBASE",
+    "EV_TAUNT_PATROL",
 
+    "EV_WALLJUMP",
+    "EV_GRAB",
+    "EV_FALL_MINIMAL",
+
+    "EV_NUKE_1",
+    "EV_NUKE_2",
+    "EV_NUKE_3",
+    "EV_NUKE_4",
+    "EV_NUKE_5",
+    "EV_NUKE_6",
+    "EV_NUKE_7",
+
+    "EV_SHRAPNEL_IMPACT",
 };
 
 /*

@@ -82,6 +82,8 @@ vmCvar_t pmove_msec;
 vmCvar_t g_rankings;
 vmCvar_t g_listEntity;
 
+vmCvar_t g_playerspeed;
+
 static cvarTable_t gameCvarTable[] = {
     // don't override the cheat state set by the system
     { &g_cheats, "sv_cheats", "", 0, 0, qfalse},
@@ -150,6 +152,8 @@ static cvarTable_t gameCvarTable[] = {
     { &pmove_msec, "pmove_msec", "8", CVAR_SYSTEMINFO, 0, qfalse},
 
     { &g_rankings, "g_rankings", "0", 0, 0, qfalse},
+
+    { &g_playerspeed, "g_playerspeed", "320", CVAR_CHEAT, 0, qfalse},
 
 };
 
