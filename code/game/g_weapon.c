@@ -507,6 +507,7 @@ weapon_barrett_fire
 #define MAX_BARRETT_UNITS   96
 #define BARRETT_DAMAGE      200
 #define BARRETT_RANGE       8129
+#define BARRETT_SPREAD      12
 
 void Weapon_Barrett_Fire(gentity_t *ent, int count) {
     vec3_t end, oldmuzzle;
@@ -518,15 +519,35 @@ void Weapon_Barrett_Fire(gentity_t *ent, int count) {
     int hits;
     int unlinked;
     gentity_t * unlinkedEntities[MAX_BARRETT_HITS];
-    damage = 100;
+    float r;
+    float u;
+    int spread;
 
+    damage = 100;
     count++;
 
     if (count > MAX_BARRETT_WALLS) {
         return;
     }
 
+    spread = ent->client->pers.cmd.forwardmove + ent->client->pers.cmd.upmove + ent->client->pers.cmd.rightmove;
+    spread *= BARRETT_SPREAD;
+
+    //Com_Printf("spread = %i\n", spread);
+
+    r = random() * M_PI * 2.0f;
+    u = cos(r) * crandom() * (spread);
+    r = cos(r) * crandom() * (spread);
     VectorMA(muzzle, BARRETT_RANGE, forward, end);
+    if (ent->client->ps.zoomFov <= 0) {
+        VectorMA(end, r, right, end);
+        VectorMA(end, u, up, end);
+    } else {
+        if (spread != 0) {
+            VectorMA(end, r, right, end);
+            VectorMA(end, u, up, end);
+        }
+    }
 
     unlinked = 0;
     hits = 0;
@@ -921,11 +942,12 @@ Weapon_Intervention_Fire
 
 ===============
  */
-#define MAX_INTERVENTION_HITS    2
-#define MAX_INTERVENTION_WALLS   1
-#define MAX_INTERVENTION_UNITS   64
-#define INTERVENTION_DAMAGE 100
-#define INTERVENTION_RANGE 8192
+#define MAX_INTERVENTION_HITS   2
+#define MAX_INTERVENTION_WALLS  1
+#define MAX_INTERVENTION_UNITS  64
+#define INTERVENTION_DAMAGE     100
+#define INTERVENTION_RANGE      8192
+#define INTERVENTION_SPREAD     8
 
 void Weapon_Intervention_Fire(gentity_t *ent, int count) {
     vec3_t end, oldmuzzle;
@@ -937,6 +959,8 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
     int hits;
     int unlinked;
     gentity_t * unlinkedEntities[MAX_INTERVENTION_HITS];
+    int spread;
+    float u, r;
     damage = 100;
 
     count++;
@@ -947,7 +971,22 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
         damage = damage / 1.5;
     }
 
+    spread = ent->client->pers.cmd.forwardmove + ent->client->pers.cmd.upmove + ent->client->pers.cmd.rightmove;
+    spread *= INTERVENTION_SPREAD;
+
+    r = random() * M_PI * 2.0f;
+    u = cos(r) * crandom() * (spread);
+    r = cos(r) * crandom() * (spread);
     VectorMA(muzzle, INTERVENTION_RANGE, forward, end);
+    if (ent->client->ps.zoomFov <= 0) {
+        VectorMA(end, r, right, end);
+        VectorMA(end, u, up, end);
+    } else {
+        if (spread != 0) {
+            VectorMA(end, r, right, end);
+            VectorMA(end, u, up, end);
+        }
+    }
 
     unlinked = 0;
     hits = 0;
@@ -1079,8 +1118,9 @@ Weapon_Crossbow_Fire
 
 ===============
  */
-#define CROSSBOW_RANGE 2048
+#define CROSSBOW_RANGE  2048
 #define CROSSBOW_DAMAGE 100
+#define CROSSBOW_SPREAD 8
 
 void Weapon_Crossbow_Fire(gentity_t *ent) {
     trace_t tr;
@@ -1089,9 +1129,25 @@ void Weapon_Crossbow_Fire(gentity_t *ent) {
     float u;
     gentity_t *tent;
     gentity_t *traceEnt;
-    int i, passent;
+    int i, passent, spread;
 
+    spread = ent->client->pers.cmd.forwardmove + ent->client->pers.cmd.upmove + ent->client->pers.cmd.rightmove;
+    spread *= CROSSBOW_SPREAD;
+
+    r = random() * M_PI * 2.0f;
+    u = cos(r) * crandom() * (spread);
+    r = cos(r) * crandom() * (spread);
     VectorMA(muzzle, CROSSBOW_RANGE, forward, end);
+    if (ent->client->ps.zoomFov <= 0) {
+        VectorMA(end, r, right, end);
+        VectorMA(end, u, up, end);
+    } else {
+        if (spread != 0) {
+            VectorMA(end, r, right, end);
+            VectorMA(end, u, up, end);
+        }
+    }
+
     passent = ent->s.number;
     trap_Trace(&tr, muzzle, NULL, NULL, end, ENTITYNUM_NONE, MASK_SHOT);
     if (tr.surfaceFlags & SURF_NOIMPACT) {
@@ -1223,12 +1279,15 @@ void FireWeapon(gentity_t *ent) {
             break;
         case WP_BARRETT:
             Weapon_Barrett_Fire(ent, 0);
+            ent->client->ps.zoomFov = 0;
             break;
         case WP_INTERVENTION:
             Weapon_Intervention_Fire(ent, 0);
+            ent->client->ps.zoomFov = 0;
             break;
         case WP_CROSSBOW:
             Weapon_Crossbow_Fire(ent);
+            ent->client->ps.zoomFov = 0;
             break;
         case WP_ACR:
             Weapon_ACR_Fire(ent);

@@ -375,6 +375,13 @@ static void CG_DrawDamagePic(void) {
             }
         }
     }
+    if (ps->zoomFov > 0) {
+        x = y = 0;
+        w = 640;
+        h = 480;
+        CG_AdjustFrom640(&x, &y, &w, &h);
+        trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.sha_viewScope);
+    }
     if (health > 0 && ps->blindTime > ps->levelTime) {
         vec4_t color;
         int time;
@@ -1664,6 +1671,12 @@ static void CG_DrawCrosshair(void) {
     }
 
     if (cg.renderingThirdPerson) {
+        return;
+    }
+
+    if ((cg.snap->ps.weapon == WP_BARRETT
+            || cg.snap->ps.weapon == WP_CROSSBOW
+            || cg.snap->ps.weapon == WP_INTERVENTION) && cg.snap->ps.zoomFov <= 0) {
         return;
     }
 

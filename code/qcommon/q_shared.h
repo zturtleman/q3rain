@@ -1118,6 +1118,8 @@ typedef struct playerState_s {
     int blindTime;
     // pda
     int pdaState;
+    // zoom
+    int zoomFov; // how much to subtract from cg_fov
 } playerState_t;
 
 

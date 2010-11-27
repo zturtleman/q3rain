@@ -261,6 +261,8 @@ void player_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
         return;
     }
 
+    self->client->ps.zoomFov = 0;
+
     if (self->client && self->client->hook) {
         Weapon_HookFree(self->client->hook);
     }

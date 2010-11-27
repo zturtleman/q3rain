@@ -31,7 +31,7 @@ G_BounceMissile
 ================
  */
 void G_BounceMissile(gentity_t *ent, trace_t *trace) {
-    vec3_t velocity, old;
+    vec3_t velocity, old, dir;
     float dot;
     int hitTime;
 
@@ -79,6 +79,12 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
             G_SetOrigin(ent, old);
             return;
         }
+        ent->s.angles[0] = DEG2RAD(90);
+        ent->s.angles[1] = DEG2RAD(90);
+        ent->s.angles[2] = DEG2RAD(90);
+        ent->s.angles2[0] = DEG2RAD(90);
+        ent->s.angles2[1] = DEG2RAD(90);
+        ent->s.angles2[2] = DEG2RAD(90);
         if (trace->plane.normal[2] > 0.2) {
             G_SetOrigin(ent, trace->endpos);
             return;

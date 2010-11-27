@@ -526,7 +526,7 @@ void CG_ExplosionParticles(int weapon, vec3_t origin) {
             return;
             break;
         case WP_HE:
-            shader = cgs.media.sparkShader;
+            shader = cgs.media.sha_spark;
             number = 128;
             jump = 100;
             speed = 400;
@@ -743,7 +743,8 @@ void CG_RegisterWeapon(int weaponNum) {
             break;
 
         case WP_BOMB:
-            weaponInfo->missileModel = trap_R_RegisterModel("models/ammo/grenade1.md3");
+            //weaponInfo->missileModel = trap_R_RegisterModel("models/ammo/grenade1.md3");
+            weaponInfo->missileModel = trap_R_RegisterModel("models/weapons/c4/c4.md3");
             weaponInfo->flashSound[0] = trap_S_RegisterSound("sound/weapons/grenade/grenlf1a.wav", qfalse);
             break;
 

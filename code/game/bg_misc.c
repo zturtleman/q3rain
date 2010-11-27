@@ -433,10 +433,9 @@ gitem_t bg_itemlist[] = {
     {
         "weapon_crossbow",
         "sound/misc/w_pkup.wav",
-        { "models/weapons2/crossbow/crossbow.md3",
-            NULL, NULL, NULL},
-        /* icon */ "icons/iconw_railgun",
-        /* pickup */ "Crossbow",
+        { "models/weapons/crossbow/crossbow.md3", NULL, NULL, NULL},
+        "icons/iconw_railgun", /* icon */
+        "Crossbow", /* pickup */
         3,
         IT_WEAPON,
         WP_CROSSBOW,
@@ -480,7 +479,7 @@ gitem_t bg_itemlist[] = {
     {
         "weapon_walther",
         "sound/misc/w_pkup.wav",
-        { "models/weapons2/gauntlet/gauntlet.md3",
+        { "models/weapons/p22/p22.md3",
             NULL, NULL, NULL},
         /* icon */ "icons/iconw_gauntlet",
         /* pickup */ "Walther P22",
@@ -496,7 +495,8 @@ gitem_t bg_itemlist[] = {
     {
         "weapon_bomb",
         "sound/misc/w_pkup.wav",
-        { "models/weapons2/grenadel/grenadel.md3",
+        //{ "models/weapons2/grenadel/grenadel.md3",
+        { "models/weapons/c4/c4.md3",
             NULL, NULL, NULL},
         /* icon */ "icons/iconw_grenade",
         /* pickup */ "C4",

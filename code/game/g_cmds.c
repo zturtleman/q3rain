@@ -1645,6 +1645,59 @@ void Cmd_Detonate_f(gentity_t *ent) {
 
 /*
 =================
+Cmd_Zoom_f
+=================
+ */
+void Cmd_Zoom_f(gentity_t *ent) {
+    int fov, w;
+    char *arg;
+    if (ent->client->ps.stats[STAT_HEALTH] > 0 && ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
+        w = ent->client->ps.weapon;
+        if (w != WP_INTERVENTION
+                && w != WP_BARRETT
+                && w != WP_CROSSBOW) {
+            return;
+        }
+
+        arg = ConcatArgs(1);
+        fov = ent->client->ps.zoomFov;
+
+        if (!Q_stricmp(arg, "in")) {
+            if (fov == 0) {
+                ent->client->ps.zoomFov = 65;
+            } else if (fov == 65) {
+                ent->client->ps.zoomFov = 85;
+            } else if (fov == 85) {
+                ent->client->ps.zoomFov = 95;
+            } else if (fov == 95) {
+                ent->client->ps.zoomFov = 0;
+            }
+            //Com_Printf("zoom in fov = %i\n", ent->client->ps.zoomFov);
+            return;
+        }
+
+        if (!Q_stricmp(arg, "out")) {
+            if (fov >= 75) {
+                ent->client->ps.zoomFov = 50;
+            } else if (fov == 50) {
+                ent->client->ps.zoomFov = 25;
+            } else if (fov == 25) {
+                ent->client->ps.zoomFov = 0;
+            }
+            //Com_Printf("zoom out fov = %i\n", ent->client->ps.zoomFov);
+            return;
+        }
+
+        if (!Q_stricmp(arg, "reset")) {
+            ent->client->ps.zoomFov = 0;
+            //Com_Printf("zoom reset\n");
+            return;
+        }
+    }
+}
+
+/*
+=================
 ClientCommand
 =================
  */
@@ -1757,6 +1810,8 @@ void ClientCommand(int clientNum) {
         Cmd_Stats_f(ent);
     else if (Q_stricmp(cmd, "detonate") == 0)
         Cmd_Detonate_f(ent);
+    else if (Q_stricmp(cmd, "zoom") == 0)
+        Cmd_Zoom_f(ent);
     else
         trap_SendServerCommand(clientNum, va("print \"unknown cmd %s\n\"", cmd));
 }

@@ -473,7 +473,7 @@ Fixed fov at intermissions, otherwise account for fov variable and zooms.
 #define	WAVE_FREQUENCY	0.4
 
 static int CG_CalcFov(void) {
-    float x;
+    float x, y, w, h;
     float phase;
     float v;
     int contents;
@@ -499,9 +499,11 @@ static int CG_CalcFov(void) {
             }
         }
 
-        zoomFov = 10;
+        zoomFov = cg_fov.integer - cg.snap->ps.zoomFov;
 
-        if (cg.zoomed) {
+        //Com_Printf("zoomFov = %f ps.zoomFov = %i\n", zoomFov, cg.snap->ps.zoomFov);
+
+        if (cg.snap->ps.zoomFov > 0) {
             f = (cg.time - cg.zoomTime) / (float) ZOOM_TIME;
             if (f > 1.0) {
                 fov_x = zoomFov;
@@ -518,6 +520,8 @@ static int CG_CalcFov(void) {
         }
 
     }
+
+    //Com_Printf("fov_x = %f\n", fov_x);
 
     x = cg.refdef.width / tan(fov_x / 360 * M_PI);
     fov_y = atan2(cg.refdef.height, x);
