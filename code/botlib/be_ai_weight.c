@@ -250,6 +250,8 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source) {
         lastfs = fs;
     } //end if
     //
+    //Com_Printf("^2ReadFuzzySeperators_r\nfs->weight = %f type= %i value = %i index = %i max = %f min = %f\n",
+    //        firstfs->weight, firstfs->type, firstfs->value, firstfs->index, firstfs->maxweight, firstfs->minweight);
     return firstfs;
 } //end of the function ReadFuzzySeperators_r
 //===========================================================================
@@ -523,10 +525,10 @@ float FuzzyWeight_r(int *inventory, fuzzyseperator_t *fs) {
 
     if (inventory[fs->index] < fs->value) {
         if (fs->child) {
-            //Com_Printf("fuzzyweight_r = %f\n", FuzzyWeight_r(inventory, fs->child));
+            //Com_Printf("FuzzyWeight_r fs->child = %f type = %i\n", FuzzyWeight_r(inventory, fs->child), fs->type);
             return FuzzyWeight_r(inventory, fs->child);
         } else {
-            //Com_Printf("fuzzyweight = %f\n", fs->weight);
+            //Com_Printf("FuzzyWeight_r fs->weight = %f type = %i\n", fs->weight, fs->type);
             return fs->weight;
         }
     } else if (fs->next) {

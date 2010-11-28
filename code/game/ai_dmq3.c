@@ -825,12 +825,15 @@ void BotChooseWeapon(bot_state_t *bs) {
         trap_EA_SelectWeapon(bs->client, bs->weaponnum);
     } else {
         newweaponnum = trap_BotChooseBestFightWeapon(bs->ws, bs->inventory);
+        if (bs->cur_ps.ammo[bs->cur_ps.weapon] == 0) {
+            newweaponnum--;
+        }
         if (bs->weaponnum != newweaponnum) {
             bs->weaponchange_time = FloatTime();
         }
         bs->weaponnum = newweaponnum;
 
-        Com_Printf("BotChooseWeapon newweapon = %i\n", newweaponnum);
+        //Com_Printf("BotChooseWeapon newweapon = %i\n", newweaponnum);
         //BotAI_Print(PRT_MESSAGE, "bs->weaponnum = %d\n", bs->weaponnum);
         trap_EA_SelectWeapon(bs->client, bs->weaponnum);
     }
@@ -891,50 +894,33 @@ void BotUpdateInventory(bot_state_t *bs) {
     int oldinventory[MAX_ITEMS];
 
     memcpy(oldinventory, bs->inventory, sizeof (oldinventory));
-    //armor
     bs->inventory[INVENTORY_ARMOR] = bs->cur_ps.stats[STAT_ARMOR];
-    //weapons
-    bs->inventory[INVENTORY_GAUNTLET] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_GAUNTLET)) != 0;
-    bs->inventory[INVENTORY_SHOTGUN] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_SHOTGUN)) != 0;
-    bs->inventory[INVENTORY_MACHINEGUN] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_MACHINEGUN)) != 0;
-    bs->inventory[INVENTORY_GRENADELAUNCHER] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_GRENADE_LAUNCHER)) != 0;
-    bs->inventory[INVENTORY_ROCKETLAUNCHER] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_ROCKET_LAUNCHER)) != 0;
-    bs->inventory[INVENTORY_LIGHTNING] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_LIGHTNING)) != 0;
-    bs->inventory[INVENTORY_RAILGUN] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_RAILGUN)) != 0;
-    bs->inventory[INVENTORY_PLASMAGUN] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_PLASMAGUN)) != 0;
-    bs->inventory[INVENTORY_BFG10K] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_BFG)) != 0;
-    bs->inventory[INVENTORY_GRAPPLINGHOOK] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_GRAPPLING_HOOK)) != 0;
 
-    bs->inventory[INVENTORY_HE] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_HE)) != 0;
-    bs->inventory[INVENTORY_BARRETT] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_BARRETT)) != 0;
-    bs->inventory[INVENTORY_INTERVENTION] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_INTERVENTION)) != 0;
-    bs->inventory[INVENTORY_CROSSBOW] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_CROSSBOW)) != 0;
     bs->inventory[INVENTORY_KNIFE] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_KNIFE)) != 0;
-    bs->inventory[INVENTORY_ACR] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_ACR)) != 0;
-    bs->inventory[INVENTORY_WALTHER] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_WALTHER)) != 0;
-    bs->inventory[INVENTORY_INJECTOR] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_INJECTOR)) != 0;
     bs->inventory[INVENTORY_HANDS] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_HANDS)) != 0;
-    //ammo
-    bs->inventory[INVENTORY_SHELLS] = bs->cur_ps.ammo[WP_SHOTGUN];
-    bs->inventory[INVENTORY_BULLETS] = bs->cur_ps.ammo[WP_MACHINEGUN];
-    bs->inventory[INVENTORY_GRENADES] = bs->cur_ps.ammo[WP_GRENADE_LAUNCHER];
-    bs->inventory[INVENTORY_CELLS] = bs->cur_ps.ammo[WP_PLASMAGUN];
-    bs->inventory[INVENTORY_LIGHTNINGAMMO] = bs->cur_ps.ammo[WP_LIGHTNING];
-    bs->inventory[INVENTORY_ROCKETS] = bs->cur_ps.ammo[WP_ROCKET_LAUNCHER];
-    bs->inventory[INVENTORY_SLUGS] = bs->cur_ps.ammo[WP_RAILGUN];
-    bs->inventory[INVENTORY_BFGAMMO] = bs->cur_ps.ammo[WP_BFG];
+    bs->inventory[INVENTORY_HE] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_HE)) != 0;
+
+    bs->inventory[INVENTORY_BARRETT] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_BARRETT)) != 0;
+    bs->inventory[CLIPAMMO_BARRETT] = bs->cur_ps.ammo[WP_BARRETT];
+    
+    bs->inventory[INVENTORY_INTERVENTION] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_INTERVENTION)) != 0;
+    bs->inventory[CLIPAMMO_INTERVENTION] = bs->cur_ps.ammo[WP_INTERVENTION];
+
+    bs->inventory[INVENTORY_CROSSBOW] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_CROSSBOW)) != 0;
+    bs->inventory[CLIPAMMO_CROSSBOW] = bs->cur_ps.ammo[WP_CROSSBOW];
+
+    bs->inventory[INVENTORY_WALTHER] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_WALTHER)) != 0;
+    bs->inventory[CLIPAMMO_WALTHER] = bs->cur_ps.ammo[WP_WALTHER];
+
+    bs->inventory[INVENTORY_ACR] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_ACR)) != 0;
+    bs->inventory[CLIPAMMO_ACR] = bs->cur_ps.ammo[WP_ACR];
+    
+    bs->inventory[INVENTORY_BOMB] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_BOMB)) != 0;
+    bs->inventory[INVENTORY_INJECTOR] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_INJECTOR)) != 0;
+    bs->inventory[INVENTORY_NUKE] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_NUKE)) != 0;
     //powerups
     bs->inventory[INVENTORY_HEALTH] = bs->cur_ps.stats[STAT_HEALTH];
-    bs->inventory[INVENTORY_ADRENALINE] = bs->cur_ps.powerups[PW_ADRENALINE] != 0;
-    // TODO remove
-    bs->inventory[INVENTORY_TELEPORTER] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_TELEPORTER;
-    bs->inventory[INVENTORY_MEDKIT] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_MEDKIT;
-    bs->inventory[INVENTORY_QUAD] = bs->cur_ps.powerups[PW_QUAD] != 0;
-    bs->inventory[INVENTORY_ENVIRONMENTSUIT] = bs->cur_ps.powerups[PW_BATTLESUIT] != 0;
-    bs->inventory[INVENTORY_HASTE] = bs->cur_ps.powerups[PW_HASTE] != 0;
-    bs->inventory[INVENTORY_INVISIBILITY] = bs->cur_ps.powerups[PW_INVIS] != 0;
-    bs->inventory[INVENTORY_REGEN] = bs->cur_ps.powerups[PW_REGEN] != 0;
-    bs->inventory[INVENTORY_FLIGHT] = bs->cur_ps.powerups[PW_FLIGHT] != 0;
+    //bs->inventory[INVENTORY_ADRENALINE] = bs->cur_ps.powerups[PW_ADRENALINE] != 0;
     BotCheckItemPickup(bs, oldinventory);
 }
 
@@ -1118,41 +1104,24 @@ float BotAggression(bot_state_t *bs) {
     if (bs->inventory[ENEMY_HEIGHT] > 200) return 0;
     //if the bot is very low on health
     if (bs->inventory[INVENTORY_HEALTH] < 40) return 0;
-    //if the bot can use the bfg
-    /*if (bs->inventory[INVENTORY_BFG10K] > 0 &&
-            bs->inventory[INVENTORY_BFGAMMO] > 7) return 100;
-    //if the bot can use the railgun
-    if (bs->inventory[INVENTORY_RAILGUN] > 0 &&
-            bs->inventory[INVENTORY_SLUGS] > 5) return 95;
-    //if the bot can use the lightning gun
-    if (bs->inventory[INVENTORY_LIGHTNING] > 0 &&
-            bs->inventory[INVENTORY_LIGHTNINGAMMO] > 50) return 90;
-    //if the bot can use the rocketlauncher
-    if (bs->inventory[INVENTORY_ROCKETLAUNCHER] > 0 &&
-            bs->inventory[INVENTORY_ROCKETS] > 5) return 90;
-    //if the bot can use the plasmagun
-    if (bs->inventory[INVENTORY_PLASMAGUN] > 0 &&
-            bs->inventory[INVENTORY_CELLS] > 40) return 85;
-    //if the bot can use the grenade launcher
-    if (bs->inventory[INVENTORY_GRENADELAUNCHER] > 0 &&
-            bs->inventory[INVENTORY_GRENADES] > 10) return 80;
-    //if the bot can use the shotgun
-    if (bs->inventory[INVENTORY_SHOTGUN] > 0 &&
-            bs->inventory[INVENTORY_SHELLS] > 10) return 50;*/
-    // rain
+
     if (bs->inventory[INVENTORY_HE] > 0 &&
-            bs->inventory[INVENTORY_HE] >= 1) return 50;
+            bs->inventory[INVENTORY_HE] > 0) return 500;
+
     if (bs->inventory[INVENTORY_BARRETT] > 0 &&
-            bs->inventory[INVENTORY_BARRETT] > 1) return 200;
+            bs->inventory[INVENTORY_BARRETT] > 0) return 5;
+
     if (bs->inventory[INVENTORY_INTERVENTION] > 0 &&
-            bs->inventory[INVENTORY_INTERVENTION] > 1) return 50;
+            bs->inventory[INVENTORY_INTERVENTION] > 0) return 5;
+
     if (bs->inventory[INVENTORY_CROSSBOW] > 0 &&
-            bs->inventory[INVENTORY_CROSSBOW] > 1) return 50;
+            bs->inventory[INVENTORY_CROSSBOW] > 0) return 5;
+
     if (bs->inventory[INVENTORY_ACR] > 0 &&
-            bs->inventory[INVENTORY_ACR] > 1) return 100;
-    if (bs->inventory[INVENTORY_WALTHER] > 0 &&
-            bs->inventory[INVENTORY_WALTHER] > 1) return 50;
-    //otherwise the bot is not feeling too good
+            bs->inventory[INVENTORY_ACR] > 0) return 3000;
+    
+    /*if (bs->inventory[INVENTORY_WALTHER] > 0 &&
+            bs->inventory[INVENTORY_WALTHER] > 1) return 50;*/
     return 0;
 }
 
@@ -1238,31 +1207,26 @@ BotHasPersistantPowerupAndWeapon
  */
 int BotHasPersistantPowerupAndWeapon(bot_state_t *bs) {
     //if the bot is very low on health
-    if (bs->inventory[INVENTORY_HEALTH] < 40) return qfalse;
+    if (bs->inventory[INVENTORY_HEALTH] < 20) return qfalse;
     //if the bot can use the bfg
-    if (bs->inventory[INVENTORY_BFG10K] > 0 &&
-            bs->inventory[INVENTORY_BFGAMMO] > 7) return qtrue;
-    //if the bot can use the railgun
-    if (bs->inventory[INVENTORY_RAILGUN] > 0 &&
-            bs->inventory[INVENTORY_SLUGS] > 5) return qtrue;
-    //if the bot can use the lightning gun
-    if (bs->inventory[INVENTORY_LIGHTNING] > 0 &&
-            bs->inventory[INVENTORY_LIGHTNINGAMMO] > 50) return qtrue;
-    //if the bot can use the rocketlauncher
-    if (bs->inventory[INVENTORY_ROCKETLAUNCHER] > 0 &&
-            bs->inventory[INVENTORY_ROCKETS] > 5) return qtrue;
-    //
-    if (bs->inventory[INVENTORY_NAILGUN] > 0 &&
-            bs->inventory[INVENTORY_NAILS] > 5) return qtrue;
-    //
-    if (bs->inventory[INVENTORY_PROXLAUNCHER] > 0 &&
-            bs->inventory[INVENTORY_MINES] > 5) return qtrue;
-    //
-    if (bs->inventory[INVENTORY_CHAINGUN] > 0 &&
-            bs->inventory[INVENTORY_BELT] > 40) return qtrue;
-    //if the bot can use the plasmagun
-    if (bs->inventory[INVENTORY_PLASMAGUN] > 0 &&
-            bs->inventory[INVENTORY_CELLS] > 20) return qtrue;
+    if (bs->inventory[INVENTORY_ACR] > 0 && bs->inventory[CLIPAMMO_ACR] > 0) {
+        return qtrue;
+    }
+    if (bs->inventory[INVENTORY_WALTHER] > 0 && bs->inventory[CLIPAMMO_WALTHER] > 0) {
+        return qtrue;
+    }
+    if (bs->inventory[INVENTORY_BARRETT] > 0 && bs->inventory[CLIPAMMO_BARRETT] > 0) {
+        return qtrue;
+    }
+    if (bs->inventory[INVENTORY_INTERVENTION] > 0 && bs->inventory[CLIPAMMO_INTERVENTION] > 0) {
+        return qtrue;
+    }
+    if (bs->inventory[INVENTORY_CROSSBOW] > 0 && bs->inventory[CLIPAMMO_CROSSBOW] > 0) {
+        return qtrue;
+    }
+    if (bs->inventory[INVENTORY_BOMB] > 0 && bs->inventory[CLIPAMMO_BOMB] > 0) {
+        return qtrue;
+    }
     return qfalse;
 }
 
@@ -2012,30 +1976,11 @@ void BotAimAtEnemy(bot_state_t *bs) {
     //get the weapon information
     trap_BotGetWeaponInfo(bs->ws, bs->weaponnum, &wi);
     //get the weapon specific aim accuracy and or aim skill
-    if (wi.number == WP_MACHINEGUN) {
-        aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_MACHINEGUN, 0, 1);
-    } else if (wi.number == WP_SHOTGUN) {
-        aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_SHOTGUN, 0, 1);
-    } else if (wi.number == WP_GRENADE_LAUNCHER) {
-        aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_GRENADELAUNCHER, 0, 1);
-        aim_skill = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_SKILL_GRENADELAUNCHER, 0, 1);
-    } else if (wi.number == WP_ROCKET_LAUNCHER) {
-        aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_ROCKETLAUNCHER, 0, 1);
-        aim_skill = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_SKILL_ROCKETLAUNCHER, 0, 1);
-    } else if (wi.number == WP_LIGHTNING) {
-        aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_LIGHTNING, 0, 1);
-    } else if (wi.number == WP_RAILGUN) {
-        aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_RAILGUN, 0, 1);
-    } else if (wi.number == WP_PLASMAGUN) {
-        aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_PLASMAGUN, 0, 1);
-        aim_skill = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_SKILL_PLASMAGUN, 0, 1);
-    } else if (wi.number == WP_BFG) {
-        aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_BFG10K, 0, 1);
-        aim_skill = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_SKILL_BFG10K, 0, 1);
-        // rain weapons
-    } else if (wi.number == WP_INTERVENTION) {
+    if (wi.number == WP_INTERVENTION) {
         aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_RAILGUN, 0, 1);
     } else if (wi.number == WP_BARRETT) {
+        aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_RAILGUN, 0, 1);
+    } else if (wi.number == WP_INTERVENTION) {
         aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_RAILGUN, 0, 1);
     } else if (wi.number == WP_CROSSBOW) {
         aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_RAILGUN, 0, 1);

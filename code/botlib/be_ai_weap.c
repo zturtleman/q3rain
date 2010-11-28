@@ -385,28 +385,32 @@ int BotChooseBestFightWeapon(int weaponstate, int *inventory) {
     ws = BotWeaponStateFromHandle(weaponstate);
     wc = weaponconfig;
     if (!weaponconfig || !ws) {
-        Com_Printf("^1BotChooseBestFightWeapon ws/wc error\n");
+        Com_Printf("^1BotChooseBestFightWeapon: ws/wc error\n");
         return 0;
     }
 
     //if the bot has no weapon weight configuration
     if (!ws->weaponweightconfig) {
-        Com_Printf("^1BotChooseBestFightWeapon no weight config\n");
+        Com_Printf("^1BotChooseBestFightWeapon: no weight config\n");
         return 0;
     }
 
     bestweight = 0;
     bestweapon = 0;
     for (i = 0; i < wc->numweapons; i++) {
-        if (!wc->weaponinfo[i].valid) continue;
+        if (!wc->weaponinfo[i].valid) {
+            continue;
+        }
         index = ws->weaponweightindex[i];
-        if (index < 0) continue;
+        if (index < 0) {
+            continue;
+        }
         weight = FuzzyWeight(inventory, ws->weaponweightconfig, index);
         if (weight > bestweight) {
             bestweight = weight;
             bestweapon = i;
         }
-        Com_Printf("BotChooseBestFightWeapon loop i = %i weight = %i bestweight = %i\n", i, weight, bestweight);
+        //Com_Printf("BotChooseBestFightWeapon loop i = %i weight = %d bestweight = %d\n", i, weight, bestweight);
     }
     Com_Printf("^2BotChooseBestFightWeapon = %i\n", bestweapon);
     return bestweapon;

@@ -320,18 +320,6 @@ typedef enum {
     WP_INJECTOR,
     WP_NUKE,
 
-    // TODO remove
-    /*WP_GAUNTLET,
-    WP_MACHINEGUN,
-    WP_SHOTGUN,
-    WP_GRENADE_LAUNCHER,
-    WP_ROCKET_LAUNCHER,
-    WP_LIGHTNING,
-    WP_RAILGUN,
-    WP_PLASMAGUN,
-    WP_BFG,
-    WP_GRAPPLING_HOOK,*/
-
     WP_NUM_WEAPONS
 } weapon_t;
 
