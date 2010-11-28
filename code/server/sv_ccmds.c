@@ -445,7 +445,7 @@ static void SV_Ban_f(void) {
     }
 
     // look up the authorize server's IP
-    if (!svs.authorizeAddress.ip[0] && svs.authorizeAddress.type != NA_BAD) {
+    /*if (!svs.authorizeAddress.ip[0] && svs.authorizeAddress.type != NA_BAD) {
         Com_Printf("Resolving %s\n", AUTHORIZE_SERVER_NAME);
         if (!NET_StringToAdr(AUTHORIZE_SERVER_NAME, &svs.authorizeAddress, NA_IP)) {
             Com_Printf("Couldn't resolve address\n");
@@ -464,7 +464,7 @@ static void SV_Ban_f(void) {
                 "banUser %i.%i.%i.%i", cl->netchan.remoteAddress.ip[0], cl->netchan.remoteAddress.ip[1],
                 cl->netchan.remoteAddress.ip[2], cl->netchan.remoteAddress.ip[3]);
         Com_Printf("%s was banned from coming back\n", cl->name);
-    }
+    }*/
 }
 
 /*
@@ -499,7 +499,7 @@ static void SV_BanNum_f(void) {
     }
 
     // look up the authorize server's IP
-    if (!svs.authorizeAddress.ip[0] && svs.authorizeAddress.type != NA_BAD) {
+    /*if (!svs.authorizeAddress.ip[0] && svs.authorizeAddress.type != NA_BAD) {
         Com_Printf("Resolving %s\n", AUTHORIZE_SERVER_NAME);
         if (!NET_StringToAdr(AUTHORIZE_SERVER_NAME, &svs.authorizeAddress, NA_IP)) {
             Com_Printf("Couldn't resolve address\n");
@@ -518,7 +518,7 @@ static void SV_BanNum_f(void) {
                 "banUser %i.%i.%i.%i", cl->netchan.remoteAddress.ip[0], cl->netchan.remoteAddress.ip[1],
                 cl->netchan.remoteAddress.ip[2], cl->netchan.remoteAddress.ip[3]);
         Com_Printf("%s was banned from coming back\n", cl->name);
-    }
+    }*/
 }
 #endif
 

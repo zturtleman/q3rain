@@ -95,7 +95,7 @@ void SV_GetChallenge(netadr_t from) {
 #ifndef STANDALONE
     // Drop the authorize stuff if this client is coming in via v6 as the auth server does not support ipv6.
     // Drop also for addresses coming in on local LAN and for stand-alone games independent from id's assets.
-    if (challenge->adr.type == NA_IP && !Cvar_VariableIntegerValue("com_standalone") && !Sys_IsLANAddress(from)) {
+    /*if (challenge->adr.type == NA_IP && !Cvar_VariableIntegerValue("com_standalone") && !Sys_IsLANAddress(from)) {
         // look up the authorize server's IP
         if (svs.authorizeAddress.type == NA_BAD) {
             Com_Printf("Resolving %s\n", AUTHORIZE_SERVER_NAME);
@@ -143,7 +143,7 @@ void SV_GetChallenge(netadr_t from) {
 
             return;
         }
-    }
+    }*/
 #endif
 
     challenge->pingTime = svs.time;

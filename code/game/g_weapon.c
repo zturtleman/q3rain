@@ -533,6 +533,10 @@ void Weapon_Barrett_Fire(gentity_t *ent, int count) {
     spread = ent->client->pers.cmd.forwardmove + (ent->client->pers.cmd.upmove >= 0) + ent->client->pers.cmd.rightmove;
     spread *= BARRETT_SPREAD;
 
+    if (spread == 0) {
+        spread = BARRETT_SPREAD * 20;
+    }
+
     //Com_Printf("spread = %i\n", spread);
 
     r = random() * M_PI * 2.0f;
@@ -974,6 +978,10 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
     spread = ent->client->pers.cmd.forwardmove + (ent->client->pers.cmd.upmove >= 0) + ent->client->pers.cmd.rightmove;
     spread *= INTERVENTION_SPREAD;
 
+    if (spread == 0) {
+        spread = INTERVENTION_SPREAD * 20;
+    }
+
     r = random() * M_PI * 2.0f;
     u = cos(r) * crandom() * (spread);
     r = cos(r) * crandom() * (spread);
@@ -1135,6 +1143,10 @@ void Weapon_Crossbow_Fire(gentity_t *ent) {
 
     spread = ent->client->pers.cmd.forwardmove + (ent->client->pers.cmd.upmove >= 0) + ent->client->pers.cmd.rightmove;
     spread *= CROSSBOW_SPREAD;
+
+    if (spread == 0) {
+        spread = CROSSBOW_SPREAD * 20;
+    }
 
     r = random() * M_PI * 2.0f;
     u = cos(r) * crandom() * (spread);

@@ -1624,13 +1624,17 @@ Cmd_Zoom_f
 =================
  */
 void Cmd_Zoom_f(gentity_t *ent) {
-    int fov, w;
+    int fov, w, ws;
     char *arg;
     if (ent->client->ps.stats[STAT_HEALTH] > 0 && ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
         w = ent->client->ps.weapon;
+        ws = ent->client->ps.weaponstate;
         if (w != WP_INTERVENTION
                 && w != WP_BARRETT
                 && w != WP_CROSSBOW) {
+            return;
+        }
+        if (ws != WEAPON_READY) {
             return;
         }
 

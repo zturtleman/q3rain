@@ -821,13 +821,16 @@ BotChooseWeapon
 void BotChooseWeapon(bot_state_t *bs) {
     int newweaponnum;
 
-    if (bs->cur_ps.weaponstate == WEAPON_RAISING ||
-            bs->cur_ps.weaponstate == WEAPON_DROPPING) {
+    if (bs->cur_ps.weaponstate == WEAPON_RAISING || bs->cur_ps.weaponstate == WEAPON_DROPPING) {
         trap_EA_SelectWeapon(bs->client, bs->weaponnum);
     } else {
         newweaponnum = trap_BotChooseBestFightWeapon(bs->ws, bs->inventory);
-        if (bs->weaponnum != newweaponnum) bs->weaponchange_time = FloatTime();
+        if (bs->weaponnum != newweaponnum) {
+            bs->weaponchange_time = FloatTime();
+        }
         bs->weaponnum = newweaponnum;
+
+        Com_Printf("BotChooseWeapon newweapon = %i\n", newweaponnum);
         //BotAI_Print(PRT_MESSAGE, "bs->weaponnum = %d\n", bs->weaponnum);
         trap_EA_SelectWeapon(bs->client, bs->weaponnum);
     }

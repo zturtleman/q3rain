@@ -1856,6 +1856,7 @@ static void PM_BeginWeaponChange(int weapon) {
     PM_AddEvent(EV_CHANGE_WEAPON);
     pm->ps->weaponstate = WEAPON_DROPPING;
     pm->ps->weaponTime += 200;
+    pm->ps->zoomFov = 0;
     PM_StartTorsoAnim(TORSO_DROP);
 }
 

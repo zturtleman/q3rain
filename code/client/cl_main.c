@@ -1365,7 +1365,8 @@ in anyway.
 #ifndef STANDALONE
 
 void CL_RequestAuthorization(void) {
-    char nums[64];
+    return;
+    /*char nums[64];
     int i, j, l;
     cvar_t *fs;
 
@@ -1405,7 +1406,7 @@ void CL_RequestAuthorization(void) {
 
     fs = Cvar_Get("cl_anonymous", "0", CVAR_INIT | CVAR_SYSTEMINFO);
 
-    NET_OutOfBandPrint(NS_CLIENT, cls.authorizeServer, "getKeyAuthorize %i %s", fs->integer, nums);
+    NET_OutOfBandPrint(NS_CLIENT, cls.authorizeServer, "getKeyAuthorize %i %s", fs->integer, nums);*/
 }
 #endif
 /*

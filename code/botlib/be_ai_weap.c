@@ -383,12 +383,17 @@ int BotChooseBestFightWeapon(int weaponstate, int *inventory) {
     bot_weaponstate_t *ws;
 
     ws = BotWeaponStateFromHandle(weaponstate);
-    if (!ws) return 0;
     wc = weaponconfig;
-    if (!weaponconfig) return 0;
+    if (!weaponconfig || !ws) {
+        Com_Printf("^1BotChooseBestFightWeapon ws/wc error\n");
+        return 0;
+    }
 
     //if the bot has no weapon weight configuration
-    if (!ws->weaponweightconfig) return 0;
+    if (!ws->weaponweightconfig) {
+        Com_Printf("^1BotChooseBestFightWeapon no weight config\n");
+        return 0;
+    }
 
     bestweight = 0;
     bestweapon = 0;
@@ -400,8 +405,10 @@ int BotChooseBestFightWeapon(int weaponstate, int *inventory) {
         if (weight > bestweight) {
             bestweight = weight;
             bestweapon = i;
-        } //end if
-    } //end for
+        }
+        Com_Printf("BotChooseBestFightWeapon loop i = %i weight = %i bestweight = %i\n", i, weight, bestweight);
+    }
+    Com_Printf("^2BotChooseBestFightWeapon = %i\n", bestweapon);
     return bestweapon;
 } //end of the function BotChooseBestFightWeapon
 //===========================================================================

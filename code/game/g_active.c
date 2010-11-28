@@ -23,8 +23,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-#undef MISSIONPACK
-
 /*
 ===============
 G_DamageFeedback
@@ -486,7 +484,7 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
                 if (ent->flags & FL_GODMODE) {
                     return;
                 }
-                Com_Printf("delta = %i\n", ent->client->ps.fallDelta);
+                //Com_Printf("delta = %i\n", ent->client->ps.fallDelta);
                 damage = ent->client->ps.fallDelta;
                 f = (float) (ent->client->ps.legsfactor / 10);
                 if (f < 1.0) {
@@ -497,7 +495,6 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
                 ent->client->ps.legsfactor = (int) (f * 10);
                 ent->pain_debounce_time = level.time + 200; // no normal pain sound
                 G_Damage(ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
-                Com_Printf("legsfactor = %i\n", ent->client->ps.legsfactor);
                 break;
 
             case EV_FIRE_WEAPON:
@@ -742,7 +739,7 @@ void ClientThink_real(gentity_t *ent) {
 
     adrenaline = client->ps.powerups[PW_ADRENALINE] > level.time;
 
-    Com_Printf("legsfactor = %i\n", client->ps.legsfactor);
+    //Com_Printf("legsfactor = %i\n", client->ps.legsfactor);
     if (adrenaline) {
         client->ps.speed = client->ps.maxspeed * 1.3;
     } else {
@@ -755,6 +752,16 @@ void ClientThink_real(gentity_t *ent) {
         if (client->ps.grenadetime != -1337) {
             G_ExplodeClient(client, ent);
             client->ps.grenadetime = -1337;
+        }
+    }
+
+    // TODO move to botlib
+    if (ent->r.svFlags & SVF_BOT) {
+        int ammo;
+        ammo = client->clipammo[client->ps.weapon];
+        //Com_Printf("ammo = %i\n", ammo);
+        if (ammo < 5) {
+            Cmd_Reload(ent);
         }
     }
 
