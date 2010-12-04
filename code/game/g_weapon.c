@@ -311,121 +311,7 @@ void weapon_supershotgun_fire(gentity_t *ent) {
 
     ShotgunPattern(tent->s.pos.trBase, tent->s.origin2, tent->s.eventParm, ent);
 }
-*/
-
-/*
-=================
-weapon_barrett_fire
-=================
  */
-#define MAX_BARRETT_HITS    4
-#define MAX_BARRETT_WALLS   2
-#define MAX_BARRETT_UNITS   96
-#define BARRETT_DAMAGE      200
-#define BARRETT_RANGE       8129
-#define BARRETT_SPREAD      12
-
-void Weapon_Barrett_Fire(gentity_t *ent, int count) {
-    vec3_t end, oldmuzzle;
-    trace_t trace, trace2;
-    gentity_t *tent;
-    gentity_t *traceEnt;
-    int damage;
-    int i;
-    int hits;
-    int unlinked;
-    gentity_t * unlinkedEntities[MAX_BARRETT_HITS];
-    float r;
-    float u;
-    int spread;
-
-    damage = 100;
-    count++;
-
-    if (count > MAX_BARRETT_WALLS) {
-        return;
-    }
-
-    spread = ent->client->pers.cmd.forwardmove + (ent->client->pers.cmd.upmove >= 0) + ent->client->pers.cmd.rightmove;
-    spread *= BARRETT_SPREAD;
-
-    if (spread == 0) {
-        spread = BARRETT_SPREAD * 20;
-    }
-
-    //Com_Printf("spread = %i\n", spread);
-
-    r = random() * M_PI * 2.0f;
-    u = cos(r) * crandom() * (spread);
-    r = cos(r) * crandom() * (spread);
-    VectorMA(muzzle, BARRETT_RANGE, forward, end);
-    if (ent->client->ps.zoomFov <= 0) {
-        VectorMA(end, r, right, end);
-        VectorMA(end, u, up, end);
-    } else {
-        if (spread != 0) {
-            VectorMA(end, r, right, end);
-            VectorMA(end, u, up, end);
-        }
-    }
-
-    unlinked = 0;
-    hits = 0;
-    do {
-        trap_Trace(&trace, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
-        if (trace.entityNum >= ENTITYNUM_MAX_NORMAL) {
-            break;
-        }
-        traceEnt = &g_entities[ trace.entityNum ];
-        if (traceEnt->takedamage) {
-            if (LogAccuracyHit(traceEnt, ent)) {
-                hits++;
-            }
-            G_Damage(traceEnt, ent, ent, forward, trace.endpos, damage, 0, MOD_BARRETT);
-        }
-        if (trace.contents & CONTENTS_SOLID) {
-            break;
-        }
-        // unlink this entity, so the next trace will go past it
-        trap_UnlinkEntity(traceEnt);
-        unlinkedEntities[unlinked] = traceEnt;
-        unlinked++;
-    } while (unlinked < MAX_BARRETT_HITS);
-
-    // link back in any entities we unlinked
-    for (i = 0; i < unlinked; i++) {
-        trap_LinkEntity(unlinkedEntities[i]);
-    }
-
-    SnapVectorTowards(trace.endpos, muzzle);
-
-    // send railgun beam effect
-    tent = G_TempEntity(trace.endpos, EV_RAILTRAIL);
-
-    VectorCopy(muzzle, tent->s.origin2);
-    VectorMA(tent->s.origin2, 4, right, tent->s.origin2);
-    VectorMA(tent->s.origin2, -1, up, tent->s.origin2);
-
-    if (trace.surfaceFlags & SURF_NOIMPACT) {
-        tent->s.eventParm = 255; // don't make the explosion at the end
-    } else {
-        tent->s.eventParm = DirToByte(trace.plane.normal);
-    }
-
-    // prepare for firing through the wall
-    VectorCopy(muzzle, oldmuzzle);
-    VectorCopy(trace.endpos, muzzle);
-    VectorMA(muzzle, MAX_BARRETT_UNITS, forward, muzzle);
-
-    if (!(trap_PointContents(muzzle, -1) & CONTENTS_SOLID)) {
-        trap_Trace(&trace2, muzzle, NULL, NULL, trace.endpos, ent->s.number, MASK_SHOT);
-        VectorCopy(trace2.endpos, muzzle);
-
-        Weapon_Barrett_Fire(ent, count);
-    }
-
-    VectorCopy(oldmuzzle, muzzle);
-}
 
 //======================================================================
 
@@ -677,6 +563,75 @@ void Weapon_Bomb_Fire(gentity_t *ent) {
 
 /*
 ===============
+Weapon_ACR_Fire
+
+===============
+ */
+#define ACR_MINSPREAD 0
+#define ACR_MAXSPREAD 200
+#define ACR_SPREADADD 7.5f
+#define ACR_DAMAGE 10
+#define ACR_RANGE 8192
+
+void Weapon_ACR_Fire(gentity_t *ent) {
+    trace_t tr;
+    vec3_t end;
+    float r;
+    float u;
+    gentity_t *tent;
+    gentity_t *traceEnt;
+    int i, passent;
+
+    ent->client->ps.spammed++;
+    ent->client->ps.spread = ACR_MINSPREAD + (ACR_SPREADADD * (ent->client->ps.spammed - 1));
+    if (ent->client->ps.spread > ACR_MAXSPREAD) {
+        ent->client->ps.spread = ACR_MAXSPREAD;
+    }
+
+    r = random() * M_PI * 2.0f;
+    u = sin(r) * crandom() * (ent->client->ps.spread + ACR_SPREADADD) * 16;
+    r = cos(r) * crandom() * (ent->client->ps.spread + ACR_SPREADADD) * 16;
+    VectorMA(muzzle, ACR_RANGE, forward, end);
+    VectorMA(end, r, right, end);
+    VectorMA(end, u, up, end);
+
+    passent = ent->s.number;
+    for (i = 0; i < 10; i++) {
+
+        trap_Trace(&tr, muzzle, NULL, NULL, end, ENTITYNUM_NONE, MASK_SHOT);
+        if (tr.surfaceFlags & SURF_NOIMPACT) {
+            return;
+        }
+
+        traceEnt = &g_entities[tr.entityNum];
+
+        // snap the endpos to integers, but nudged towards the line
+        SnapVectorTowards(tr.endpos, muzzle);
+
+        // send bullet impact
+        if (traceEnt->takedamage && traceEnt->client) {
+            tent = G_TempEntity(tr.endpos, EV_BULLET_HIT_FLESH);
+            tent->s.eventParm = traceEnt->s.number;
+            if (LogAccuracyHit(traceEnt, ent)) {
+                ent->client->accuracy_hits++;
+            }
+        } else {
+            tent = G_TempEntity(tr.endpos, EV_BULLET_HIT_WALL);
+            tent->s.eventParm = DirToByte(tr.plane.normal);
+        }
+        tent->s.otherEntityNum = ent->s.number;
+
+        if (traceEnt->takedamage) {
+            G_Damage(traceEnt, ent, ent, forward, tr.endpos, ACR_DAMAGE, 0, MOD_ACR);
+        }
+        break;
+    }
+}
+
+#define STATICSPREAD 120
+
+/*
+===============
 Weapon_Intervention_Fire
 
 ===============
@@ -700,6 +655,7 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
     gentity_t * unlinkedEntities[MAX_INTERVENTION_HITS];
     int spread;
     float u, r;
+    int upmove;
     damage = 100;
 
     count++;
@@ -710,11 +666,16 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
         damage = damage / 1.5;
     }
 
-    spread = ent->client->pers.cmd.forwardmove + (ent->client->pers.cmd.upmove >= 0) + ent->client->pers.cmd.rightmove;
+    upmove = ent->client->pers.cmd.upmove;
+    if (upmove < 0) {
+        upmove = 0;
+    }
+
+    spread = ent->client->pers.cmd.forwardmove + upmove + ent->client->pers.cmd.rightmove;
     spread *= INTERVENTION_SPREAD;
 
     if (spread == 0) {
-        spread = INTERVENTION_SPREAD * 20;
+        spread = INTERVENTION_SPREAD * STATICSPREAD;
     }
 
     r = random() * M_PI * 2.0f;
@@ -789,70 +750,122 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
 }
 
 /*
-===============
-Weapon_ACR_Fire
-
-===============
+=================
+weapon_barrett_fire
+=================
  */
-#define ACR_MINSPREAD 0
-#define ACR_MAXSPREAD 200
-#define ACR_SPREADADD 7.5f
-#define ACR_DAMAGE 10
-#define ACR_RANGE 8192
+#define MAX_BARRETT_HITS    4
+#define MAX_BARRETT_WALLS   2
+#define MAX_BARRETT_UNITS   96
+#define BARRETT_DAMAGE      200
+#define BARRETT_RANGE       8129
+#define BARRETT_SPREAD      12
 
-void Weapon_ACR_Fire(gentity_t *ent) {
-    trace_t tr;
-    vec3_t end;
-    float r;
-    float u;
+void Weapon_Barrett_Fire(gentity_t *ent, int count) {
+    vec3_t end, oldmuzzle;
+    trace_t trace, trace2;
     gentity_t *tent;
     gentity_t *traceEnt;
-    int i, passent;
+    int damage;
+    int i;
+    int hits;
+    int unlinked;
+    gentity_t * unlinkedEntities[MAX_BARRETT_HITS];
+    float r;
+    float u;
+    int spread, upmove;
 
-    ent->client->ps.spammed++;
-    ent->client->ps.spread = ACR_MINSPREAD + (ACR_SPREADADD * (ent->client->ps.spammed - 1));
-    if (ent->client->ps.spread > ACR_MAXSPREAD) {
-        ent->client->ps.spread = ACR_MAXSPREAD;
+    damage = 100;
+    count++;
+
+    if (count > MAX_BARRETT_WALLS) {
+        return;
     }
+
+    upmove = ent->client->pers.cmd.upmove;
+    if (upmove < 0) {
+        upmove = 0;
+    }
+
+    spread = ent->client->pers.cmd.forwardmove + upmove + ent->client->pers.cmd.rightmove;
+    spread *= BARRETT_SPREAD;
+
+    if (spread == 0) {
+        spread = BARRETT_SPREAD * STATICSPREAD;
+    }
+
+    //Com_Printf("spread = %i\n", spread);
 
     r = random() * M_PI * 2.0f;
-    u = sin(r) * crandom() * (ent->client->ps.spread + ACR_SPREADADD) * 16;
-    r = cos(r) * crandom() * (ent->client->ps.spread + ACR_SPREADADD) * 16;
-    VectorMA(muzzle, ACR_RANGE, forward, end);
-    VectorMA(end, r, right, end);
-    VectorMA(end, u, up, end);
-
-    passent = ent->s.number;
-    for (i = 0; i < 10; i++) {
-
-        trap_Trace(&tr, muzzle, NULL, NULL, end, ENTITYNUM_NONE, MASK_SHOT);
-        if (tr.surfaceFlags & SURF_NOIMPACT) {
-            return;
+    u = cos(r) * crandom() * (spread);
+    r = cos(r) * crandom() * (spread);
+    VectorMA(muzzle, BARRETT_RANGE, forward, end);
+    if (ent->client->ps.zoomFov <= 0) {
+        VectorMA(end, r, right, end);
+        VectorMA(end, u, up, end);
+    } else {
+        if (spread != 0) {
+            VectorMA(end, r, right, end);
+            VectorMA(end, u, up, end);
         }
-
-        traceEnt = &g_entities[tr.entityNum];
-
-        // snap the endpos to integers, but nudged towards the line
-        SnapVectorTowards(tr.endpos, muzzle);
-
-        // send bullet impact
-        if (traceEnt->takedamage && traceEnt->client) {
-            tent = G_TempEntity(tr.endpos, EV_BULLET_HIT_FLESH);
-            tent->s.eventParm = traceEnt->s.number;
-            if (LogAccuracyHit(traceEnt, ent)) {
-                ent->client->accuracy_hits++;
-            }
-        } else {
-            tent = G_TempEntity(tr.endpos, EV_BULLET_HIT_WALL);
-            tent->s.eventParm = DirToByte(tr.plane.normal);
-        }
-        tent->s.otherEntityNum = ent->s.number;
-
-        if (traceEnt->takedamage) {
-            G_Damage(traceEnt, ent, ent, forward, tr.endpos, ACR_DAMAGE, 0, MOD_ACR);
-        }
-        break;
     }
+
+    unlinked = 0;
+    hits = 0;
+    do {
+        trap_Trace(&trace, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
+        if (trace.entityNum >= ENTITYNUM_MAX_NORMAL) {
+            break;
+        }
+        traceEnt = &g_entities[ trace.entityNum ];
+        if (traceEnt->takedamage) {
+            if (LogAccuracyHit(traceEnt, ent)) {
+                hits++;
+            }
+            G_Damage(traceEnt, ent, ent, forward, trace.endpos, damage, 0, MOD_BARRETT);
+        }
+        if (trace.contents & CONTENTS_SOLID) {
+            break;
+        }
+        // unlink this entity, so the next trace will go past it
+        trap_UnlinkEntity(traceEnt);
+        unlinkedEntities[unlinked] = traceEnt;
+        unlinked++;
+    } while (unlinked < MAX_BARRETT_HITS);
+
+    // link back in any entities we unlinked
+    for (i = 0; i < unlinked; i++) {
+        trap_LinkEntity(unlinkedEntities[i]);
+    }
+
+    SnapVectorTowards(trace.endpos, muzzle);
+
+    // send railgun beam effect
+    tent = G_TempEntity(trace.endpos, EV_RAILTRAIL);
+
+    VectorCopy(muzzle, tent->s.origin2);
+    VectorMA(tent->s.origin2, 4, right, tent->s.origin2);
+    VectorMA(tent->s.origin2, -1, up, tent->s.origin2);
+
+    if (trace.surfaceFlags & SURF_NOIMPACT) {
+        tent->s.eventParm = 255; // don't make the explosion at the end
+    } else {
+        tent->s.eventParm = DirToByte(trace.plane.normal);
+    }
+
+    // prepare for firing through the wall
+    VectorCopy(muzzle, oldmuzzle);
+    VectorCopy(trace.endpos, muzzle);
+    VectorMA(muzzle, MAX_BARRETT_UNITS, forward, muzzle);
+
+    if (!(trap_PointContents(muzzle, -1) & CONTENTS_SOLID)) {
+        trap_Trace(&trace2, muzzle, NULL, NULL, trace.endpos, ent->s.number, MASK_SHOT);
+        VectorCopy(trace2.endpos, muzzle);
+
+        Weapon_Barrett_Fire(ent, count);
+    }
+
+    VectorCopy(oldmuzzle, muzzle);
 }
 
 /*
@@ -872,15 +885,18 @@ void Weapon_Crossbow_Fire(gentity_t *ent) {
     float u;
     gentity_t *tent;
     gentity_t *traceEnt;
-    int i, passent, spread;
+    int i, passent, spread, upmove;
 
-    Com_Printf("%i\n", ent->client->ps.speed);
+    upmove = ent->client->pers.cmd.upmove;
+    if (upmove < 0) {
+        upmove = 0;
+    }
 
-    spread = ent->client->pers.cmd.forwardmove + (ent->client->pers.cmd.upmove >= 0) + ent->client->pers.cmd.rightmove;
+    spread = ent->client->pers.cmd.forwardmove + upmove + ent->client->pers.cmd.rightmove;
     spread *= CROSSBOW_SPREAD;
 
     if (spread == 0) {
-        spread = CROSSBOW_SPREAD * 20;
+        spread = CROSSBOW_SPREAD * STATICSPREAD;
     }
 
     r = random() * M_PI * 2.0f;
