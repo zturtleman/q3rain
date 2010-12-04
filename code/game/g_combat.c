@@ -689,7 +689,7 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
     if (targ->s.eType == ET_BREAKABLE) {
         if (damage > targ->health_higher) {
             targ->health -= damage;
-            if (G_BreakGlass(targ, point, mod) && attacker->client->ps.weapon == WP_HANDS && mod != MOD_HE_SPLASH) {
+            if (G_BreakGlass(targ, point, mod, attacker) && attacker->client->ps.weapon == WP_HANDS && mod != MOD_HE_SPLASH) {
                 damage = 5;
                 //inflictor = attacker;
                 targ = attacker;

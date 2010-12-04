@@ -62,7 +62,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 int numnodeswitches;
 char nodeswitch[MAX_NODESWITCHES + 1][144];
 
-#define LOOKAHEAD_DISTANCE	512
+#define LOOKAHEAD_DISTANCE	4096
 
 /*
 ==================
@@ -988,21 +988,20 @@ BotSelectActivateWeapon
 ==================
  */
 int BotSelectActivateWeapon(bot_state_t *bs) {
-    //
-    if (bs->inventory[INVENTORY_CROSSBOW] > 0 && bs->inventory[INVENTORY_CROSSBOW] > 0)
+    if (bs->inventory[INVENTORY_CROSSBOW] > 0 && bs->inventory[CLIPAMMO_CROSSBOW] > 0)
         return WEAPONINDEX_CROSSBOW;
-    else if (bs->inventory[INVENTORY_BARRETT] > 0 && bs->inventory[INVENTORY_BARRETT] > 0)
-        return WEAPONINDEX_BARRETT;
-    else if (bs->inventory[INVENTORY_HE] > 0 && bs->inventory[INVENTORY_HE] > 0)
+    else if (bs->inventory[INVENTORY_HE] > 0)
         return WEAPONINDEX_HE;
-    else if (bs->inventory[INVENTORY_INTERVENTION] > 0 && bs->inventory[INVENTORY_INTERVENTION] > 0)
+    else if (bs->inventory[INVENTORY_INTERVENTION] > 0 && bs->inventory[CLIPAMMO_INTERVENTION] > 0)
         return WEAPONINDEX_INTERVENTION;
-    else if (bs->inventory[INVENTORY_WALTHER] > 0 && bs->inventory[INVENTORY_WALTHER] > 0)
+    else if (bs->inventory[INVENTORY_WALTHER] > 0 && bs->inventory[CLIPAMMO_WALTHER] > 0)
         return WEAPONINDEX_WALTHER;
-    else if (bs->inventory[INVENTORY_KNIFE] > 0 && bs->inventory[INVENTORY_KNIFE] > 0)
+    else if (bs->inventory[INVENTORY_KNIFE] > 0)
         return WEAPONINDEX_KNIFE;
-    else if (bs->inventory[INVENTORY_ACR] > 0 && bs->inventory[INVENTORY_ACR] > 0)
+    else if (bs->inventory[INVENTORY_ACR] > 0 && bs->inventory[CLIPAMMO_ACR] > 0)
         return WEAPONINDEX_ACR;
+    else if (bs->inventory[INVENTORY_BARRETT] > 0 && bs->inventory[CLIPAMMO_BARRETT] > 0)
+        return WEAPONINDEX_BARRETT;
     else {
         return 1;
     }

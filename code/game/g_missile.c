@@ -336,7 +336,7 @@ void G_MissileImpact(gentity_t *ent, trace_t * trace) {
     if (strcmp(ent->classname, "grenade") == 0) {
         if (other->s.eType == ET_BREAKABLE && other->takedamage && ent->damage > other->health_higher) {
             other->health = 0;
-            if (G_BreakGlass(other, ent->s.origin, MOD_HE_SPLASH) == qtrue) {
+            if (G_BreakGlass(other, ent->s.origin, MOD_HE_SPLASH, NULL) == qtrue) {
                 return;
             }
         }

@@ -137,29 +137,101 @@ void SP_target_score(gentity_t *ent) {
 
 /*QUAKED target_print (1 0 0) (-8 -8 -8) (8 8 8) redteam blueteam private
 "message"	text to print
+"small"         show in chat
 If "private", only the activator gets the message.  If no checks, all clients get the message.
  */
 void Use_Target_Print(gentity_t *ent, gentity_t *other, gentity_t *activator) {
+    int i, l;
+
+    l = 0;
+    for (i = 0; ent->message[i]; i++) {
+        if (ent->message[i] == '\x19')
+            continue;
+        ent->message[l++] = ent->message[i];
+    }
+    ent->message[l] = '\0';
     if (activator->client && (ent->spawnflags & 4)) {
-        trap_SendServerCommand(activator - g_entities, va("cp \"%s\"", ent->message));
+        if (ent->count == 1) {
+            trap_SendServerCommand(activator - g_entities, va("chat \"^7%s\"", ent->message));
+        } else {
+            trap_SendServerCommand(activator - g_entities, va("cp \"%s\"", ent->message));
+        }
         return;
     }
 
     if (ent->spawnflags & 3) {
         if (ent->spawnflags & 1) {
-            G_TeamCommand(TEAM_RED, va("cp \"%s\"", ent->message));
+            if (ent->count == 1) {
+                G_TeamCommand(TEAM_RED, va("print \"%s\"", ent->message));
+            } else {
+                G_TeamCommand(TEAM_RED, va("cp \"%s\"", ent->message));
+            }
         }
         if (ent->spawnflags & 2) {
-            G_TeamCommand(TEAM_BLUE, va("cp \"%s\"", ent->message));
+            if (ent->count == 1) {
+                G_TeamCommand(TEAM_BLUE, va("print \"%s\"", ent->message));
+            } else {
+                G_TeamCommand(TEAM_BLUE, va("cp \"%s\"", ent->message));
+            }
         }
         return;
     }
-
-    trap_SendServerCommand(-1, va("cp \"%s\"", ent->message));
+    if (ent->count == 1) {
+        trap_SendServerCommand(-1, va("chat \"^7%s\"", ent->message));
+    } else {
+        trap_SendServerCommand(-1, va("cp \"%s\"", ent->message));
+    }
 }
 
-void SP_target_print(gentity_t *ent) {
+void SP_target_print(gentity_t * ent) {
     ent->use = Use_Target_Print;
+    G_SpawnInt("small", "1", &ent->count);
+}
+
+
+//==========================================================
+
+/*QUAKED target_health (1 0 0) (-8 -8 -8) (8 8 8)
+ set > sub > add
+ */
+void Use_Target_Health(gentity_t *ent, gentity_t *other, gentity_t *activator) {
+    if (ent->speed != -1 && activator->client != NULL) {
+        activator->client->ps.legsfactor = ent->speed * 10;
+    }
+    if (ent->health > 0) {
+        activator->health = ent->health;
+    }
+    if (ent->health_lower > 0) {
+        G_Damage(activator, NULL, NULL, NULL, NULL, ent->health_lower, DAMAGE_NO_PROTECTION, MOD_TRIGGER_HURT);
+    } else {
+        activator->health += ent->health_higher;
+        if (activator->health > 100) {
+            activator->health = 100;
+        }
+    }
+    ent->think(ent);
+}
+
+void Think_Target_Health(gentity_t *ent) {
+    ent->inuse = qfalse;
+    G_FreeEntity(ent);
+    trap_UnlinkEntity(ent);
+}
+
+void SP_target_health(gentity_t *ent) {
+    int i;
+    ent->use = Use_Target_Health;
+    G_SpawnInt("set", "-1", &ent->health);
+    G_SpawnInt("add", "0", &ent->health_higher);
+    G_SpawnInt("sub", "0", &ent->health_lower);
+    G_SpawnFloat("legs", "-1", &ent->speed);
+    G_SpawnInt("once", "0", &i);
+    if (i >= 1) {
+        ent->think = Think_Target_Health;
+    }
+    if (ent->health > 100) {
+        ent->health = 100;
+    }
 }
 
 
@@ -177,7 +249,7 @@ Multiple identical looping sounds will just increase volume without any speed co
 "wait" : Seconds between auto triggerings, 0 = don't auto trigger
 "random"	wait variance, default is 0
  */
-void Use_Target_Speaker(gentity_t *ent, gentity_t *other, gentity_t *activator) {
+void Use_Target_Speaker(gentity_t *ent, gentity_t *other, gentity_t * activator) {
     if (ent->spawnflags & 3) { // looping sound toggles
         if (ent->s.loopSound)
             ent->s.loopSound = 0; // turn it off
@@ -194,7 +266,7 @@ void Use_Target_Speaker(gentity_t *ent, gentity_t *other, gentity_t *activator) 
     }
 }
 
-void SP_target_speaker(gentity_t *ent) {
+void SP_target_speaker(gentity_t * ent) {
     char buffer[MAX_QPATH];
     char *s;
 
@@ -250,7 +322,7 @@ void SP_target_speaker(gentity_t *ent) {
 /*QUAKED target_laser (0 .5 .8) (-8 -8 -8) (8 8 8) START_ON
 When triggered, fires a laser.  You can either set a target or a direction.
  */
-void target_laser_think(gentity_t *self) {
+void target_laser_think(gentity_t * self) {
     vec3_t end;
     trace_t tr;
     vec3_t point;
@@ -280,18 +352,18 @@ void target_laser_think(gentity_t *self) {
     self->nextthink = level.time + FRAMETIME;
 }
 
-void target_laser_on(gentity_t *self) {
+void target_laser_on(gentity_t * self) {
     if (!self->activator)
         self->activator = self;
     target_laser_think(self);
 }
 
-void target_laser_off(gentity_t *self) {
+void target_laser_off(gentity_t * self) {
     trap_UnlinkEntity(self);
     self->nextthink = 0;
 }
 
-void target_laser_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
+void target_laser_use(gentity_t *self, gentity_t *other, gentity_t * activator) {
     self->activator = activator;
     if (self->nextthink > 0)
         target_laser_off(self);
@@ -299,7 +371,7 @@ void target_laser_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
         target_laser_on(self);
 }
 
-void target_laser_start(gentity_t *self) {
+void target_laser_start(gentity_t * self) {
     gentity_t *ent;
 
     self->s.eType = ET_BEAM;
@@ -327,7 +399,7 @@ void target_laser_start(gentity_t *self) {
         target_laser_off(self);
 }
 
-void SP_target_laser(gentity_t *self) {
+void SP_target_laser(gentity_t * self) {
     // let everything else get spawned before we start firing
     self->think = target_laser_start;
     self->nextthink = level.time + FRAMETIME;
@@ -336,7 +408,7 @@ void SP_target_laser(gentity_t *self) {
 
 //==========================================================
 
-void target_teleporter_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
+void target_teleporter_use(gentity_t *self, gentity_t *other, gentity_t * activator) {
     gentity_t *dest;
 
     if (!activator->client)
@@ -353,7 +425,7 @@ void target_teleporter_use(gentity_t *self, gentity_t *other, gentity_t *activat
 /*QUAKED target_teleporter (1 0 0) (-8 -8 -8) (8 8 8)
 The activator will be teleported away.
  */
-void SP_target_teleporter(gentity_t *self) {
+void SP_target_teleporter(gentity_t * self) {
     if (!self->targetname)
         G_Printf("untargeted %s at %s\n", self->classname, vtos(self->s.origin));
 
@@ -367,7 +439,7 @@ This doesn't perform any actions except fire its targets.
 The activator can be forced to be from a certain team.
 if RANDOM is checked, only one of the targets will be fired, not all of them
  */
-void target_relay_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
+void target_relay_use(gentity_t *self, gentity_t *other, gentity_t * activator) {
     if ((self->spawnflags & 1) && activator->client
             && activator->client->sess.sessionTeam != TEAM_RED) {
         return;
@@ -388,7 +460,7 @@ void target_relay_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
     G_UseTargets(self, activator);
 }
 
-void SP_target_relay(gentity_t *self) {
+void SP_target_relay(gentity_t * self) {
     self->use = target_relay_use;
 }
 
@@ -398,22 +470,22 @@ void SP_target_relay(gentity_t *self) {
 /*QUAKED target_kill (.5 .5 .5) (-8 -8 -8) (8 8 8)
 Kills the activator.
  */
-void target_kill_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
+void target_kill_use(gentity_t *self, gentity_t *other, gentity_t * activator) {
     G_Damage(activator, NULL, NULL, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
 }
 
-void SP_target_kill(gentity_t *self) {
+void SP_target_kill(gentity_t * self) {
     self->use = target_kill_use;
 }
 
 /*QUAKED target_position (0 0.5 0) (-4 -4 -4) (4 4 4)
 Used as a positional target for in-game calculation, like jumppad targets.
  */
-void SP_target_position(gentity_t *self) {
+void SP_target_position(gentity_t * self) {
     G_SetOrigin(self, self->s.origin);
 }
 
-static void target_location_linkup(gentity_t *ent) {
+static void target_location_linkup(gentity_t * ent) {
     int i;
     int n;
 
@@ -450,7 +522,7 @@ Set "count" to 0-7 for color.
 Closest target_location in sight used for the location, if none
 in site, closest in distance
  */
-void SP_target_location(gentity_t *self) {
+void SP_target_location(gentity_t * self) {
     self->think = target_location_linkup;
     self->nextthink = level.time + 200; // Let them all spawn first
 
@@ -473,18 +545,18 @@ void SP_target_location(gentity_t *self) {
 
  */
 
-void win_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
+void win_use(gentity_t *self, gentity_t *other, gentity_t * activator) {
     Com_Printf("target_win: used - ^1Not implemented yet\n");
 }
 
-void SP_target_win(gentity_t *self) {
+void SP_target_win(gentity_t * self) {
     self->use = win_use;
 }
 
 /*QUAKED target_condition (0.3 0.1 0.6) (-8 -8 -8) (8 8 8)
 
 "targetname"            ya should know that
-"falsetarget"           
+"falsetarget"
 "standalone"
 "has_weapon"
 "has_powerup"
@@ -504,17 +576,17 @@ void SP_target_win(gentity_t *self) {
 "cvar_value"            cvar value
  */
 
-void condition_firetarget(gentity_t *self) {
+void condition_firetarget(gentity_t * self) {
     //Com_Printf("target_condition: ^2firing targets\n");
     G_UseTargets(self, NULL);
 }
 
-void condition_triggertargets(gentity_t *self, gentity_t *activator) {
+void condition_triggertargets(gentity_t *self, gentity_t * activator) {
     //Com_Printf("target_condition: ^2triggering targets\n");
     G_UseTargets(self, activator);
 }
 
-void condition_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
+void condition_use(gentity_t *self, gentity_t *other, gentity_t * activator) {
     //Com_Printf("target_condition: ^3used\n");
 
     if (self->has_weapon >= 0) {
@@ -702,7 +774,7 @@ void condition_use(gentity_t *self, gentity_t *other, gentity_t *activator) {
     }
 }
 
-void SP_target_condition(gentity_t *self) {
+void SP_target_condition(gentity_t * self) {
     int i;
 
     self->use = condition_use;

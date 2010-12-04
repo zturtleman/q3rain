@@ -347,7 +347,7 @@ void SP_func_breakable(gentity_t *ent) {
 G_BreakGlass
 =================
  */
-qboolean G_BreakGlass(gentity_t *ent, vec3_t point, int mod) {
+qboolean G_BreakGlass(gentity_t *ent, vec3_t point, int mod, gentity_t *activator) {
     gentity_t *tent;
     vec3_t size;
     vec3_t center;
@@ -403,6 +403,7 @@ qboolean G_BreakGlass(gentity_t *ent, vec3_t point, int mod) {
                 }
                 break;
         }
+        G_UseTargets(ent, activator);
         G_FreeEntity(ent);
         tent->s.eventParm = 0;
         return qtrue;

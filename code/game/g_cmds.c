@@ -1521,7 +1521,7 @@ void Cmd_Stats_f(gentity_t *ent) {
   Cmd_Reload RELOADING
 ==================
  */
-void Cmd_Reload(gentity_t *ent) {
+qboolean Cmd_Reload(gentity_t *ent) {
     int weapon;
     int amt;
     int ammotoadd;
@@ -1534,14 +1534,14 @@ void Cmd_Reload(gentity_t *ent) {
             || weapon == WP_NONE
             || weapon == WP_HANDS
             || weapon == WP_INJECTOR) {
-        return;
+        return qfalse;
     }
 
     amt = ClipAmountForWeapon(weapon);
     ammotoadd = amt;
     if (ent->client->clipammo[weapon] >= ClipAmountForWeapon(weapon)) {
         trap_SendServerCommand(ent - g_entities, "cp \"No need to reload.\n\"");
-        return;
+        return qfalse;
     }
     ent->client->ps.weaponstate = WEAPON_RELOADING;
     ent->client->ps.torsoAnim = ((ent->client->ps.torsoAnim & ANIM_TOGGLEBIT) ^ ANIM_TOGGLEBIT) | TORSO_DROP;
@@ -1559,7 +1559,7 @@ void Cmd_Reload(gentity_t *ent) {
     if (ent->client->ps.ammo[weapon] < ClipAmountForWeapon(weapon)) {
         trap_SendServerCommand(ent - g_entities, "cp \"Out of ammo\n\"");
         ent->client->ps.weaponTime = 0;
-        return;
+        return qfalse;
     }
 
     if (ammotoadd > ClipAmountForWeapon(weapon)) {
@@ -1570,6 +1570,7 @@ void Cmd_Reload(gentity_t *ent) {
     ent->client->ps.ammo[weapon] -= ClipAmountForWeapon(weapon);
     //Add the ammo to weapon
     ent->client->clipammo[weapon] = ClipAmountForWeapon(weapon);
+    return qtrue;
 }
 
 /*

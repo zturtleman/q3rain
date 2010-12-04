@@ -1590,7 +1590,7 @@ The current weapon has just run out of ammo
 ===================
  */
 void CG_OutOfAmmoChange(void) {
-    /*int		i;
+    /*int i;
 
     cg.weaponSelectTime = cg.time;
 

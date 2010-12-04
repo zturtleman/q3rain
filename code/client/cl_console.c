@@ -595,10 +595,10 @@ void Con_DrawNotify(void) {
     // skip should be text drawn + 1
     if (Key_GetCatcher() & KEYCATCH_MESSAGE) {
         if (chat_team) {
-            SCR_DrawBigString(BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "Team:", 1.0f, qfalse);
+            SCR_DrawBigString(BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "team:", 1.0f, qfalse);
             skip = 6;
         } else {
-            SCR_DrawBigString(BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "Say:", 1.0f, qfalse);
+            SCR_DrawBigString(BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "say:", 1.0f, qfalse);
             skip = 5;
         }
 

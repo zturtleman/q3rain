@@ -166,6 +166,8 @@ void SP_target_position(gentity_t *ent);
 void SP_target_location(gentity_t *ent);
 void SP_target_push(gentity_t *ent);
 
+void SP_target_health(gentity_t *ent);
+
 void SP_light(gentity_t *self);
 void SP_info_null(gentity_t *self);
 void SP_info_notnull(gentity_t *self);
@@ -278,6 +280,7 @@ spawn_t spawns[] = {
     // trigger_* section
 
     // target_* section
+    {"target_health", SP_target_health},
     {"target_win", SP_target_win},
     {"target_stopwatch", 0},
     {"target_condition", SP_target_condition},

@@ -760,8 +760,11 @@ void ClientThink_real(gentity_t *ent) {
         int ammo;
         ammo = client->clipammo[client->ps.weapon];
         //Com_Printf("ammo = %i\n", ammo);
-        if (ammo < 5) {
-            Cmd_Reload(ent);
+        if (ammo == 0) {
+            if (!Cmd_Reload(ent)) {
+                //trap_EA_SelectWeapon(ent->s.clientNum, client->ps.weapon - 1);
+                //trap_EA_Say(ent->s.clientNum, "no ammo D:\n");
+            }
         }
     }
 
