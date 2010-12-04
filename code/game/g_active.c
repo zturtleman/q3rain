@@ -461,6 +461,7 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
     gitem_t *item;
     gentity_t *drop;
     float f;
+    int factor = 100;
 
     client = ent->client;
 
@@ -495,6 +496,10 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
                 ent->client->ps.legsfactor = (int) (f * 10);
                 ent->pain_debounce_time = level.time + 200; // no normal pain sound
                 G_Damage(ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
+                if (ent->client->ps.powerups[PW_ADRENALINE] > 0) {
+                    factor /= 2;
+                }
+                ent->client->ps.jumpCooldown = ent->client->ps.levelTime + (damage * factor);
                 break;
 
             case EV_FIRE_WEAPON:
@@ -851,9 +856,9 @@ void ClientThink_real(gentity_t *ent) {
     client->buttons = ucmd->buttons;
     client->latched_buttons |= client->buttons & ~client->oldbuttons;
 
-    if (client->ps.stats[STAT_HEALTH] > 0 && client->ps.stats[STAT_HEALTH] <= 20 && (level.time % 53 == 0) && (client->ps.powerups[PW_ADRENALINE] == 0)) {
+    /*if (client->ps.stats[STAT_HEALTH] > 0 && client->ps.stats[STAT_HEALTH] <= 20 && (level.time % 53 == 0) && (client->ps.powerups[PW_ADRENALINE] == 0)) {
         P_KickBack(ent, (int) crandom()*10, (int) crandom()*10, 3);
-    }
+    }*/
 
     // check for respawning
     if (client->ps.stats[STAT_HEALTH] <= 0) {

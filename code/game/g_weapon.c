@@ -682,11 +682,12 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
     u = cos(r) * crandom() * (spread);
     r = cos(r) * crandom() * (spread);
     VectorMA(muzzle, INTERVENTION_RANGE, forward, end);
+    // not zooming
     if (ent->client->ps.zoomFov <= 0) {
         VectorMA(end, r, right, end);
         VectorMA(end, u, up, end);
     } else {
-        if (spread != 0) {
+        if (spread != INTERVENTION_SPREAD * STATICSPREAD) {
             VectorMA(end, r, right, end);
             VectorMA(end, u, up, end);
         }
@@ -794,17 +795,16 @@ void Weapon_Barrett_Fire(gentity_t *ent, int count) {
         spread = BARRETT_SPREAD * STATICSPREAD;
     }
 
-    //Com_Printf("spread = %i\n", spread);
-
     r = random() * M_PI * 2.0f;
     u = cos(r) * crandom() * (spread);
     r = cos(r) * crandom() * (spread);
     VectorMA(muzzle, BARRETT_RANGE, forward, end);
+    // not zooming
     if (ent->client->ps.zoomFov <= 0) {
         VectorMA(end, r, right, end);
         VectorMA(end, u, up, end);
     } else {
-        if (spread != 0) {
+        if (spread != BARRETT_SPREAD * STATICSPREAD) {
             VectorMA(end, r, right, end);
             VectorMA(end, u, up, end);
         }
@@ -903,11 +903,12 @@ void Weapon_Crossbow_Fire(gentity_t *ent) {
     u = cos(r) * crandom() * (spread);
     r = cos(r) * crandom() * (spread);
     VectorMA(muzzle, CROSSBOW_RANGE, forward, end);
+    // not zooming
     if (ent->client->ps.zoomFov <= 0) {
         VectorMA(end, r, right, end);
         VectorMA(end, u, up, end);
     } else {
-        if (spread != 0) {
+        if (spread != CROSSBOW_SPREAD * STATICSPREAD) {
             VectorMA(end, r, right, end);
             VectorMA(end, u, up, end);
         }

@@ -1120,6 +1120,7 @@ typedef struct playerState_s {
     int wallclimbs;
     int maxspeed;
     int fallDelta;
+    int jumpCooldown;
 } playerState_t;
 
 

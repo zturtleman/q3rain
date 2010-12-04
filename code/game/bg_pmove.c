@@ -453,6 +453,10 @@ static qboolean PM_CheckJump(void) {
         return qfalse;
     }
 
+    if (pm->ps->jumpCooldown >= pm->ps->levelTime) {
+        return qfalse;
+    }
+
     pml.groundPlane = qfalse; // jumping away
     pml.walking = qfalse;
     pm->ps->pm_flags |= PMF_JUMP_HELD;
@@ -1333,11 +1337,6 @@ static void PM_CrashLand(void) {
     delta = vel + t * acc;
     delta = delta * delta * 0.0001;
 
-    // ducking while falling doubles damage
-    /*if (pm->ps->pm_flags & PMF_DUCKED) {
-        delta *= 2;
-    }*/
-
     if (pm->waterlevel == 3) {
         return;
     }
@@ -1368,24 +1367,23 @@ static void PM_CrashLand(void) {
         if (delta <= 25) {
             if (delta > 10) {
                 PM_AddEvent(EV_FALL_MINIMAL);
+                if (pm->ps->powerups[PW_ADRENALINE] == 0) {
+                    pm->ps->jumpCooldown = pm->ps->levelTime + 400;
+                } else {
+                    pm->ps->jumpCooldown = pm->ps->levelTime + 200;
+                }
             } else {
+                if (pm->ps->powerups[PW_ADRENALINE] == 0) {
+                    pm->ps->jumpCooldown = pm->ps->levelTime + 200;
+                } else {
+                    pm->ps->jumpCooldown = pm->ps->levelTime + 100;
+                }
                 PM_AddEvent(PM_FootstepForSurface());
             }
         } else {
             pm->ps->fallDelta = ((int) delta);
             PM_AddEvent(EV_FALL_FAR);
         }
-        /*if (delta > 100) {
-            PM_AddEvent(EV_FALL_FAR);
-        } else if (delta > 51) {
-            PM_AddEvent(EV_FALL_MEDIUM);
-        } else if (delta > 25) {
-            PM_AddEvent(EV_FALL_SHORT);
-        } else if (delta > 10) {
-            PM_AddEvent(EV_FALL_MINIMAL);
-        } else {
-            PM_AddEvent(PM_FootstepForSurface());
-        }*/
     }
 
     // start footstep cycle over
@@ -2220,7 +2218,7 @@ void PmoveSingle(pmove_t * pmove) {
     }
     pm->ps->commandTime = pmove->cmd.serverTime;
 
-    // save old org in case we get stuck
+    // save old origin in case we get stuck
     VectorCopy(pm->ps->origin, pml.previous_origin);
 
     // save old velocity for crashlanding
@@ -2233,7 +2231,7 @@ void PmoveSingle(pmove_t * pmove) {
 
     AngleVectors(pm->ps->viewangles, pml.forward, pml.right, pml.up);
 
-    if (pm->cmd.upmove < 10) {
+    if (pm->cmd.upmove < 1) {
         // not holding jump
         pm->ps->pm_flags &= ~PMF_JUMP_HELD;
     }
@@ -2369,7 +2367,9 @@ void Pmove(pmove_t * pmove) {
         PmoveSingle(pmove);
 
         if (pmove->ps->pm_flags & PMF_JUMP_HELD) {
-            pmove->cmd.upmove = 20;
+            if (pmove->ps->jumpCooldown < pmove->ps->levelTime) {
+                pmove->cmd.upmove = 20;
+            }
         }
     }
 
