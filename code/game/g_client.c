@@ -1092,6 +1092,9 @@ void ClientSpawn(gentity_t *ent) {
     client->ps.grenadetime = -1337;
     client->ps.levelTime = level.time;
 
+    client->ps.sprintAdd = 0;
+    client->ps.stamina = 10000;
+
     client->airOutTime = level.time + 12000;
 
     trap_GetUserinfo(index, userinfo, sizeof (userinfo));
@@ -1149,29 +1152,29 @@ void ClientSpawn(gentity_t *ent) {
     /*if (ent->r.svFlags & SVF_BOT) {
         client->clipammo[WP_ACR] = 300; // haaaaax!
     } else {*/
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_WALTHER);
-        client->clipammo[WP_WALTHER] = 10;
-        client->ps.ammo[WP_WALTHER] = 20;
+    client->ps.stats[STAT_WEAPONS] |= (1 << WP_WALTHER);
+    client->clipammo[WP_WALTHER] = 10;
+    client->ps.ammo[WP_WALTHER] = 20;
 
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_INJECTOR);
-        client->clipammo[WP_INJECTOR] = 1;
-        client->ps.ammo[WP_INJECTOR] = 0;
+    client->ps.stats[STAT_WEAPONS] |= (1 << WP_INJECTOR);
+    client->clipammo[WP_INJECTOR] = 1;
+    client->ps.ammo[WP_INJECTOR] = 0;
 
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_HE);
-        client->clipammo[WP_HE] = 2;
-        client->ps.ammo[WP_HE] = 0;
+    client->ps.stats[STAT_WEAPONS] |= (1 << WP_HE);
+    client->clipammo[WP_HE] = 2;
+    client->ps.ammo[WP_HE] = 0;
 
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_CROSSBOW);
-        client->clipammo[WP_CROSSBOW] = 1;
-        client->ps.ammo[WP_CROSSBOW] = 3;
+    client->ps.stats[STAT_WEAPONS] |= (1 << WP_CROSSBOW);
+    client->clipammo[WP_CROSSBOW] = 1;
+    client->ps.ammo[WP_CROSSBOW] = 3;
 
-        /*client->ps.stats[STAT_WEAPONS] |= (1 << WP_NUKE);
-        client->clipammo[WP_NUKE] = 1;
-        client->ps.ammo[WP_NUKE] = 0;*/
+    /*client->ps.stats[STAT_WEAPONS] |= (1 << WP_NUKE);
+    client->clipammo[WP_NUKE] = 1;
+    client->ps.ammo[WP_NUKE] = 0;*/
 
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_BOMB);
-        client->clipammo[WP_BOMB] = 5;
-        client->ps.ammo[WP_BOMB] = 0;
+    client->ps.stats[STAT_WEAPONS] |= (1 << WP_BOMB);
+    client->clipammo[WP_BOMB] = 5;
+    client->ps.ammo[WP_BOMB] = 0;
     //}
 
     // health will count down towards max_health

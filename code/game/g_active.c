@@ -750,6 +750,7 @@ void ClientThink_real(gentity_t *ent) {
     } else {
         client->ps.speed = (int) ((float) client->ps.maxspeed / ((float) client->ps.legsfactor / 10));
     }
+    client->ps.speed += client->ps.sprintAdd;
 
     ent->client->ps.levelTime = level.time;
 

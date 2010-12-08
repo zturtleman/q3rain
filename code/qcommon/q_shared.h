@@ -1121,6 +1121,8 @@ typedef struct playerState_s {
     int maxspeed;
     int fallDelta;
     int jumpCooldown;
+    int sprintAdd;
+    int stamina;
 } playerState_t;
 
 
@@ -1132,7 +1134,7 @@ typedef struct playerState_s {
 // so they aren't game/cgame only definitions
 //
 #define	BUTTON_ATTACK		1
-#define	BUTTON_TALK			2			// displays talk balloon and disables actions
+#define	BUTTON_TALK		2			// displays talk balloon and disables actions
 #define	BUTTON_USE_HOLDABLE	4
 #define	BUTTON_GESTURE		8
 #define	BUTTON_WALKING		16			// walking can't just be infered from MOVE_RUN
@@ -1140,17 +1142,18 @@ typedef struct playerState_s {
 // only generate a small move value for that frame
 // walking will use different animations and
 // won't generate footsteps
-#define BUTTON_AFFIRMATIVE	32
+/*#define BUTTON_AFFIRMATIVE	32
 #define	BUTTON_NEGATIVE		64
 
 #define BUTTON_GETFLAG		128
 #define BUTTON_GUARDBASE	256
 #define BUTTON_PATROL		512
-#define BUTTON_FOLLOWME		1024
+#define BUTTON_FOLLOWME		1024*/
+#define BUTTON_SPRINT 32
 
-#define	BUTTON_ANY			2048			// any key whatsoever
+#define	BUTTON_ANY			2048	// any key whatsoever
 
-#define	MOVE_RUN			120			// if forwardmove or rightmove are >= MOVE_RUN,
+#define	MOVE_RUN			120	// if forwardmove or rightmove are >= MOVE_RUN,
 // then BUTTON_WALKING should be set
 
 // usercmd_t is sent to the server each client frame

@@ -1190,6 +1190,8 @@ netField_t playerStateFields[] = {
     { PSF(maxspeed), 8},
     { PSF(fallDelta), 8},
     { PSF(jumpCooldown), 32},
+    { PSF(sprintAdd), 8},
+    { PSF(stamina), 16},
 };
 
 /*

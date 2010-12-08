@@ -457,13 +457,17 @@ static qboolean PM_CheckJump(void) {
         return qfalse;
     }
 
+    if (pm->ps->stamina < 1000) {
+        return qfalse;
+    }
+
     pml.groundPlane = qfalse; // jumping away
     pml.walking = qfalse;
     pm->ps->pm_flags |= PMF_JUMP_HELD;
 
     pm->ps->groundEntityNum = ENTITYNUM_NONE;
     if (pm->ps->powerups[PW_ADRENALINE] == 0) {
-        vel = JUMP_VELOCITY / (pm->ps->legsfactor / 10);
+        vel = (JUMP_VELOCITY + (pm->ps->sprintAdd / 3)) / (pm->ps->legsfactor / 10);
         if (vel < JUMP_VELOCITY / 1.5) {
             vel = JUMP_VELOCITY / 1.5;
         }
@@ -480,6 +484,8 @@ static qboolean PM_CheckJump(void) {
         PM_ForceLegsAnim(LEGS_JUMPB);
         pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
     }
+
+    pm->ps->stamina -= 1000;
 
     return qtrue;
 }
@@ -736,6 +742,8 @@ static void PM_WallClimb(void) {
     }
     PM_AddEvent(EV_JUMP);
 
+    pm->ps->stamina -= 750;
+
     if (pm->cmd.forwardmove >= 0) {
         PM_ForceLegsAnim(LEGS_JUMP);
         pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
@@ -768,6 +776,10 @@ static qboolean PM_CheckWallJump(void) {
 
     if (pm->ps->pm_flags & PMF_JUMP_HELD) {
         pm->cmd.upmove = 0;
+        return qfalse;
+    }
+
+    if (pm->ps->stamina < 750) {
         return qfalse;
     }
 
@@ -2152,6 +2164,7 @@ PmoveSingle
 void trap_SnapVector(float *v);
 
 void PmoveSingle(pmove_t * pmove) {
+    int regain;
     pm = pmove;
 
     // this counter lets us debug movement problems with a journal
@@ -2163,6 +2176,8 @@ void PmoveSingle(pmove_t * pmove) {
     pm->watertype = 0;
     pm->waterlevel = 0;
 
+    regain = pml.msec / 1.5f;
+
     if (pm->ps->stats[STAT_HEALTH] <= 0) {
         pm->tracemask &= ~CONTENTS_BODY; // corpses can fly through bodies
     }
@@ -2171,6 +2186,7 @@ void PmoveSingle(pmove_t * pmove) {
     // proxy no-footsteps cheats
     if (abs(pm->cmd.forwardmove) > 64 || abs(pm->cmd.rightmove) > 64) {
         pm->cmd.buttons &= ~BUTTON_WALKING;
+        regain /= 2;
     }
 
     // set the talk balloon flag
@@ -2178,6 +2194,26 @@ void PmoveSingle(pmove_t * pmove) {
         pm->ps->eFlags |= EF_TALK;
     } else {
         pm->ps->eFlags &= ~EF_TALK;
+    }
+
+    // ! because of some wrong setting in cl_input.c and lazy rylius
+
+    if (!(pm->cmd.buttons & BUTTON_SPRINT)
+            && pm->ps->stats[STAT_HEALTH] > 60
+            && !(pm->cmd.buttons & BUTTON_WALKING)
+            && pm->ps->stamina > 0
+            && (abs(pm->cmd.forwardmove) != 0 || abs(pm->cmd.rightmove) != 0)) {
+        pm->ps->sprintAdd += pml.msec / 4;
+        if (pm->ps->sprintAdd > 270) {
+            pm->ps->sprintAdd = 270;
+        }
+        pm->ps->stamina -= (pml.msec / 4)*6;
+        regain = 0;
+    } else {
+        pm->ps->sprintAdd -= pml.msec / 2;
+        if (pm->ps->sprintAdd < 0) {
+            pm->ps->sprintAdd = 0;
+        }
     }
 
     // set the firing flag for continuous beam weapons
@@ -2204,6 +2240,16 @@ void PmoveSingle(pmove_t * pmove) {
         pmove->cmd.forwardmove = 0;
         pmove->cmd.rightmove = 0;
         pmove->cmd.upmove = 0;
+    }
+
+    if (pm->cmd.buttons & BUTTON_WALKING &&
+            (abs(pm->cmd.forwardmove) != 0
+            || abs(pm->cmd.rightmove) != 0
+            || abs(pm->cmd.upmove) != 0)) {
+        regain *= 1.5f;
+    } else if (abs(pm->cmd.forwardmove) == 0
+            && abs(pm->cmd.rightmove) == 0) {
+        regain *= 2.5;
     }
 
     // clear all pmove local vars
@@ -2323,6 +2369,17 @@ void PmoveSingle(pmove_t * pmove) {
 
     // snap some parts of playerstate to save network bandwidth
     trap_SnapVector(pm->ps->velocity);
+
+    if (pm->ps->stats[STAT_HEALTH] < 40) {
+        regain /= 1.5f;
+    }
+
+    pm->ps->stamina += regain;
+    if (pm->ps->stamina > 10000) {
+        pm->ps->stamina = 10000;
+    }
+
+    //Com_Printf("stamina = %i regain = %i\n", pm->ps->stamina, regain);
 }
 
 /*
@@ -2367,7 +2424,7 @@ void Pmove(pmove_t * pmove) {
         PmoveSingle(pmove);
 
         if (pmove->ps->pm_flags & PMF_JUMP_HELD) {
-            if (pmove->ps->jumpCooldown < pmove->ps->levelTime) {
+            if (pmove->ps->jumpCooldown < pmove->ps->levelTime && pmove->ps->stamina >= 1000) {
                 pmove->cmd.upmove = 20;
             }
         }
