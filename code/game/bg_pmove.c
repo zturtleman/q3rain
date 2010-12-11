@@ -60,9 +60,10 @@ float pm_snowfriction = 2.0f;
 
 int c_pmove = 0;
 
-#define WALLJUMP_BOOST 300
+#define WALLJUMP_BOOST 180
 #define WALLCLIMB_BOOST 400
 #define MAX_WALLCLIMBS 1
+#define MAX_WALLJUMPS 3
 
 /*
 ===============
@@ -696,6 +697,10 @@ static qboolean PM_CheckWallClimb(void) {
         return qfalse;
     }
 
+    if (!(pm->cmd.buttons & BUTTON_WALKING)) {
+        return qfalse;
+    }
+
     if (pm->ps->pm_flags & PMF_JUMP_HELD) {
         pm->cmd.upmove = 0;
         return qfalse;
@@ -779,7 +784,11 @@ static qboolean PM_CheckWallJump(void) {
         return qfalse;
     }
 
-    if (pm->ps->stamina < 750) {
+    if (pm->ps->stamina < 1000) {
+        return qfalse;
+    }
+
+    if (pm->cmd.buttons & BUTTON_WALKING) {
         return qfalse;
     }
 
@@ -802,6 +811,111 @@ PM_WallJump
 =============
  */
 static void PM_WallJump(void) {
+    int boost;
+    vec3_t flatforward, spot;
+    trace_t trace;
+    qboolean jumped = qfalse;
+
+    pml.groundPlane = qfalse;
+    pml.walking = qfalse;
+    pm->ps->pm_flags |= PMF_JUMP_HELD;
+
+    boost = WALLJUMP_BOOST;
+    if (pm->ps->speed < pm->ps->maxspeed) {
+        boost /= 2;
+    }
+
+    flatforward[0] = pml.forward[0];
+    flatforward[1] = pml.forward[1];
+    flatforward[2] = 0;
+    VectorNormalize(flatforward);
+    VectorMA(pm->ps->origin, 1, flatforward, spot);
+    pm->trace(&trace, pm->ps->origin, pm->mins, pm->maxs, spot, pm->ps->clientNum, MASK_PLAYERSOLID);
+
+    //Com_Printf("vel 0 = %f vel 1 = %f\n", pm->ps->velocity[0], pm->ps->velocity[1]);
+
+#define MINIMUM 10
+
+    // 1
+    if (pm->ps->velocity[0] < 0 && pm->ps->velocity[0] > -MINIMUM && pm->ps->velocity[1] < -MINIMUM) {
+        pm->ps->velocity[0] += boost;
+        //Com_Printf("1\n");
+        jumped = qtrue;
+    }
+
+    // 2
+    if (pm->ps->velocity[0] < 0 && pm->ps->velocity[1] > MINIMUM) {
+        pm->ps->velocity[0] -= boost;
+        pm->ps->velocity[0] *= -1;
+        //Com_Printf("2\n");
+        jumped = qtrue;
+    }
+
+    // 3
+    if (pm->ps->velocity[0] > MINIMUM && pm->ps->velocity[1] > 0 && pm->ps->velocity[1] < MINIMUM) {
+        pm->ps->velocity[1] += boost;
+        pm->ps->velocity[1] *= -1;
+        //Com_Printf("3\n");
+        jumped = qtrue;
+    }
+
+    // 4
+    if (pm->ps->velocity[0] < -MINIMUM && pm->ps->velocity[1] > 0 && pm->ps->velocity[1] < MINIMUM) {
+        pm->ps->velocity[1] += boost;
+        pm->ps->velocity[1] *= -1;
+        //Com_Printf("4\n");
+        jumped = qtrue;
+    }
+
+    // 5
+    if (pm->ps->velocity[0] < -MINIMUM && pm->ps->velocity[1] < 0 && pm->ps->velocity[1] > -MINIMUM) {
+        pm->ps->velocity[1] -= boost;
+        pm->ps->velocity[1] *= -1;
+        //Com_Printf("5\n");
+        jumped = qtrue;
+    }
+
+    // 6
+    if (pm->ps->velocity[0] > MINIMUM && pm->ps->velocity[1] < 0 && pm->ps->velocity[1] > -MINIMUM) {
+        pm->ps->velocity[1] -= boost;
+        pm->ps->velocity[1] *= -1;
+        //Com_Printf("6\n");
+        jumped = qtrue;
+    }
+
+    // 7
+    if (pm->ps->velocity[0] > 0 && pm->ps->velocity[0] < MINIMUM && pm->ps->velocity[1] < -MINIMUM) {
+        pm->ps->velocity[0] += boost;
+        pm->ps->velocity[0] *= -1;
+        //Com_Printf("7\n");
+        jumped = qtrue;
+    }
+
+    // 8
+    if (pm->ps->velocity[0] > 0 && pm->ps->velocity[0] < MINIMUM && pm->ps->velocity[1] > MINIMUM) {
+        pm->ps->velocity[0] += boost;
+        pm->ps->velocity[0] *= -1;
+        //Com_Printf("8\n");
+        jumped = qtrue;
+    }
+
+    if (jumped) {
+        pm->ps->velocity[2] += boost * 1.5f;
+
+        pm->ps->groundEntityNum = ENTITYNUM_NONE;
+
+        PM_AddEvent(EV_WALLJUMP);
+
+        pm->ps->stamina -= 1000;
+
+        if (pm->cmd.forwardmove >= 0) {
+            PM_ForceLegsAnim(LEGS_JUMP);
+            pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
+        } else {
+            PM_ForceLegsAnim(LEGS_JUMPB);
+            pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
+        }
+    }
 }
 
 /*
@@ -856,11 +970,18 @@ static void PM_AirMove(pmove_t *pmove) {
                 pm->ps->velocity, OVERCLIP);
     }
 
-
     if (pmove->ps->wallclimbs < MAX_WALLCLIMBS) {
         if (PM_CheckWallClimb()) {
             PM_WallClimb();
             pmove->ps->wallclimbs++;
+            return;
+        }
+    }
+
+    if (pmove->ps->walljumps < MAX_WALLJUMPS) {
+        if (PM_CheckWallJump()) {
+            PM_WallJump();
+            pmove->ps->walljumps++;
             return;
         }
     }
@@ -911,6 +1032,7 @@ static void PM_WalkMove(pmove_t *pmove) {
     float vel;
 
     pmove->ps->wallclimbs = 0;
+    pmove->ps->walljumps = 0;
 
     if (pm->waterlevel > 2 && DotProduct(pml.forward, pml.groundTrace.plane.normal) > 0) {
         // begin swimming

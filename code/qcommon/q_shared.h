@@ -1118,6 +1118,7 @@ typedef struct playerState_s {
     // movement
     int legsfactor;
     int wallclimbs;
+    int walljumps;
     int maxspeed;
     int fallDelta;
     int jumpCooldown;

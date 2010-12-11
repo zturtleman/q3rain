@@ -553,6 +553,9 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
             trap_S_StartSound(NULL, es->number, CHAN_VOICE, CG_CustomSound(es->number, "*jump1.wav"));
             break;
 
+        case EV_WALLJUMP:
+            DEBUGNAME("EV_WALLJUMP");
+            break;
         case EV_JUMP:
             DEBUGNAME("EV_JUMP");
             //trap_S_StartSound (NULL, es->number, CHAN_VOICE, CG_CustomSound( es->number, "*jump1.wav" ) );

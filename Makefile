@@ -841,21 +841,21 @@ ifndef SHLIBNAME
 endif
 
 ifneq ($(BUILD_SERVER),0)
-  TARGETS += $(B)/ioq3ded$(FULLBINEXT)
+  TARGETS += $(B)/cloud$(FULLBINEXT)
 endif
 
 ifneq ($(BUILD_CLIENT),0)
-  TARGETS += $(B)/ioquake3$(FULLBINEXT)
+  TARGETS += $(B)/rain$(FULLBINEXT)
   ifneq ($(BUILD_CLIENT_SMP),0)
-    TARGETS += $(B)/ioquake3-smp$(FULLBINEXT)
+    TARGETS += $(B)/rain-smp$(FULLBINEXT)
   endif
 endif
 
 ifneq ($(BUILD_GAME_SO),0)
   TARGETS += \
-    $(B)/baseq3/cgame$(SHLIBNAME) \
-    $(B)/baseq3/qagame$(SHLIBNAME) \
-    $(B)/baseq3/ui$(SHLIBNAME)
+    $(B)/rain/cgame$(SHLIBNAME) \
+    $(B)/rain/qagame$(SHLIBNAME) \
+    $(B)/rain/ui$(SHLIBNAME)
   ifneq ($(BUILD_MISSIONPACK),0)
     TARGETS += \
     $(B)/missionpack/cgame$(SHLIBNAME) \
@@ -867,9 +867,9 @@ endif
 ifneq ($(BUILD_GAME_QVM),0)
   ifneq ($(CROSS_COMPILING),1)
     TARGETS += \
-      $(B)/baseq3/vm/cgame.qvm \
-      $(B)/baseq3/vm/qagame.qvm \
-      $(B)/baseq3/vm/ui.qvm
+      $(B)/rain/vm/cgame.qvm \
+      $(B)/rain/vm/qagame.qvm \
+      $(B)/rain/vm/ui.qvm
     ifneq ($(BUILD_MISSIONPACK),0)
       TARGETS += \
       $(B)/missionpack/vm/qagame.qvm \
@@ -1038,7 +1038,7 @@ release:
 # an informational message, then start building
 targets: makedirs
 	@echo ""
-	@echo "Building ioquake3 in $(B):"
+	@echo "Building Rain in $(B):"
 	@echo "  PLATFORM: $(PLATFORM)"
 	@echo "  ARCH: $(ARCH)"
 	@echo "  VERSION: $(VERSION)"
@@ -1102,12 +1102,12 @@ makedirs:
 	@if [ ! -d $(B)/client ];then $(MKDIR) $(B)/client;fi
 	@if [ ! -d $(B)/clientsmp ];then $(MKDIR) $(B)/clientsmp;fi
 	@if [ ! -d $(B)/ded ];then $(MKDIR) $(B)/ded;fi
-	@if [ ! -d $(B)/baseq3 ];then $(MKDIR) $(B)/baseq3;fi
-	@if [ ! -d $(B)/baseq3/cgame ];then $(MKDIR) $(B)/baseq3/cgame;fi
-	@if [ ! -d $(B)/baseq3/game ];then $(MKDIR) $(B)/baseq3/game;fi
-	@if [ ! -d $(B)/baseq3/ui ];then $(MKDIR) $(B)/baseq3/ui;fi
-	@if [ ! -d $(B)/baseq3/qcommon ];then $(MKDIR) $(B)/baseq3/qcommon;fi
-	@if [ ! -d $(B)/baseq3/vm ];then $(MKDIR) $(B)/baseq3/vm;fi
+	@if [ ! -d $(B)/rain ];then $(MKDIR) $(B)/rain;fi
+	@if [ ! -d $(B)/rain/cgame ];then $(MKDIR) $(B)/rain/cgame;fi
+	@if [ ! -d $(B)/rain/game ];then $(MKDIR) $(B)/rain/game;fi
+	@if [ ! -d $(B)/rain/ui ];then $(MKDIR) $(B)/rain/ui;fi
+	@if [ ! -d $(B)/rain/qcommon ];then $(MKDIR) $(B)/rain/qcommon;fi
+	@if [ ! -d $(B)/rain/vm ];then $(MKDIR) $(B)/rain/vm;fi
 	@if [ ! -d $(B)/tools ];then $(MKDIR) $(B)/tools;fi
 	@if [ ! -d $(B)/tools/asm ];then $(MKDIR) $(B)/tools/asm;fi
 	@if [ ! -d $(B)/tools/etc ];then $(MKDIR) $(B)/tools/etc;fi
@@ -1582,13 +1582,13 @@ Q3POBJ += \
 Q3POBJ_SMP += \
   $(B)/clientsmp/sdl_glimp.o
 
-$(B)/ioquake3$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+$(B)/rain$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ) \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 
-$(B)/ioquake3-smp$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
+$(B)/rain-smp$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
@@ -1744,7 +1744,7 @@ ifeq ($(PLATFORM),darwin)
     $(B)/ded/sys_osx.o
 endif
 
-$(B)/ioq3ded$(FULLBINEXT): $(Q3DOBJ)
+$(B)/cloud$(FULLBINEXT): $(Q3DOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(Q3DOBJ) $(LIBS)
 
@@ -1755,41 +1755,41 @@ $(B)/ioq3ded$(FULLBINEXT): $(Q3DOBJ)
 #############################################################################
 
 Q3CGOBJ_ = \
-  $(B)/baseq3/cgame/cg_main.o \
-  $(B)/baseq3/cgame/bg_misc.o \
-  $(B)/baseq3/cgame/bg_pmove.o \
-  $(B)/baseq3/cgame/bg_slidemove.o \
-  $(B)/baseq3/cgame/bg_lib.o \
-  $(B)/baseq3/cgame/cg_consolecmds.o \
-  $(B)/baseq3/cgame/cg_draw.o \
-  $(B)/baseq3/cgame/cg_drawtools.o \
-  $(B)/baseq3/cgame/cg_effects.o \
-  $(B)/baseq3/cgame/cg_ents.o \
-  $(B)/baseq3/cgame/cg_environment.o \
-  $(B)/baseq3/cgame/cg_event.o \
-  $(B)/baseq3/cgame/cg_info.o \
-  $(B)/baseq3/cgame/cg_localents.o \
-  $(B)/baseq3/cgame/cg_marks.o \
-  $(B)/baseq3/cgame/cg_players.o \
-  $(B)/baseq3/cgame/cg_playerstate.o \
-  $(B)/baseq3/cgame/cg_predict.o \
-  $(B)/baseq3/cgame/cg_scoreboard.o \
-  $(B)/baseq3/cgame/cg_servercmds.o \
-  $(B)/baseq3/cgame/cg_snapshot.o \
-  $(B)/baseq3/cgame/cg_view.o \
-  $(B)/baseq3/cgame/cg_weapons.o \
+  $(B)/rain/cgame/cg_main.o \
+  $(B)/rain/cgame/bg_misc.o \
+  $(B)/rain/cgame/bg_pmove.o \
+  $(B)/rain/cgame/bg_slidemove.o \
+  $(B)/rain/cgame/bg_lib.o \
+  $(B)/rain/cgame/cg_consolecmds.o \
+  $(B)/rain/cgame/cg_draw.o \
+  $(B)/rain/cgame/cg_drawtools.o \
+  $(B)/rain/cgame/cg_effects.o \
+  $(B)/rain/cgame/cg_ents.o \
+  $(B)/rain/cgame/cg_environment.o \
+  $(B)/rain/cgame/cg_event.o \
+  $(B)/rain/cgame/cg_info.o \
+  $(B)/rain/cgame/cg_localents.o \
+  $(B)/rain/cgame/cg_marks.o \
+  $(B)/rain/cgame/cg_players.o \
+  $(B)/rain/cgame/cg_playerstate.o \
+  $(B)/rain/cgame/cg_predict.o \
+  $(B)/rain/cgame/cg_scoreboard.o \
+  $(B)/rain/cgame/cg_servercmds.o \
+  $(B)/rain/cgame/cg_snapshot.o \
+  $(B)/rain/cgame/cg_view.o \
+  $(B)/rain/cgame/cg_weapons.o \
   \
-  $(B)/baseq3/qcommon/q_math.o \
-  $(B)/baseq3/qcommon/q_shared.o
+  $(B)/rain/qcommon/q_math.o \
+  $(B)/rain/qcommon/q_shared.o
 
-Q3CGOBJ = $(Q3CGOBJ_) $(B)/baseq3/cgame/cg_syscalls.o
+Q3CGOBJ = $(Q3CGOBJ_) $(B)/rain/cgame/cg_syscalls.o
 Q3CGVMOBJ = $(Q3CGOBJ_:%.o=%.asm)
 
-$(B)/baseq3/cgame$(SHLIBNAME): $(Q3CGOBJ)
+$(B)/rain/cgame$(SHLIBNAME): $(Q3CGOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3CGOBJ)
 
-$(B)/baseq3/vm/cgame.qvm: $(Q3CGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
+$(B)/rain/vm/cgame.qvm: $(Q3CGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(Q3CGVMOBJ) $(CGDIR)/cg_syscalls.asm
 
@@ -1799,49 +1799,49 @@ $(B)/baseq3/vm/cgame.qvm: $(Q3CGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
 #############################################################################
 
 Q3GOBJ_ = \
-  $(B)/baseq3/game/g_main.o \
-  $(B)/baseq3/game/ai_chat.o \
-  $(B)/baseq3/game/ai_cmd.o \
-  $(B)/baseq3/game/ai_dmnet.o \
-  $(B)/baseq3/game/ai_dmq3.o \
-  $(B)/baseq3/game/ai_main.o \
-  $(B)/baseq3/game/ai_team.o \
-  $(B)/baseq3/game/ai_vcmd.o \
-  $(B)/baseq3/game/bg_misc.o \
-  $(B)/baseq3/game/bg_pmove.o \
-  $(B)/baseq3/game/bg_slidemove.o \
-  $(B)/baseq3/game/bg_lib.o \
-  $(B)/baseq3/game/g_active.o \
-  $(B)/baseq3/game/g_arenas.o \
-  $(B)/baseq3/game/g_bot.o \
-  $(B)/baseq3/game/g_client.o \
-  $(B)/baseq3/game/g_cmds.o \
-  $(B)/baseq3/game/g_combat.o \
-  $(B)/baseq3/game/g_items.o \
-  $(B)/baseq3/game/g_mem.o \
-  $(B)/baseq3/game/g_misc.o \
-  $(B)/baseq3/game/g_missile.o \
-  $(B)/baseq3/game/g_mover.o \
-  $(B)/baseq3/game/g_session.o \
-  $(B)/baseq3/game/g_spawn.o \
-  $(B)/baseq3/game/g_svcmds.o \
-  $(B)/baseq3/game/g_target.o \
-  $(B)/baseq3/game/g_team.o \
-  $(B)/baseq3/game/g_trigger.o \
-  $(B)/baseq3/game/g_utils.o \
-  $(B)/baseq3/game/g_weapon.o \
+  $(B)/rain/game/g_main.o \
+  $(B)/rain/game/ai_chat.o \
+  $(B)/rain/game/ai_cmd.o \
+  $(B)/rain/game/ai_dmnet.o \
+  $(B)/rain/game/ai_dmq3.o \
+  $(B)/rain/game/ai_main.o \
+  $(B)/rain/game/ai_team.o \
+  $(B)/rain/game/ai_vcmd.o \
+  $(B)/rain/game/bg_misc.o \
+  $(B)/rain/game/bg_pmove.o \
+  $(B)/rain/game/bg_slidemove.o \
+  $(B)/rain/game/bg_lib.o \
+  $(B)/rain/game/g_active.o \
+  $(B)/rain/game/g_arenas.o \
+  $(B)/rain/game/g_bot.o \
+  $(B)/rain/game/g_client.o \
+  $(B)/rain/game/g_cmds.o \
+  $(B)/rain/game/g_combat.o \
+  $(B)/rain/game/g_items.o \
+  $(B)/rain/game/g_mem.o \
+  $(B)/rain/game/g_misc.o \
+  $(B)/rain/game/g_missile.o \
+  $(B)/rain/game/g_mover.o \
+  $(B)/rain/game/g_session.o \
+  $(B)/rain/game/g_spawn.o \
+  $(B)/rain/game/g_svcmds.o \
+  $(B)/rain/game/g_target.o \
+  $(B)/rain/game/g_team.o \
+  $(B)/rain/game/g_trigger.o \
+  $(B)/rain/game/g_utils.o \
+  $(B)/rain/game/g_weapon.o \
   \
-  $(B)/baseq3/qcommon/q_math.o \
-  $(B)/baseq3/qcommon/q_shared.o
+  $(B)/rain/qcommon/q_math.o \
+  $(B)/rain/qcommon/q_shared.o
 
-Q3GOBJ = $(Q3GOBJ_) $(B)/baseq3/game/g_syscalls.o
+Q3GOBJ = $(Q3GOBJ_) $(B)/rain/game/g_syscalls.o
 Q3GVMOBJ = $(Q3GOBJ_:%.o=%.asm)
 
-$(B)/baseq3/qagame$(SHLIBNAME): $(Q3GOBJ)
+$(B)/rain/qagame$(SHLIBNAME): $(Q3GOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3GOBJ)
 
-$(B)/baseq3/vm/qagame.qvm: $(Q3GVMOBJ) $(GDIR)/g_syscalls.asm $(Q3ASM)
+$(B)/rain/vm/qagame.qvm: $(Q3GVMOBJ) $(GDIR)/g_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(Q3GVMOBJ) $(GDIR)/g_syscalls.asm
 
@@ -1903,60 +1903,60 @@ $(B)/baseq3/vm/qagame.qvm: $(Q3GVMOBJ) $(GDIR)/g_syscalls.asm $(Q3ASM)
 #############################################################################
 
 Q3UIOBJ_ = \
-  $(B)/baseq3/ui/ui_main.o \
-  $(B)/baseq3/ui/bg_misc.o \
-  $(B)/baseq3/ui/bg_lib.o \
-  $(B)/baseq3/ui/ui_addbots.o \
-  $(B)/baseq3/ui/ui_atoms.o \
-  $(B)/baseq3/ui/ui_cdkey.o \
-  $(B)/baseq3/ui/ui_authorize.o \
-  $(B)/baseq3/ui/ui_cinematics.o \
-  $(B)/baseq3/ui/ui_confirm.o \
-  $(B)/baseq3/ui/ui_connect.o \
-  $(B)/baseq3/ui/ui_controls2.o \
-  $(B)/baseq3/ui/ui_credits.o \
-  $(B)/baseq3/ui/ui_demo2.o \
-  $(B)/baseq3/ui/ui_display.o \
-  $(B)/baseq3/ui/ui_gameinfo.o \
-  $(B)/baseq3/ui/ui_ingame.o \
-  $(B)/baseq3/ui/ui_loadconfig.o \
-  $(B)/baseq3/ui/ui_menu.o \
-  $(B)/baseq3/ui/ui_mfield.o \
-  $(B)/baseq3/ui/ui_mods.o \
-  $(B)/baseq3/ui/ui_network.o \
-  $(B)/baseq3/ui/ui_options.o \
-  $(B)/baseq3/ui/ui_playermodel.o \
-  $(B)/baseq3/ui/ui_players.o \
-  $(B)/baseq3/ui/ui_playersettings.o \
-  $(B)/baseq3/ui/ui_preferences.o \
-  $(B)/baseq3/ui/ui_qmenu.o \
-  $(B)/baseq3/ui/ui_removebots.o \
-  $(B)/baseq3/ui/ui_saveconfig.o \
-  $(B)/baseq3/ui/ui_serverinfo.o \
-  $(B)/baseq3/ui/ui_servers2.o \
-  $(B)/baseq3/ui/ui_setup.o \
-  $(B)/baseq3/ui/ui_sound.o \
-  $(B)/baseq3/ui/ui_sparena.o \
-  $(B)/baseq3/ui/ui_specifyserver.o \
-  $(B)/baseq3/ui/ui_splevel.o \
-  $(B)/baseq3/ui/ui_sppostgame.o \
-  $(B)/baseq3/ui/ui_spskill.o \
-  $(B)/baseq3/ui/ui_startserver.o \
-  $(B)/baseq3/ui/ui_team.o \
-  $(B)/baseq3/ui/ui_teamorders.o \
-  $(B)/baseq3/ui/ui_video.o \
+  $(B)/rain/ui/ui_main.o \
+  $(B)/rain/ui/bg_misc.o \
+  $(B)/rain/ui/bg_lib.o \
+  $(B)/rain/ui/ui_addbots.o \
+  $(B)/rain/ui/ui_atoms.o \
+  $(B)/rain/ui/ui_cdkey.o \
+  $(B)/rain/ui/ui_authorize.o \
+  $(B)/rain/ui/ui_cinematics.o \
+  $(B)/rain/ui/ui_confirm.o \
+  $(B)/rain/ui/ui_connect.o \
+  $(B)/rain/ui/ui_controls2.o \
+  $(B)/rain/ui/ui_credits.o \
+  $(B)/rain/ui/ui_demo2.o \
+  $(B)/rain/ui/ui_display.o \
+  $(B)/rain/ui/ui_gameinfo.o \
+  $(B)/rain/ui/ui_ingame.o \
+  $(B)/rain/ui/ui_loadconfig.o \
+  $(B)/rain/ui/ui_menu.o \
+  $(B)/rain/ui/ui_mfield.o \
+  $(B)/rain/ui/ui_mods.o \
+  $(B)/rain/ui/ui_network.o \
+  $(B)/rain/ui/ui_options.o \
+  $(B)/rain/ui/ui_playermodel.o \
+  $(B)/rain/ui/ui_players.o \
+  $(B)/rain/ui/ui_playersettings.o \
+  $(B)/rain/ui/ui_preferences.o \
+  $(B)/rain/ui/ui_qmenu.o \
+  $(B)/rain/ui/ui_removebots.o \
+  $(B)/rain/ui/ui_saveconfig.o \
+  $(B)/rain/ui/ui_serverinfo.o \
+  $(B)/rain/ui/ui_servers2.o \
+  $(B)/rain/ui/ui_setup.o \
+  $(B)/rain/ui/ui_sound.o \
+  $(B)/rain/ui/ui_sparena.o \
+  $(B)/rain/ui/ui_specifyserver.o \
+  $(B)/rain/ui/ui_splevel.o \
+  $(B)/rain/ui/ui_sppostgame.o \
+  $(B)/rain/ui/ui_spskill.o \
+  $(B)/rain/ui/ui_startserver.o \
+  $(B)/rain/ui/ui_team.o \
+  $(B)/rain/ui/ui_teamorders.o \
+  $(B)/rain/ui/ui_video.o \
   \
-  $(B)/baseq3/qcommon/q_math.o \
-  $(B)/baseq3/qcommon/q_shared.o
+  $(B)/rain/qcommon/q_math.o \
+  $(B)/rain/qcommon/q_shared.o
 
 Q3UIOBJ = $(Q3UIOBJ_) $(B)/missionpack/ui/ui_syscalls.o
 Q3UIVMOBJ = $(Q3UIOBJ_:%.o=%.asm)
 
-$(B)/baseq3/ui$(SHLIBNAME): $(Q3UIOBJ)
+$(B)/rain/ui$(SHLIBNAME): $(Q3UIOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3UIOBJ)
 
-$(B)/baseq3/vm/ui.qvm: $(Q3UIVMOBJ) $(UIDIR)/ui_syscalls.asm $(Q3ASM)
+$(B)/rain/vm/ui.qvm: $(Q3UIVMOBJ) $(UIDIR)/ui_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(Q3UIVMOBJ) $(UIDIR)/ui_syscalls.asm
 
@@ -2076,43 +2076,43 @@ endif
 ## GAME MODULE RULES
 #############################################################################
 
-$(B)/baseq3/cgame/bg_%.o: $(GDIR)/bg_%.c
+$(B)/rain/cgame/bg_%.o: $(GDIR)/bg_%.c
 	$(DO_CGAME_CC)
 
-$(B)/baseq3/cgame/%.o: $(CGDIR)/%.c
+$(B)/rain/cgame/%.o: $(CGDIR)/%.c
 	$(DO_CGAME_CC)
 
-$(B)/baseq3/cgame/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
+$(B)/rain/cgame/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
 	$(DO_CGAME_Q3LCC)
 
-$(B)/baseq3/cgame/%.asm: $(CGDIR)/%.c $(Q3LCC)
+$(B)/rain/cgame/%.asm: $(CGDIR)/%.c $(Q3LCC)
 	$(DO_CGAME_Q3LCC)
 
 
-$(B)/baseq3/game/%.o: $(GDIR)/%.c
+$(B)/rain/game/%.o: $(GDIR)/%.c
 	$(DO_GAME_CC)
 
-$(B)/baseq3/game/%.asm: $(GDIR)/%.c $(Q3LCC)
+$(B)/rain/game/%.asm: $(GDIR)/%.c $(Q3LCC)
 	$(DO_GAME_Q3LCC)
 
 
-$(B)/baseq3/ui/bg_%.o: $(GDIR)/bg_%.c
+$(B)/rain/ui/bg_%.o: $(GDIR)/bg_%.c
 	$(DO_UI_CC)
 
-$(B)/baseq3/ui/%.o: $(Q3UIDIR)/%.c
+$(B)/rain/ui/%.o: $(Q3UIDIR)/%.c
 	$(DO_UI_CC)
 
-$(B)/baseq3/ui/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
+$(B)/rain/ui/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
 	$(DO_UI_Q3LCC)
 
-$(B)/baseq3/ui/%.asm: $(Q3UIDIR)/%.c $(Q3LCC)
+$(B)/rain/ui/%.asm: $(Q3UIDIR)/%.c $(Q3LCC)
 	$(DO_UI_Q3LCC)
 
 
-$(B)/baseq3/qcommon/%.o: $(CMDIR)/%.c
+$(B)/rain/qcommon/%.o: $(CMDIR)/%.c
 	$(DO_SHLIB_CC)
 
-$(B)/baseq3/qcommon/%.asm: $(CMDIR)/%.c $(Q3LCC)
+$(B)/rain/qcommon/%.asm: $(CMDIR)/%.c $(Q3LCC)
 	$(DO_Q3LCC)
 
 
@@ -2132,27 +2132,27 @@ copyfiles: release
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/missionpack
 
 ifneq ($(BUILD_CLIENT),0)
-	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/ioquake3$(FULLBINEXT) $(COPYBINDIR)/ioquake3$(FULLBINEXT)
+	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/rain$(FULLBINEXT) $(COPYBINDIR)/rain$(FULLBINEXT)
 endif
 
 # Don't copy the SMP until it's working together with SDL.
 #ifneq ($(BUILD_CLIENT_SMP),0)
-#	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/ioquake3-smp$(FULLBINEXT) $(COPYBINDIR)/ioquake3-smp$(FULLBINEXT)
+#	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/rain-smp$(FULLBINEXT) $(COPYBINDIR)/rain-smp$(FULLBINEXT)
 #endif
 
 ifneq ($(BUILD_SERVER),0)
-	@if [ -f $(BR)/ioq3ded$(FULLBINEXT) ]; then \
-		$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/ioq3ded$(FULLBINEXT) $(COPYBINDIR)/ioq3ded$(FULLBINEXT); \
+	@if [ -f $(BR)/cloud$(FULLBINEXT) ]; then \
+		$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/cloud$(FULLBINEXT) $(COPYBINDIR)/cloud$(FULLBINEXT); \
 	fi
 endif
 
 ifneq ($(BUILD_GAME_SO),0)
-	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/baseq3/cgame$(SHLIBNAME) \
-					$(COPYDIR)/baseq3/.
-	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/baseq3/qagame$(SHLIBNAME) \
-					$(COPYDIR)/baseq3/.
-	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/baseq3/ui$(SHLIBNAME) \
-					$(COPYDIR)/baseq3/.
+	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/rain/cgame$(SHLIBNAME) \
+					$(COPYDIR)/rain/.
+	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/rain/qagame$(SHLIBNAME) \
+					$(COPYDIR)/rain/.
+	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/rain/ui$(SHLIBNAME) \
+					$(COPYDIR)/rain/.
 endif
 
 clean: clean-debug clean-release
@@ -2199,10 +2199,10 @@ else
 endif
 
 dist:
-	rm -rf ioquake3-$(VERSION)
-	svn export . ioquake3-$(VERSION)
-	tar --owner=root --group=root --force-local -cjf ioquake3-$(VERSION).tar.bz2 ioquake3-$(VERSION)
-	rm -rf ioquake3-$(VERSION)
+	rm -rf rain-$(VERSION)
+	svn export . rain-$(VERSION)
+	tar --owner=root --group=root --force-local -cjf rain-$(VERSION).tar.bz2 rain-$(VERSION)
+	rm -rf rain-$(VERSION)
 
 #############################################################################
 # DEPENDENCIES
