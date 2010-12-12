@@ -143,6 +143,8 @@ void SP_func_door(gentity_t *ent);
 void SP_func_train(gentity_t *ent);
 void SP_func_timer(gentity_t *self);
 
+void SP_func_shooter(gentity_t *ent);
+
 void SP_func_breakable(gentity_t *ent);
 
 void SP_trigger_always(gentity_t *ent);
@@ -258,8 +260,6 @@ spawn_t spawns[] = {
     {"shooter_grenade", SP_shooter_grenade},
     {"shooter_plasma", SP_shooter_plasma},
 
-    {"shooter_nuke", SP_shooter_nuke},
-
     {"team_CTF_redplayer", SP_team_CTF_redplayer},
     {"team_CTF_blueplayer", SP_team_CTF_blueplayer},
 
@@ -268,11 +268,10 @@ spawn_t spawns[] = {
 
     {"item_botroam", SP_item_botroam},
 
-    //{"", 0},
-
     // RAIN ENTITIES
     // func_* section
     {"func_breakable", SP_func_breakable},
+    {"func_shooter", SP_func_shooter},
 
     // info_* section
     {"info_enemy", 0},
@@ -284,9 +283,7 @@ spawn_t spawns[] = {
     {"target_win", SP_target_win},
     {"target_stopwatch", 0},
     {"target_condition", SP_target_condition},
-    {"target_text", 0},
     {"target_remove", 0},
-    {"target_health", 0},
     {"target_random", 0},
 
     {NULL, 0}

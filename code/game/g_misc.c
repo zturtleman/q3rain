@@ -263,18 +263,15 @@ void Use_Shooter(gentity_t *ent, gentity_t *other, gentity_t *activator) {
     VectorNormalize(dir);
 
     switch (ent->s.weapon) {
-        case WP_HE:
+        /*case WP_HE:
             fire_he(ent, ent->s.origin, dir);
             break;
         case WP_NUKE:
             fire_nuke(ent, ent->s.origin, dir);
+            break;*/
+        default:
+            FireEntWeapon(ent, dir);
             break;
-            /*case WP_ROCKET_LAUNCHER:
-                    fire_rocket( ent, ent->s.origin, dir );
-                    break;
-            case WP_PLASMAGUN:
-                    fire_plasma( ent, ent->s.origin, dir );
-                    break;*/
     }
 
     G_AddEvent(ent, EV_FIRE_WEAPON, 0);
@@ -287,6 +284,9 @@ static void InitShooter_Finish(gentity_t *ent) {
 }
 
 void InitShooter(gentity_t *ent, int weapon) {
+    if (weapon < 0) {
+        G_FreeEntity(ent);
+    }
     ent->use = Use_Shooter;
     ent->s.weapon = weapon;
 
@@ -425,7 +425,7 @@ Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
  */
 void SP_shooter_plasma(gentity_t *ent) {
-    //InitShooter( ent, WP_PLASMAGUN);
+    InitShooter(ent, WP_ACR);
 }
 
 /*QUAKED shooter_grenade (1 0 0) (-16 -16 -16) (16 16 16)
@@ -442,4 +442,11 @@ Fires at either the target or the current direction.
  */
 void SP_shooter_nuke(gentity_t *ent) {
     InitShooter(ent, WP_NUKE);
+}
+
+void SP_func_shooter(gentity_t *ent) {
+    int weapon;
+
+    G_SpawnInt("weapon", "-1", &weapon);
+    InitShooter(ent, weapon);
 }

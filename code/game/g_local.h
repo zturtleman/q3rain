@@ -622,6 +622,7 @@ qboolean G_FilterPacket(char *from);
 // g_weapon.c
 //
 void FireWeapon(gentity_t *ent);
+void FireEntWeapon(gentity_t *ent, vec3_t dir);
 #ifdef MISSIONPACK
 void G_StartKamikaze(gentity_t *ent);
 #endif

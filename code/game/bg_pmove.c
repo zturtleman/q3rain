@@ -468,7 +468,7 @@ static qboolean PM_CheckJump(void) {
 
     pm->ps->groundEntityNum = ENTITYNUM_NONE;
     if (pm->ps->powerups[PW_ADRENALINE] == 0) {
-        vel = (JUMP_VELOCITY + (pm->ps->sprintAdd / 3)) / (pm->ps->legsfactor / 10);
+        vel = (JUMP_VELOCITY + (pm->ps->sprintAdd / 4)) / (pm->ps->legsfactor / 10);
         if (vel < JUMP_VELOCITY / 1.5) {
             vel = JUMP_VELOCITY / 1.5;
         }
@@ -900,7 +900,9 @@ static void PM_WallJump(void) {
     }
 
     if (jumped) {
-        pm->ps->velocity[2] += boost * 1.5f;
+        pm->ps->velocity[2] += boost * 1.75f;
+
+        pm->ps->walljumps++;
 
         pm->ps->groundEntityNum = ENTITYNUM_NONE;
 

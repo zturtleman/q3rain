@@ -582,15 +582,19 @@ void Weapon_ACR_Fire(gentity_t *ent) {
     gentity_t *traceEnt;
     int i, passent;
 
-    ent->client->ps.spammed++;
-    ent->client->ps.spread = ACR_MINSPREAD + (ACR_SPREADADD * (ent->client->ps.spammed - 1));
-    if (ent->client->ps.spread > ACR_MAXSPREAD) {
-        ent->client->ps.spread = ACR_MAXSPREAD;
-    }
+    if (ent->client != NULL) {
+        ent->client->ps.spammed++;
+        ent->client->ps.spread = ACR_MINSPREAD + (ACR_SPREADADD * (ent->client->ps.spammed - 1));
+        if (ent->client->ps.spread > ACR_MAXSPREAD) {
+            ent->client->ps.spread = ACR_MAXSPREAD;
+        }
 
-    r = random() * M_PI * 2.0f;
-    u = sin(r) * crandom() * (ent->client->ps.spread + ACR_SPREADADD) * 16;
-    r = cos(r) * crandom() * (ent->client->ps.spread + ACR_SPREADADD) * 16;
+        r = random() * M_PI * 2.0f;
+        u = sin(r) * crandom() * (ent->client->ps.spread + ACR_SPREADADD) * 16;
+        r = cos(r) * crandom() * (ent->client->ps.spread + ACR_SPREADADD) * 16;
+    } else {
+        r = u = 0;
+    }
     VectorMA(muzzle, ACR_RANGE, forward, end);
     VectorMA(end, r, right, end);
     VectorMA(end, u, up, end);
@@ -1014,8 +1018,8 @@ FireWeapon
 void FireWeapon(gentity_t *ent) {
 
     //Remove Ammo if not infinite
-    if (ent->client->clipammo[ ent->client->ps.weapon ] != -1) {
-        ent->client->clipammo[ ent->client->ps.weapon ]--;
+    if (ent->client->clipammo[ent->client->ps.weapon] != -1) {
+        ent->client->clipammo[ent->client->ps.weapon]--;
     }
 
     // track shots taken for accuracy tracking.  Grapple is not a weapon and gauntet is just not tracked
@@ -1084,6 +1088,59 @@ void FireWeapon(gentity_t *ent) {
     }
 
     ent->client->ps.grenadetime = -1337;
+}
+
+/*
+===============
+FireEntWeapon
+===============
+ */
+void FireEntWeapon(gentity_t *ent, vec3_t dir) {
+
+    VectorCopy(dir, forward);
+    VectorCopy(dir, right);
+    VectorCopy(dir, up);
+
+    CalcMuzzlePointOrigin(ent, ent->s.origin, forward, right, up, muzzle);
+
+    // fire the specific weapon
+    switch (ent->s.weapon) {
+        case WP_HANDS:
+            Weapon_Hands_Fire(ent);
+            break;
+        case WP_KNIFE:
+            Weapon_Knife_Fire(ent);
+            break;
+        case WP_HE:
+            Weapon_HE_Fire(ent, 3000);
+            break;
+        case WP_BARRETT:
+            Weapon_Barrett_Fire(ent, 0);
+            break;
+        case WP_INTERVENTION:
+            Weapon_Intervention_Fire(ent, 0);
+            break;
+        case WP_CROSSBOW:
+            Weapon_Crossbow_Fire(ent);
+            break;
+        case WP_ACR:
+            Weapon_ACR_Fire(ent);
+            break;
+        case WP_WALTHER:
+            Weapon_Walther_Fire(ent);
+            break;
+        case WP_INJECTOR:
+            Weapon_Injector_Fire(ent);
+            break;
+        case WP_BOMB:
+            break;
+        case WP_NUKE:
+            Weapon_Nuke_Fire(ent);
+            break;
+        default:
+            //G_Error( "Bad ent->s.weapon" );
+            break;
+    }
 }
 
 static void FireGrenade(gentity_t *ent, int time, int mod) {

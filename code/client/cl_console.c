@@ -328,17 +328,27 @@ void Con_Auth_f(void) {
         Com_Printf("usage: auth <nickname> <password>\nSpace, \", @ and ^ are not allowed.\n");
         return;
     }
-    if (!NET_StringToAdr("localhost:1337", &master, NA_UNSPEC)) {
-        Com_Printf("^1ERROR: Couldn't resolve master server\n");
-        return;
+    // TODO remove localhost stuff
+    if (!NET_StringToAdr("localhost:27950", &master, NA_UNSPEC)) {
+        Com_Printf("^1ERROR: Couldn't resolve master server, trying alternative\n");
+        if (!NET_StringToAdr("hazewood.de:27950", &master, NA_UNSPEC)) {
+            Com_Printf("^1ERROR: Couldn't resolve master server, trying alternative\n");
+            if (!NET_StringToAdr("rylius-is-a-geek.org:27950", &master, NA_UNSPEC)) {
+                Com_Printf("^1ERROR: Couldn't resolve master server, trying alternative\n");
+                if (!NET_StringToAdr("rylius-is-a-geek.org:1337", &master, NA_UNSPEC)) {
+                    Com_Printf("^1ERROR: Couldn't resolve master server\n");
+                    return;
+                }
+            }
+        }
     }
-    message = va("%s %s %s", Cmd_Argv(0), Cmd_Argv(1), Cmd_Argv(2));
+    message = va("%s %s %s ", Cmd_Argv(0), Cmd_Argv(1), Cmd_Argv(2));
 
     NET_SendPacket(NS_CLIENT, strlen(message) + 1, message, master);
     NET_OutOfBandPrint(NS_CLIENT, master, "%s", message);
 
-    NET_SendPacket(NS_SERVER, strlen(message) + 1, message, master);
-    NET_OutOfBandPrint(NS_SERVER, master, "%s", message);
+    /*NET_SendPacket(NS_SERVER, strlen(message) + 1, message, master);
+    NET_OutOfBandPrint(NS_SERVER, master, "%s", message);*/
 }
 
 /*

@@ -2418,7 +2418,36 @@ void CL_ConnectionlessPacket(netadr_t from, msg_t *msg) {
         return;
     }
 
-    Com_DPrintf("Unknown connectionless packet command.\n");
+    if (!Q_strncmp(c, "authSuccess", 12)) {
+        CL_AuthSuccess(&from, msg);
+        return;
+    }
+
+    if (!Q_strncmp(c, "authFail", 8)) {
+        CL_AuthFail(&from, msg);
+        return;
+    }
+
+    Com_DPrintf("Unknown connectionless packet command.\nWas: '%s'\n", c);
+    Com_Printf("Unknown connectionless packet command.\nWas: '%s'\n", c);
+}
+
+/*
+===================
+CL_AuthSuccess
+===================
+ */
+void CL_AuthSuccess(netadr_t *from, msg_t *msg) {
+    Com_Printf("^2Successfully logged in.\n");
+}
+
+/*
+===================
+CL_AuthFail
+===================
+ */
+void CL_AuthFail(netadr_t *from, msg_t *msg) {
+    Com_Printf("^1Authentication failed!\nWrong password?\n");
 }
 
 /*

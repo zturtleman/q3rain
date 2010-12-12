@@ -434,6 +434,9 @@ void CL_FlushMemory(void);
 void CL_ShutdownAll(void);
 void CL_AddReliableCommand(const char *cmd, qboolean isDisconnectCmd);
 
+void CL_AuthSuccess(netadr_t *from, msg_t *msg);
+void CL_AuthFail(netadr_t *from, msg_t *msg);
+
 void CL_StartHunkUsers(qboolean rendererOnly);
 
 void CL_Disconnect_f(void);
