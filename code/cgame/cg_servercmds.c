@@ -26,7 +26,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 #include "../../ui/menudef.h"
-#undef MISSIONPACK
 
 typedef struct {
     const char *order;
@@ -214,6 +213,9 @@ void CG_SetConfigValues(void) {
     cgs.scores2 = atoi(CG_ConfigString(CS_SCORES2));
     cgs.levelStartTime = atoi(CG_ConfigString(CS_LEVEL_START_TIME));
     cg.warmup = atoi(CG_ConfigString(CS_WARMUP));
+    if (cg_atmosphericEffects.integer) {
+        CG_EffectParse(CG_ConfigString(CS_ATMOSEFFECT));
+    }
 }
 
 /*
@@ -323,6 +325,8 @@ static void CG_ConfigStringModified(void) {
         CG_BuildSpectatorString();
     } else if (num == CS_SHADERSTATE) {
         CG_ShaderStateChanged();
+    } else if (num == CS_ATMOSEFFECT) {
+        CG_EffectParse(str);
     }
 
 }
@@ -668,7 +672,7 @@ int CG_GetVoiceChat(voiceChatList_t *voiceChatList, const char *id, sfxHandle_t 
 CG_VoiceChatListForClient
 =================
  */
-voiceChatList_t *CG_VoiceChatListForClient(int clientNum) {
+voiceChatList_t * CG_VoiceChatListForClient(int clientNum) {
     clientInfo_t *ci;
     int voiceChatNum, i, j, k, gender;
     char filename[MAX_QPATH], headModelName[MAX_QPATH];
@@ -769,7 +773,7 @@ bufferedVoiceChat_t voiceChatBuffer[MAX_VOICECHATBUFFER];
 CG_PlayVoiceChat
 =================
  */
-void CG_PlayVoiceChat(bufferedVoiceChat_t *vchat) {
+void CG_PlayVoiceChat(bufferedVoiceChat_t * vchat) {
 #ifdef MISSIONPACK
     // if we are going into the intermission, don't start any voices
     if (cg.intermissionStarted) {
@@ -822,7 +826,7 @@ void CG_PlayBufferedVoiceChats(void) {
 CG_AddBufferedVoiceChat
 =====================
  */
-void CG_AddBufferedVoiceChat(bufferedVoiceChat_t *vchat) {
+void CG_AddBufferedVoiceChat(bufferedVoiceChat_t * vchat) {
 #ifdef MISSIONPACK
     // if we are going into the intermission, don't start any voices
     if (cg.intermissionStarted) {
@@ -902,8 +906,8 @@ void CG_VoiceChat(int mode) {
     cmd = CG_Argv(4);
 
     if (cg_noTaunt.integer != 0) {
-        if (!strcmp(cmd, VOICECHAT_KILLINSULT) || !strcmp(cmd, VOICECHAT_TAUNT) ||  \
-			!strcmp(cmd, VOICECHAT_DEATHINSULT) || !strcmp(cmd, VOICECHAT_KILLGAUNTLET) ||  \
+        if (!strcmp(cmd, VOICECHAT_KILLINSULT) || !strcmp(cmd, VOICECHAT_TAUNT) ||         \
+			!strcmp(cmd, VOICECHAT_DEATHINSULT) || !strcmp(cmd, VOICECHAT_KILLGAUNTLET) ||         \
 			!strcmp(cmd, VOICECHAT_PRAISE)) {
             return;
         }

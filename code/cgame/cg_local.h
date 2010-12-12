@@ -1102,6 +1102,9 @@ extern vmCvar_t cg_oldRocket;
 extern vmCvar_t cg_oldPlasma;
 extern vmCvar_t cg_trueLightning;
 
+extern vmCvar_t cg_atmosphericEffects;
+extern vmCvar_t cg_lowEffects;
+
 //
 // cg_main.c
 //
@@ -1126,6 +1129,12 @@ void CG_SetScoreSelection(void *menu);
 score_t *CG_GetSelectedScore(void);
 void CG_BuildSpectatorString(void);
 
+//
+// cg_atmospheric.c
+//
+void CG_EffectParse(const char *effectstr);
+void CG_AddAtmosphericEffects();
+qboolean CG_AtmosphericKludge();
 
 //
 // cg_view.c

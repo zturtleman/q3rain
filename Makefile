@@ -1778,6 +1778,7 @@ Q3CGOBJ_ = \
   $(B)/rain/cgame/cg_snapshot.o \
   $(B)/rain/cgame/cg_view.o \
   $(B)/rain/cgame/cg_weapons.o \
+  $(B)/rain/cgame/cg_atmospheric.o \
   \
   $(B)/rain/qcommon/q_math.o \
   $(B)/rain/qcommon/q_shared.o

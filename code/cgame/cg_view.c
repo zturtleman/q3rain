@@ -484,12 +484,12 @@ static int CG_CalcFov(void) {
 
     if (cg.predictedPlayerState.pm_type == PM_INTERMISSION) {
         // if in intermission, use a fixed value
-        fov_x = 90;
+        fov_x = 110;
     } else {
         // user selectable
         if (cgs.dmflags & DF_FIXED_FOV) {
             // dmflag to prevent wide fov for all clients
-            fov_x = 90;
+            fov_x = 110;
         } else {
             fov_x = cg_fov.value;
             if (fov_x < 1) {
@@ -821,7 +821,7 @@ void CG_DrawActiveFrame(int serverTime, stereoFrame_t stereoView, qboolean demoP
         CG_AddMarks();
         CG_AddParticles();
         CG_AddLocalEntities();
-        //CG_AddWeather();
+        CG_AddAtmosphericEffects(); // Add rain/snow etc.
     }
     CG_AddViewWeapon(&cg.predictedPlayerState);
 

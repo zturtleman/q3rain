@@ -9,6 +9,8 @@ Roughly inspired by Q3F Team
 ===========================================
 */
 
+/*
+
 #define MAX_WEATHER_PARTICLES 8192
 #define RAIN_WEIGHT 1.1f
 #define SNOW_WEIGHT 0.1f
@@ -262,3 +264,5 @@ static void CG_SetupWeather(void) {
   
   Com_Printf("^2CG_SetupWeather: Finished.\n");
 }
+
+ */
