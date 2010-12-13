@@ -367,8 +367,8 @@ static void SV_Kick_f(void) {
         return;
     }
 
-    if (Cmd_Argc() != 2) {
-        Com_Printf("Usage: kick <player name>\nkick all = kick everyone\nkick allbots = kick all bots\n");
+    if (Cmd_Argc() <= 1 || Cmd_Argc() > 3) {
+        Com_Printf("Usage: kick <player> [reason]\nkick all [reason] = kick everyone\nkick allbots = kick all bots\n");
         return;
     }
 
@@ -382,7 +382,11 @@ static void SV_Kick_f(void) {
                 if (cl->netchan.remoteAddress.type == NA_LOOPBACK) {
                     continue;
                 }
-                SV_DropClient(cl, "was kicked");
+                if (Cmd_Argv(2) && Q_stricmp(Cmd_Argv(2), "") && Q_stricmp(Cmd_Argv(2), " ")) {
+                    SV_DropClient(cl, va("was kicked (%s)", Cmd_Argv(2)));
+                } else {
+                    SV_DropClient(cl, "was kicked");
+                }
                 cl->lastPacketTime = svs.time; // in case there is a funny zombie
             }
         } else if (!Q_stricmp(Cmd_Argv(1), "allbots")) {
@@ -404,7 +408,11 @@ static void SV_Kick_f(void) {
         return;
     }
 
-    SV_DropClient(cl, "was kicked");
+    if (Cmd_Argv(2) && Q_stricmp(Cmd_Argv(2), "") && Q_stricmp(Cmd_Argv(2), " ")) {
+        SV_DropClient(cl, va("was kicked (%s)", Cmd_Argv(2)));
+    } else {
+        SV_DropClient(cl, "was kicked");
+    }
     cl->lastPacketTime = svs.time; // in case there is a funny zombie
 }
 

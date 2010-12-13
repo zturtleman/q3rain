@@ -684,8 +684,13 @@ void SP_worldspawn(void) {
     G_SpawnString("enableBreath", "1", &s);
     trap_Cvar_Set("g_enableBreath", s);
 
-    G_SpawnString("atmosphere", "", &s);
-    trap_SetConfigstring(CS_ATMOSEFFECT, s); // Atmospheric effect
+    //G_SpawnString("atmosphere", "", &s);
+    //trap_SetConfigstring(CS_ATMOSEFFECT, s); // Atmospheric effect
+
+    G_SpawnString("disallow", "", &s);
+    if (!Q_stricmp("all", s)) {
+        level.allDisallowed = qtrue;
+    }
 
     g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
     g_entities[ENTITYNUM_WORLD].classname = "worldspawn";

@@ -341,7 +341,7 @@ void CG_DrawTeamBackground(int x, int y, int w, int h, float alpha, int team) {
     trap_R_SetColor(NULL);
 }
 
-#define BLINDTIME 10000
+#define BLINDTIME 7500
 
 /*
 ================
@@ -356,15 +356,17 @@ static void CG_DrawDamagePic(void) {
 
     ps = &cg.snap->ps;
     health = ps->stats[STAT_HEALTH];
+    x = y = 0;
+    w = 640;
+    h = 480;
+    CG_AdjustFrom640(&x, &y, &w, &h);
 
     if (cg_blood.integer == 1) {
         if (health > 0) {
-            x = y = 0;
-            w = 640;
-            h = 480;
-            CG_AdjustFrom640(&x, &y, &w, &h);
-            if (health < 80) {
+            if (health < 60) {
                 trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.viewBloodSpurts);
+            } else if (health < 80) {
+                trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.sha_fewBloodSpurts);
             }
             if (cg.predictedPlayerState.powerups[PW_ADRENALINE] == 0) {
                 if (health <= 20) {
@@ -376,10 +378,6 @@ static void CG_DrawDamagePic(void) {
         }
     }
     if (ps->zoomFov > 0) {
-        x = y = 0;
-        w = 640;
-        h = 480;
-        CG_AdjustFrom640(&x, &y, &w, &h);
         trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.sha_viewScope);
     }
     if (health > 0 && ps->blindTime > ps->levelTime) {

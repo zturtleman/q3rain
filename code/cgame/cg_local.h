@@ -907,6 +907,8 @@ typedef struct {
     qhandle_t sha_pdaMinimap;
 
     qhandle_t sha_viewScope;
+
+    qhandle_t sha_fewBloodSpurts;
 } cgMedia_t;
 
 

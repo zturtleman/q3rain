@@ -43,8 +43,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	RESPAWN_MEGAHEALTH	35//120
 #define	RESPAWN_POWERUP		120
 
-#undef MISSIONPACK
-
 //======================================================================
 
 int Pickup_Powerup(gentity_t *ent, gentity_t *other) {
@@ -130,9 +128,9 @@ int Pickup_Holdable(gentity_t *ent, gentity_t *other) {
 
 void Add_Ammo(gentity_t *ent, int weapon, int count) {
     ent->client->ps.ammo[weapon] += count;
-    if (ent->client->ps.ammo[weapon] > 200) {
+    /*if (ent->client->ps.ammo[weapon] > 200) {
         ent->client->ps.ammo[weapon] = 200;
-    }
+    }*/
 }
 
 int Pickup_Ammo(gentity_t *ent, gentity_t *other) {
@@ -180,8 +178,14 @@ int Pickup_Weapon(gentity_t *ent, gentity_t *other) {
     clipsize = ClipAmountForWeapon(ent->item->giTag);
     //Com_Printf("up: ammo: %i clipammo: %i\n", ammo, clipammo);
     //Add_Ammo(other, ent->item->giTag, ammo);
-    other->client->ps.ammo[ent->item->giTag] = clipammo;
-    other->client->clipammo[ent->item->giTag] = ammo;
+
+    if (!Q_stricmp(ent->classname, "weapon_bomb") || !Q_stricmp(ent->classname, "weapon_he")) {
+        other->client->clipammo[ent->item->giTag] += ammo;
+    } else {
+
+        other->client->ps.ammo[ent->item->giTag] += clipammo;
+        other->client->clipammo[ent->item->giTag] = ammo;
+    }
 
     return g_weaponRespawn.integer;
 }
@@ -214,6 +218,7 @@ int Pickup_Health(gentity_t *ent, gentity_t *other) {
     other->client->ps.stats[STAT_HEALTH] = other->health;
 
     if (ent->item->quantity == 100) { // mega health respawns slow
+
         return RESPAWN_MEGAHEALTH;
     }
 
@@ -225,6 +230,7 @@ int Pickup_Health(gentity_t *ent, gentity_t *other) {
 int Pickup_Armor(gentity_t *ent, gentity_t *other) {
     other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
     if (other->client->ps.stats[STAT_ARMOR] > other->client->ps.stats[STAT_MAX_HEALTH] * 2) {
+
         other->client->ps.stats[STAT_ARMOR] = other->client->ps.stats[STAT_MAX_HEALTH] * 2;
     }
     return RESPAWN_ARMOR;
@@ -271,6 +277,7 @@ void RespawnItem(gentity_t *ent) {
         if (ent->speed) {
             te = G_TempEntity(ent->s.pos.trBase, EV_GENERAL_SOUND);
         } else {
+
             te = G_TempEntity(ent->s.pos.trBase, EV_GLOBAL_SOUND);
         }
         te->s.eventParm = G_SoundIndex("sound/items/poweruprespawn.wav");
@@ -412,6 +419,7 @@ void Touch_Item(gentity_t *ent, gentity_t *other, trace_t *trace) {
         ent->nextthink = 0;
         ent->think = 0;
     } else {
+
         ent->nextthink = level.time + respawn * 1000;
         ent->think = RespawnItem;
     }
@@ -431,6 +439,7 @@ Spawns an item and tosses it forward
  */
 
 static void Set_Touch_Item(gentity_t * ent) {
+
     ent->touch = Touch_Item;
 }
 
@@ -518,6 +527,7 @@ gentity_t *dropWeapon(gentity_t *ent, gitem_t *item, float angle, int xr_flags) 
     // extra vertical velocity
     velocity[2] += 0.2;
     VectorNormalize(velocity);
+
     return LaunchItem(item, origin, velocity, xr_flags);
 }
 
@@ -529,6 +539,7 @@ Respawn the item
 ================
  */
 void Use_Item(gentity_t *ent, gentity_t *other, gentity_t *activator) {
+
     RespawnItem(ent);
 }
 
@@ -593,6 +604,7 @@ void FinishSpawningItem(gentity_t *ent) {
         ent->r.contents = 0;
         ent->nextthink = level.time + respawn * 1000;
         ent->think = RespawnItem;
+
         return;
     }
 
@@ -610,6 +622,7 @@ G_CheckTeamItems
  */
 void G_CheckTeamItems(void) {
     // Set up team stuff
+
     Team_InitGame();
 }
 
@@ -619,6 +632,7 @@ ClearRegisteredItems
 ==============
  */
 void ClearRegisteredItems(void) {
+
     memset(itemRegistered, 0, sizeof ( itemRegistered));
     // players always start with the base weapon
 
@@ -649,6 +663,7 @@ The item will be added to the precache list
  */
 void RegisterItem(gitem_t *item) {
     if (!item) {
+
         G_Error("RegisterItem: NULL");
     }
     itemRegistered[ item - bg_itemlist ] = qtrue;
@@ -673,6 +688,7 @@ void SaveRegisteredItems(void) {
             count++;
             string[i] = '1';
         } else {
+
             string[i] = '0';
         }
     }
@@ -692,6 +708,7 @@ int G_ItemDisabled(gitem_t *item) {
     char name[128];
 
     Com_sprintf(name, sizeof (name), "disable_%s", item->classname);
+
     return trap_Cvar_VariableIntegerValue(name);
 }
 
@@ -722,6 +739,7 @@ void G_SpawnItem(gentity_t *ent, gitem_t *item) {
     ent->physicsBounce = 0.50; // items are bouncy
 
     if (item->giType == IT_POWERUP) {
+
         G_SoundIndex("sound/items/poweruprespawn.wav");
         G_SpawnFloat("noglobalsound", "0", &ent->speed);
     }
@@ -753,6 +771,7 @@ void G_BounceItem(gentity_t *ent, trace_t *trace) {
         SnapVector(trace->endpos);
         G_SetOrigin(ent, trace->endpos);
         ent->s.groundEntityNum = trace->entityNum;
+
         return;
     }
 

@@ -1242,8 +1242,7 @@ static void SV_VerifyPaks_f(client_t *cl) {
 
         if (bGood) {
             cl->pureAuthentic = 1;
-        }
-        else {
+        } else {
             cl->pureAuthentic = 0;
             cl->nextSnapshotTime = -1;
             cl->state = CS_ACTIVE;

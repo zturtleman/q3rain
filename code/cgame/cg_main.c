@@ -788,6 +788,9 @@ static void CG_RegisterGraphics(void) {
     // zoom
     cgs.media.sha_viewScope = trap_R_RegisterShader("viewScope");
 
+    // dmage
+    cgs.media.sha_fewBloodSpurts = trap_R_RegisterShader("fewBloodSpurts");
+
     // register the inline models
     cgs.numInlineModels = trap_CM_NumInlineModels();
     for (i = 1; i < cgs.numInlineModels; i++) {
