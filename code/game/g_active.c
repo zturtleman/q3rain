@@ -69,7 +69,7 @@ void P_DamageFeedback(gentity_t *player) {
     }
 
     // play an apropriate pain sound
-    if ((level.time > player->pain_debounce_time) && !(player->flags & FL_GODMODE)) {
+    if ((level.time > player->pain_debounce_time) && !(player->flags & FL_GODMODE) && client->lasthurt_mod != MOD_BLEED) {
         player->pain_debounce_time = level.time + 700;
         G_AddEvent(player, EV_PAIN, player->health);
         client->ps.damageEvent++;
@@ -395,25 +395,8 @@ void ClientTimerActions(gentity_t *ent, int msec) {
 
     while (client->timeResidual >= 1000) {
         client->timeResidual -= 1000;
-
-        if (client->ps.powerups[PW_REGEN]) {
-            if (ent->health < client->ps.stats[STAT_MAX_HEALTH]) {
-                ent->health += 15;
-                if (ent->health > client->ps.stats[STAT_MAX_HEALTH] * 1.1) {
-                    ent->health = client->ps.stats[STAT_MAX_HEALTH] * 1.1;
-                }
-                G_AddEvent(ent, EV_POWERUP_REGEN, 0);
-            } else if (ent->health < client->ps.stats[STAT_MAX_HEALTH] * 2) {
-                ent->health += 5;
-                if (ent->health > client->ps.stats[STAT_MAX_HEALTH] * 2) {
-                    ent->health = client->ps.stats[STAT_MAX_HEALTH] * 2;
-                }
-                G_AddEvent(ent, EV_POWERUP_REGEN, 0);
-            }
-        } else {
-            if (ent->health > client->ps.stats[STAT_MAX_HEALTH]) {
-                ent->health = 100;
-            }
+        if (ent->health > client->ps.stats[STAT_MAX_HEALTH]) {
+            ent->health = 100;
         }
 
         if (client->ps.stats[STAT_ARMOR] > client->ps.stats[STAT_MAX_HEALTH]) {
@@ -656,7 +639,7 @@ void ClientThink_real(gentity_t *ent) {
     pmove_t pm;
     int oldEventSequence;
     int msec;
-    int adrenaline;
+    int adrenaline, bleed;
     usercmd_t *ucmd;
 
     client = ent->client;
@@ -750,7 +733,14 @@ void ClientThink_real(gentity_t *ent) {
     } else {
         client->ps.speed = (int) ((float) client->ps.maxspeed / ((float) client->ps.legsfactor / 10));
     }
+
     client->ps.speed += client->ps.sprintAdd;
+
+    bleed = client->ps.powerups[PW_BLEED];
+    if (client->ps.wounds > 0 && bleed <= level.time) {
+        G_Damage(ent, NULL, NULL, NULL, NULL, 1, DAMAGE_NO_KNOCKBACK | DAMAGE_NO_ARMOR, MOD_BLEED);
+        client->ps.powerups[PW_BLEED] = level.time + (BLEEDTIME / client->ps.wounds);
+    }
 
     ent->client->ps.levelTime = level.time;
 

@@ -855,8 +855,34 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
             targ->enemy = attacker;
             targ->die(targ, inflictor, attacker, take, mod);
             return;
-        } else if (targ->pain) {
+        } else if (targ->pain && mod != MOD_BLEED) {
             targ->pain(targ, attacker, take);
+        }
+        if (crandom() < -0.4f || mod == MOD_WINDOW) {
+            if (mod != MOD_BLEED
+                    && mod != MOD_HANDS
+                    && mod != MOD_HE
+                    && mod != MOD_HE_SPLASH
+                    && mod != MOD_WATER
+                    && mod != MOD_SLIME
+                    && mod != MOD_LAVA
+                    && mod != MOD_CRUSH
+                    && mod != MOD_MOOR
+                    && mod != MOD_FALLING
+                    && mod != MOD_TELEFRAG
+                    && mod != MOD_SUICIDE
+                    && mod != MOD_TRIGGER_HURT
+                    && mod != MOD_NADELOVE
+                    && mod != MOD_ADMIN
+                    && mod != MOD_BOMB
+                    && mod != MOD_NUKE) {
+                int nextBleed;
+                targ->client->ps.wounds++;
+                nextBleed = targ->client->ps.powerups[PW_BLEED] - level.time;
+                if (nextBleed <= 0 || nextBleed > BLEEDTIME) {
+                    targ->client->ps.powerups[PW_BLEED] = level.time + BLEEDTIME;
+                }
+            }
         }
     }
 

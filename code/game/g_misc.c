@@ -263,12 +263,6 @@ void Use_Shooter(gentity_t *ent, gentity_t *other, gentity_t *activator) {
     VectorNormalize(dir);
 
     switch (ent->s.weapon) {
-        /*case WP_HE:
-            fire_he(ent, ent->s.origin, dir);
-            break;
-        case WP_NUKE:
-            fire_nuke(ent, ent->s.origin, dir);
-            break;*/
         default:
             FireEntWeapon(ent, dir);
             break;
@@ -360,11 +354,11 @@ qboolean G_BreakGlass(gentity_t *ent, vec3_t point, int mod, gentity_t *activato
 
     // If the glass has no more life, BREAK IT
     if (ent->health <= 0) {
-        // Tell the program based on the gun if it has no splash dmg, no reason to ad ones with
-        // splash dmg as qtrue as is that is the default
+        // Tell the program based on the gun if it has no splash dmg
         splashdmg = qfalse;
         if (mod == MOD_HE_SPLASH
-                || mod == MOD_NUKE) {
+                || mod == MOD_NUKE
+                || mod == MOD_BOMB) {
             splashdmg = qtrue;
         }
         // Call the function to show the glass shards in cgame
@@ -379,7 +373,7 @@ qboolean G_BreakGlass(gentity_t *ent, vec3_t point, int mod, gentity_t *activato
                     tent = G_TempEntity(center, EV_BREAK_FLESH);
                 } else if (!Q_stricmp(ent->message, "wood")) {
                     tent = G_TempEntity(center, EV_BREAK_WOOD);
-                } else if (!Q_stricmp(ent->message, "stone")) {
+                } else if (!Q_stricmp(ent->message, "stone") || !Q_stricmp(ent->message, "concrete")) {
                     tent = G_TempEntity(center, EV_BREAK_STONE);
                 } else if (!Q_stricmp(ent->message, "metal")) {
                     tent = G_TempEntity(center, EV_BREAK_METAL);
@@ -394,7 +388,7 @@ qboolean G_BreakGlass(gentity_t *ent, vec3_t point, int mod, gentity_t *activato
                     tent = G_TempEntity(point, EV_BREAK_FLESH);
                 } else if (!Q_stricmp(ent->message, "wood")) {
                     tent = G_TempEntity(point, EV_BREAK_WOOD);
-                } else if (!Q_stricmp(ent->message, "stone")) {
+                } else if (!Q_stricmp(ent->message, "stone") || !Q_stricmp(ent->message, "concrete")) {
                     tent = G_TempEntity(point, EV_BREAK_STONE);
                 } else if (!Q_stricmp(ent->message, "metal")) {
                     tent = G_TempEntity(point, EV_BREAK_METAL);

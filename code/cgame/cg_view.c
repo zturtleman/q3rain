@@ -716,9 +716,9 @@ static void CG_PowerupTimerSounds(void) {
         if (t - cg.time >= POWERUP_BLINKS * POWERUP_BLINK_TIME) {
             continue;
         }
-        if ((t - cg.time) / POWERUP_BLINK_TIME != (t - cg.oldTime) / POWERUP_BLINK_TIME) {
+        /*if ((t - cg.time) / POWERUP_BLINK_TIME != (t - cg.oldTime) / POWERUP_BLINK_TIME) {
             trap_S_StartSound(NULL, cg.snap->ps.clientNum, CHAN_ITEM, cgs.media.wearOffSound);
-        }
+        }*/
     }
 }
 

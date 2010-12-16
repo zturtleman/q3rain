@@ -222,9 +222,6 @@ qboolean EntityIsInvisible(aas_entityinfo_t *entinfo) {
     if (EntityCarriesFlag(entinfo)) {
         return qfalse;
     }
-    if (entinfo->powerups & (1 << PW_INVIS)) {
-        return qtrue;
-    }
     return qfalse;
 }
 
@@ -258,9 +255,6 @@ EntityHasQuad
 ==================
  */
 qboolean EntityHasQuad(aas_entityinfo_t *entinfo) {
-    if (entinfo->powerups & (1 << PW_QUAD)) {
-        return qtrue;
-    }
     return qfalse;
 }
 

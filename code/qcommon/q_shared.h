@@ -1124,6 +1124,8 @@ typedef struct playerState_s {
     int jumpCooldown;
     int sprintAdd;
     int stamina;
+    // combat
+    int wounds;
 } playerState_t;
 
 

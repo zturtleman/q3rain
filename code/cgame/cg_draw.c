@@ -1813,11 +1813,6 @@ static void CG_ScanForCrosshairEntity(void) {
         return;
     }
 
-    // if the player is invisible, don't show it
-    if (cg_entities[ trace.entityNum ].currentState.powerups & (1 << PW_INVIS)) {
-        return;
-    }
-
     // update the fade timer
     cg.crosshairClientNum = trace.entityNum;
     cg.crosshairClientTime = cg.time;

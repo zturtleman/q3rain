@@ -1121,7 +1121,7 @@ void MSG_ReadDeltaEntity(msg_t *msg, entityState_t *from, entityState_t *to,
 /*
 ============================================================================
 
-plyer_state_t communication
+plyerstate_t communication
 
 ============================================================================
  */
@@ -1193,6 +1193,7 @@ netField_t playerStateFields[] = {
     { PSF(jumpCooldown), 32},
     { PSF(sprintAdd), 8},
     { PSF(stamina), 16},
+    { PSF(wounds), 4},
 };
 
 /*

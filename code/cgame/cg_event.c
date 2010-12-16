@@ -151,6 +151,9 @@ static void CG_Obituary(entityState_t *ent) {
         case MOD_SHRAPNEL:
             message = "was pierced by a shrapnel";
             break;
+        case MOD_BLEED:
+            message = "bled to death";
+            break;
         default:
             message = NULL;
             break;

@@ -62,7 +62,7 @@ void SP_target_give(gentity_t *ent) {
 
 /*QUAKED target_remove_powerups (1 0 0) (-8 -8 -8) (8 8 8)
 takes away all the activators powerups.
-Used to drop flight powerups into death puts.
+Used to drop flight powerups into death pits.
  */
 void Use_target_remove_powerups(gentity_t *ent, gentity_t *other, gentity_t *activator) {
     if (!activator->client) {

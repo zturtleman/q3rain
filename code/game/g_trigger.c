@@ -216,9 +216,6 @@ void Use_target_push(gentity_t *self, gentity_t *other, gentity_t *activator) {
     if (activator->client->ps.pm_type != PM_NORMAL) {
         return;
     }
-    if (activator->client->ps.powerups[PW_FLIGHT]) {
-        return;
-    }
 
     VectorCopy(self->s.origin2, activator->client->ps.velocity);
 
@@ -367,11 +364,12 @@ void hurt_touch(gentity_t *self, gentity_t *other, trace_t *trace) {
         G_Sound(other, CHAN_AUTO, self->noise_index);
     }
 
-    if (self->spawnflags & 8)
+    if (self->spawnflags & 8) {
         dflags = DAMAGE_NO_PROTECTION;
-    else
+    } else {
         dflags = 0;
-    G_Damage(other, self, self, NULL, NULL, self->damage, dflags, MOD_TRIGGER_HURT);
+    }
+    G_Damage(other, self, self, NULL, NULL, self->damage, dflags, self->methodOfDeath);
 }
 
 void SP_trigger_hurt(gentity_t *self) {
@@ -383,6 +381,8 @@ void SP_trigger_hurt(gentity_t *self) {
     if (!self->damage) {
         self->damage = 5;
     }
+
+    G_SpawnInt("mod", va("%i", MOD_TRIGGER_HURT), &self->methodOfDeath);
 
     self->r.contents = CONTENTS_TRIGGER;
 

@@ -273,27 +273,13 @@ typedef enum {
 typedef enum {
     PW_NONE,
 
-    // TODO remove
-    PW_QUAD,
-    PW_BATTLESUIT,
-    PW_HASTE,
-    PW_INVIS,
-    PW_REGEN,
-    PW_FLIGHT,
-
     PW_REDFLAG,
     PW_BLUEFLAG,
     PW_NEUTRALFLAG,
 
-    PW_SCOUT,
-    PW_GUARD,
-    PW_DOUBLER,
-    PW_AMMOREGEN,
-    PW_INVULNERABILITY,
-    // end remove
-
     PW_DIVESUIT,
     PW_ADRENALINE,
+    PW_BLEED, // powerdown? :)
 
     PW_NUM_POWERUPS
 
@@ -564,6 +550,8 @@ typedef enum {
 #define LOCATION_FRONT		0x00000400
 #define LOCATION_BACK		0x00000800
 
+#define BLEEDTIME 10000
+
 //team task
 
 typedef enum {
@@ -625,6 +613,7 @@ typedef enum {
     MOD_BOMB,
     MOD_NUKE,
     MOD_SHRAPNEL,
+    MOD_BLEED,
 } meansOfDeath_t;
 
 

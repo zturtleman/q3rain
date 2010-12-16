@@ -123,12 +123,7 @@ qboolean CheckGauntletAttack(gentity_t *ent) {
         return qfalse;
     }
 
-    if (ent->client->ps.powerups[PW_QUAD]) {
-        G_AddEvent(ent, EV_POWERUP_QUAD, 0);
-        s_quadFactor = g_quadfactor.value;
-    } else {
-        s_quadFactor = 1;
-    }
+    s_quadFactor = 1;
 
     damage = 50;
     G_Damage(traceEnt, ent, ent, forward, tr.endpos,
