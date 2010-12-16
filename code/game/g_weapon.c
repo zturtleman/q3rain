@@ -654,7 +654,7 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
     gentity_t * unlinkedEntities[MAX_INTERVENTION_HITS];
     int spread;
     float u, r;
-    int upmove;
+    float side, front, top;
     damage = 100;
 
     count++;
@@ -665,12 +665,21 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
         damage = damage / 1.5;
     }
 
-    upmove = ent->client->pers.cmd.upmove;
-    if (upmove < 0) {
-        upmove = 0;
+    side = ent->client->ps.velocity[0];
+    front = ent->client->ps.velocity[1];
+    top = ent->client->ps.velocity[2];
+
+    if (side < 0) {
+        side *= -1;
+    }
+    if (front < 0) {
+        front *= -1;
+    }
+    if (top < 0) {
+        top *= -1;
     }
 
-    spread = ent->client->pers.cmd.forwardmove + upmove + ent->client->pers.cmd.rightmove;
+    spread = side + front + top;
     spread *= INTERVENTION_SPREAD;
 
     if (spread == 0) {
@@ -773,7 +782,8 @@ void Weapon_Barrett_Fire(gentity_t *ent, int count) {
     gentity_t * unlinkedEntities[MAX_BARRETT_HITS];
     float r;
     float u;
-    int spread, upmove;
+    int spread;
+    float side, front, top;
 
     damage = 100;
     count++;
@@ -782,12 +792,21 @@ void Weapon_Barrett_Fire(gentity_t *ent, int count) {
         return;
     }
 
-    upmove = ent->client->pers.cmd.upmove;
-    if (upmove < 0) {
-        upmove = 0;
+    side = ent->client->ps.velocity[0];
+    front = ent->client->ps.velocity[1];
+    top = ent->client->ps.velocity[2];
+
+    if (side < 0) {
+        side *= -1;
+    }
+    if (front < 0) {
+        front *= -1;
+    }
+    if (top < 0) {
+        top *= -1;
     }
 
-    spread = ent->client->pers.cmd.forwardmove + upmove + ent->client->pers.cmd.rightmove;
+    spread = side + front + top;
     spread *= BARRETT_SPREAD;
 
     if (spread == 0) {
@@ -884,14 +903,24 @@ void Weapon_Crossbow_Fire(gentity_t *ent) {
     float u;
     gentity_t *tent;
     gentity_t *traceEnt;
-    int i, passent, spread, upmove;
+    int passent, spread;
+    float side, front, top;
 
-    upmove = ent->client->pers.cmd.upmove;
-    if (upmove < 0) {
-        upmove = 0;
+    side = ent->client->ps.velocity[0];
+    front = ent->client->ps.velocity[1];
+    top = ent->client->ps.velocity[2];
+
+    if (side < 0) {
+        side *= -1;
+    }
+    if (front < 0) {
+        front *= -1;
+    }
+    if (top < 0) {
+        top *= -1;
     }
 
-    spread = ent->client->pers.cmd.forwardmove + upmove + ent->client->pers.cmd.rightmove;
+    spread = side + front + top;
     spread *= CROSSBOW_SPREAD;
 
     if (spread == 0) {
