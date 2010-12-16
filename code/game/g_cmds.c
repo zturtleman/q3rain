@@ -223,6 +223,11 @@ void Cmd_Give_f(gentity_t *ent) {
             return;
     }
 
+    if (Q_stricmp(name, "bandage") == 0) {
+        ent->client->ps.stats[STAT_BANDAGES] += 1;
+        return;
+    }
+
     if (give_all || Q_stricmp(name, "weapons") == 0) {
         ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 - (1 << WP_NONE);
         if (!give_all)
@@ -1678,6 +1683,33 @@ void Cmd_Zoom_f(gentity_t *ent) {
 
 /*
 =================
+Cmd_Bandage_f
+=================
+ */
+void Cmd_Bandage_f(gentity_t *ent) {
+    playerState_t *ps = &ent->client->ps;
+    if (ps->stats[STAT_HEALTH] > 0
+            && ps->stats[STAT_HEALTH] < 100
+            && ent->client->sess.sessionTeam != TEAM_SPECTATOR
+            && ps->stats[STAT_BANDAGES] > 0
+            && ps->wounds > 0
+            && ps->weaponstate == WEAPON_READY) {
+        ps->stats[STAT_BANDAGES]--;
+        ps->wounds--;
+        ps->weaponTime += 3000;
+        ps->weapon = WP_NONE;
+        ps->zoomFov = 0;
+        ps->stats[STAT_HEALTH] += 10;
+        ent->health += 10;
+        if (ent->health > 100 || ps->stats[STAT_HEALTH] > 100) {
+            ent->health = 100;
+            ps->stats[STAT_HEALTH] = 100;
+        }
+    }
+}
+
+/*
+=================
 ClientCommand
 =================
  */
@@ -1792,6 +1824,8 @@ void ClientCommand(int clientNum) {
         Cmd_Detonate_f(ent);
     else if (Q_stricmp(cmd, "zoom") == 0)
         Cmd_Zoom_f(ent);
+    else if (Q_stricmp(cmd, "bandage") == 0)
+        Cmd_Bandage_f(ent);
     else
         trap_SendServerCommand(clientNum, va("print \"unknown cmd %s\n\"", cmd));
 }

@@ -183,6 +183,22 @@ gitem_t bg_itemlist[] = {
         /* sounds */ ""
     },
 
+    /*QUAKED item_bandage (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+     */
+    {
+        "item_bandage",
+        "sound/items/m_health.wav",
+        { "models/powerups/health/mega_cross.md3",
+            NULL, NULL, NULL},
+        "icons/iconh_mega", // icon
+        "Bandage", // text
+        1,
+        IT_HEALTH,
+        0,
+        "", // precache
+        "" // sounds
+    },
+
 
     //
     // WEAPONS
@@ -371,25 +387,6 @@ gitem_t bg_itemlist[] = {
     // HOLDABLE ITEMS
     //
 
-    /*QUAKED holdable_bomb (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-     */
-    /*{
-        "holdable_bomb",
-        "sound/items/holdable.wav",
-        {
-            "models/powerups/holdable/bomb.md3",
-            "models/powerups/holdable/bomb_sphere.md3",
-            NULL, NULL
-        },
-        "icons/bomb", // icon
-        "Bomb", // pickup
-        60,
-        IT_HOLDABLE,
-        HI_BOMB,
-        "", // precache
-        "sound/items/use_bomb.wav" // sounds
-    },*/
-
     //
     // POWERUP ITEMS
     //
@@ -569,18 +566,6 @@ qboolean BG_CanItemBeGrabbed(int gametype, const entityState_t *ent, const playe
             return qtrue;
 
         case IT_HEALTH:
-            // small and mega healths will go over the max, otherwise
-            // don't pick up if already at max
-            if (item->quantity == 5 || item->quantity == 100) {
-                if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] * 2) {
-                    return qfalse;
-                }
-                return qtrue;
-            }
-
-            if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH]) {
-                return qfalse;
-            }
             return qtrue;
 
         case IT_POWERUP:

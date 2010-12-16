@@ -194,15 +194,7 @@ int Pickup_Weapon(gentity_t *ent, gentity_t *other) {
 //======================================================================
 
 int Pickup_Health(gentity_t *ent, gentity_t *other) {
-    int max;
     int quantity;
-
-    // small and mega healths will go over the max
-    if (ent->item->quantity != 5 && ent->item->quantity != 100) {
-        max = other->client->ps.stats[STAT_MAX_HEALTH];
-    } else {
-        max = other->client->ps.stats[STAT_MAX_HEALTH] * 2;
-    }
 
     if (ent->count) {
         quantity = ent->count;
@@ -210,19 +202,9 @@ int Pickup_Health(gentity_t *ent, gentity_t *other) {
         quantity = ent->item->quantity;
     }
 
-    other->health += quantity;
+    other->client->ps.stats[STAT_BANDAGES] += quantity;
 
-    if (other->health > max) {
-        other->health = max;
-    }
-    other->client->ps.stats[STAT_HEALTH] = other->health;
-
-    if (ent->item->quantity == 100) { // mega health respawns slow
-
-        return RESPAWN_MEGAHEALTH;
-    }
-
-    return RESPAWN_HEALTH;
+    return 20;
 }
 
 //======================================================================
@@ -663,7 +645,6 @@ The item will be added to the precache list
  */
 void RegisterItem(gitem_t *item) {
     if (!item) {
-
         G_Error("RegisterItem: NULL");
     }
     itemRegistered[ item - bg_itemlist ] = qtrue;
@@ -739,7 +720,6 @@ void G_SpawnItem(gentity_t *ent, gitem_t *item) {
     ent->physicsBounce = 0.50; // items are bouncy
 
     if (item->giType == IT_POWERUP) {
-
         G_SoundIndex("sound/items/poweruprespawn.wav");
         G_SpawnFloat("noglobalsound", "0", &ent->speed);
     }
