@@ -563,5 +563,11 @@ void CG_InitConsoleCommands(void) {
     trap_AddCommand("stats");
     trap_AddCommand("teamtask");
     trap_AddCommand("loaddefered"); // spelled wrong, but not changing for demo
+    // RAIN COMMANDS
     trap_AddCommand("weapdrop"); // XRAY FMJ weap drop cmd WEAPONDROP
+    trap_AddCommand("bandage");
+    trap_AddCommand("detonate");
+    trap_AddCommand("zoom");
+    trap_AddCommand("weapreload");
+    trap_AddCommand("cutscene");
 }

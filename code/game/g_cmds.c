@@ -1827,11 +1827,10 @@ void ClientCommand(int clientNum) {
         Cmd_GameCommand_f(ent);
     else if (Q_stricmp(cmd, "setviewpos") == 0)
         Cmd_SetViewpos_f(ent);
-        // RELOADING
+    // RAIN COMMANDS
     else if (Q_stricmp(cmd, "weapreload") == 0)
         Cmd_Reload(ent);
-        // WEAPDROP
-    else if (Q_stricmp(cmd, "weapdrop") == 0) // XRAY FMJ
+    else if (Q_stricmp(cmd, "weapdrop") == 0)
         Cmd_Drop_f(ent);
     else if (Q_stricmp(cmd, "stats") == 0)
         Cmd_Stats_f(ent);
@@ -1844,5 +1843,5 @@ void ClientCommand(int clientNum) {
     else if (!Q_stricmp(cmd, "cutscene") && g_cheats.integer)
         level.cutscene = !level.cutscene;
     else
-        trap_SendServerCommand(clientNum, va("print \"unknown cmd %s\n\"", cmd));
+        trap_SendServerCommand(clientNum, va("print \"^1Unknown command '%s'\n\"", cmd));
 }

@@ -29,14 +29,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef STANDALONE
 #define PRODUCT_NAME			"Rain"
 #define BASEGAME			"rain"
-#define CLIENT_WINDOW_TITLE     	"Rain"
-#define CLIENT_WINDOW_MIN_TITLE 	"Rain"
+#define CLIENT_WINDOW_TITLE     	"Rain " PRODUCT_VERSION
+#define CLIENT_WINDOW_MIN_TITLE 	"Rain " PRODUCT_VERSION
 #define GAMENAME_FOR_MASTER		"rain"	// must NOT contain whitespaces
 #else
 #define PRODUCT_NAME			"Rain"
 #define BASEGAME			"rain"
-#define CLIENT_WINDOW_TITLE     	"Rain" PRODUCT_VERSION
-#define CLIENT_WINDOW_MIN_TITLE 	"Rain" PRODUCT_VERSION
+#define CLIENT_WINDOW_TITLE     	"Rain " PRODUCT_VERSION
+#define CLIENT_WINDOW_MIN_TITLE 	"Rain " PRODUCT_VERSION
 #define GAMENAME_FOR_MASTER		"Quake3Arena"
 #endif
 
@@ -196,7 +196,7 @@ typedef int clipHandle_t;
 
 // angle indexes
 #define	PITCH				0		// up / down
-#define	YAW					1		// left / right
+#define	YAW				1		// left / right
 #define	ROLL				2		// fall over
 
 // the game guarantees that no string from the network will ever
@@ -206,24 +206,24 @@ typedef int clipHandle_t;
 #define	MAX_TOKEN_CHARS		1024	// max length of an individual token
 
 #define	MAX_INFO_STRING		1024
-#define	MAX_INFO_KEY		  1024
+#define	MAX_INFO_KEY		1024
 #define	MAX_INFO_VALUE		1024
 
 #define	BIG_INFO_STRING		8192  // used for system info key only
-#define	BIG_INFO_KEY		  8192
+#define	BIG_INFO_KEY		8192
 #define	BIG_INFO_VALUE		8192
 
 
-#define	MAX_QPATH			64		// max length of a quake game pathname
+#define	MAX_QPATH		64		// max length of a quake game pathname
 #ifdef PATH_MAX
-#define MAX_OSPATH			PATH_MAX
+#define MAX_OSPATH		PATH_MAX
 #else
-#define	MAX_OSPATH			256		// max length of a filesystem pathname
+#define	MAX_OSPATH		256		// max length of a filesystem pathname
 #endif
 
 #define	MAX_NAME_LENGTH		32		// max length of a client name
 
-#define	MAX_SAY_TEXT	150
+#define	MAX_SAY_TEXT            150
 
 // paramters for command buffer stuffing
 
@@ -657,11 +657,11 @@ void COM_ParseWarning(char *format, ...) __attribute__((format(printf, 1, 2)));
 
 #ifndef TT_STRING
 //token types
-#define TT_STRING					1			// string
-#define TT_LITERAL					2			// literal
-#define TT_NUMBER					3			// number
-#define TT_NAME						4			// name
-#define TT_PUNCTUATION				5			// punctuation
+#define TT_STRING		1			// string
+#define TT_LITERAL		2			// literal
+#define TT_NUMBER		3			// number
+#define TT_NAME			4			// name
+#define TT_PUNCTUATION		5			// punctuation
 #endif
 
 typedef struct pc_token_s {
@@ -876,7 +876,7 @@ COLLISION DETECTION
 #define	PLANE_X			0
 #define	PLANE_Y			1
 #define	PLANE_Z			2
-#define	PLANE_NON_AXIAL	3
+#define	PLANE_NON_AXIAL         3
 
 
 /*
@@ -934,7 +934,7 @@ typedef struct {
 // in order from highest priority to lowest
 // if none of the catchers are active, bound key strings will be executed
 #define KEYCATCH_CONSOLE		0x0001
-#define	KEYCATCH_UI					0x0002
+#define	KEYCATCH_UI			0x0002
 #define	KEYCATCH_MESSAGE		0x0004
 #define	KEYCATCH_CGAME			0x0008
 
@@ -967,14 +967,14 @@ typedef enum {
 #define	SHORT2ANGLE(x)	((x)*(360.0/65536))
 
 #define	SNAPFLAG_RATE_DELAYED	1
-#define	SNAPFLAG_NOT_ACTIVE		2	// snapshot used during connection and for zombies
+#define	SNAPFLAG_NOT_ACTIVE	2	// snapshot used during connection and for zombies
 #define SNAPFLAG_SERVERCOUNT	4	// toggled every map_restart so transitions can be detected
 
 //
 // per-level limits
 //
-#define	MAX_CLIENTS			64		// absolute limit
-#define MAX_LOCATIONS		64
+#define	MAX_CLIENTS		64		// absolute limit
+#define MAX_LOCATIONS		128
 
 #define	GENTITYNUM_BITS		10		// don't need to send any more
 #define	MAX_GENTITIES		(1<<GENTITYNUM_BITS)
@@ -987,9 +987,8 @@ typedef enum {
 #define	ENTITYNUM_MAX_NORMAL	(MAX_GENTITIES-2)
 
 
-#define	MAX_MODELS			256		// these are sent over the net as 8 bits
-#define	MAX_SOUNDS			256		// so they cannot be blindly increased
-
+#define	MAX_MODELS		256		// these are sent over the net as 8 bits
+#define	MAX_SOUNDS		256		// so they cannot be blindly increased
 
 #define	MAX_CONFIGSTRINGS	1024
 
@@ -1011,12 +1010,10 @@ typedef struct {
 //=========================================================
 
 // bit field limits
-#define	MAX_STATS				16
+#define	MAX_STATS			16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16
-#define	MAX_WEAPONS				16
-
-#define MAX_BOMBS_PP 32
+#define	MAX_WEAPONS			16
 
 #define	MAX_PS_EVENTS			2
 
@@ -1153,6 +1150,7 @@ typedef struct playerState_s {
 #define BUTTON_PATROL		512
 #define BUTTON_FOLLOWME		1024*/
 #define BUTTON_SPRINT 32
+#define BUTTON_USE 64
 
 #define	BUTTON_ANY			2048	// any key whatsoever
 
@@ -1305,9 +1303,9 @@ typedef struct qtime_s {
 
 // server browser sources
 // TTimo: AS_MPLAYER is no longer used
-#define AS_LOCAL			0
-#define AS_MPLAYER		1
-#define AS_GLOBAL			2
+#define AS_LOCAL	0
+#define AS_MPLAYER	1
+#define AS_GLOBAL	2
 #define AS_FAVORITES	3
 
 
@@ -1333,9 +1331,9 @@ typedef enum _flag_status {
 
 
 
-#define	MAX_GLOBAL_SERVERS				4096
-#define	MAX_OTHER_SERVERS					128
-#define MAX_PINGREQUESTS					32
+#define	MAX_GLOBAL_SERVERS		4096
+#define	MAX_OTHER_SERVERS		128
+#define MAX_PINGREQUESTS		32
 #define MAX_SERVERSTATUSREQUESTS	16
 
 #define SAY_ALL		0

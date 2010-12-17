@@ -1069,9 +1069,10 @@ void Touch_DoorTrigger(gentity_t *ent, gentity_t *other, trace_t *trace) {
                 ent->parent->moverState != ROTATOR_POS2) {
             Touch_DoorTriggerSpectator(ent, other, trace);
         }
-    } else if (ent->parent->moverState != MOVER_1TO2 &&
-            ent->parent->moverState != ROTATOR_1TO2) {
-        Use_BinaryMover(ent->parent, ent, other);
+    } else if (ent->parent->moverState != MOVER_1TO2 && ent->parent->moverState != ROTATOR_1TO2) {
+        if (other->client->buttons & BUTTON_USE) {
+            Use_BinaryMover(ent->parent, ent, other);
+        }
     }
 }
 
@@ -1276,7 +1277,7 @@ void SP_func_door_rotating(gentity_t *ent) {
     // default distance of 90 degrees. This is something the mapper should not
     // leave out, so we'll tell him if he does.
     if (!ent->distance) {
-        G_Printf("%s at %s with no distance set.\n",
+        G_Printf("^4WARNING: %s at %s with no distance set.\n",
                 ent->classname, vtos(ent->s.origin));
         ent->distance = 90.0;
     }
@@ -1481,7 +1482,7 @@ void Touch_Button(gentity_t *ent, gentity_t *other, trace_t *trace) {
         return;
     }
 
-    if (ent->moverState == MOVER_POS1) {
+    if (ent->moverState == MOVER_POS1 && (other->client->buttons & BUTTON_USE)) {
         Use_BinaryMover(ent, other, other);
     }
 }
@@ -1552,7 +1553,6 @@ TRAIN
 
 ===============================================================================
  */
-
 
 #define TRAIN_START_ON		1
 #define TRAIN_TOGGLE		2

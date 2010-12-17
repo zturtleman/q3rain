@@ -2302,7 +2302,7 @@ void PmoveSingle(pmove_t * pmove) {
 
     // ! because of some wrong setting in cl_input.c and lazy rylius
 
-    if (!(pm->cmd.buttons & BUTTON_SPRINT)
+    if (pm->cmd.buttons & BUTTON_SPRINT
             && pm->ps->stats[STAT_HEALTH] > 60
             && !(pm->cmd.buttons & BUTTON_WALKING)
             && pm->ps->stamina > 0

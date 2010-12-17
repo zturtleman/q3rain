@@ -49,7 +49,7 @@ at the same time.
 
 kbutton_t in_left, in_right, in_forward, in_back;
 kbutton_t in_lookup, in_lookdown, in_moveleft, in_moveright;
-kbutton_t in_strafe, in_speed, in_sprint;
+kbutton_t in_strafe, in_speed, in_sprint, in_use;
 kbutton_t in_up, in_down;
 
 #ifdef USE_VOIP
@@ -277,14 +277,6 @@ void IN_SpeedUp(void) {
     IN_KeyUp(&in_speed);
 }
 
-void IN_SprintDown(void) {
-    IN_KeyDown(&in_sprint);
-}
-
-void IN_SprintUp(void) {
-    IN_KeyUp(&in_sprint);
-}
-
 void IN_StrafeDown(void) {
     IN_KeyDown(&in_strafe);
 }
@@ -446,6 +438,22 @@ void IN_CenterView(void) {
     cl.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);
 }
 
+void IN_SprintDown(void) {
+    IN_KeyDown(&in_sprint);
+}
+
+void IN_SprintUp(void) {
+    IN_KeyUp(&in_sprint);
+}
+
+void IN_UseDown(void) {
+    IN_KeyDown(&in_use);
+}
+
+void IN_UseUp(void) {
+    IN_KeyUp(&in_use);
+}
+
 
 //==========================================================================
 
@@ -510,9 +518,15 @@ void CL_KeyMove(usercmd_t *cmd) {
     }
 
     if (in_sprint.active) {
-        cmd->buttons &= ~BUTTON_SPRINT;
-    } else {
         cmd->buttons |= BUTTON_SPRINT;
+    } else {
+        cmd->buttons &= ~BUTTON_SPRINT;
+    }
+
+    if (in_use.active) {
+        cmd->buttons |= BUTTON_USE;
+    } else {
+        cmd->buttons &= ~BUTTON_USE;
     }
 
     forward = 0;
@@ -582,12 +596,6 @@ void CL_JoystickMove(usercmd_t *cmd) {
     } else {
         movespeed = 1;
         cmd->buttons |= BUTTON_WALKING;
-    }
-
-    if (in_sprint.active) {
-        cmd->buttons &= ~BUTTON_SPRINT;
-    } else {
-        cmd->buttons |= BUTTON_SPRINT;
     }
 
     if (in_speed.active) {
@@ -1203,6 +1211,8 @@ void CL_InitInput(void) {
     Cmd_AddCommand("-mlook", IN_MLookUp);
     Cmd_AddCommand("+sprint", IN_SprintDown);
     Cmd_AddCommand("-sprint", IN_SprintUp);
+    Cmd_AddCommand("+use", IN_UseDown);
+    Cmd_AddCommand("-use", IN_UseUp);
 
 #ifdef USE_VOIP
     Cmd_AddCommand("+voiprecord", IN_VoipRecordDown);
