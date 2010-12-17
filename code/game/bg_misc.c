@@ -225,7 +225,7 @@ gitem_t bg_itemlist[] = {
     {
         "weapon_intervention",
         "sound/misc/w_pkup.wav",
-        { "models/weapons2/railgun/railgun.md3",
+        { "models/weapons/intervention/intervention.md3",
             NULL, NULL, NULL},
         /* icon */ "icons/iconw_railgun",
         /* pickup */ "M200 Intervention",
@@ -241,7 +241,7 @@ gitem_t bg_itemlist[] = {
     {
         "weapon_knife",
         "sound/misc/w_pkup.wav",
-        { "models/weapons2/gauntlet/gauntlet.md3",
+        { "models/weapons/kbar/kbar.md3",
             NULL, NULL, NULL},
         /* icon */ "icons/iconw_gauntlet",
         /* pickup */ "K-Bar",

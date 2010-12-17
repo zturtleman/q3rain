@@ -2119,7 +2119,11 @@ static void PM_Weapon(void) {
         }
     }
 
-    PM_StartTorsoAnim(TORSO_ATTACK);
+    if (pm->ps->weapon == WP_KNIFE) {
+        PM_StartTorsoAnim(TORSO_ATTACK2);
+    } else {
+        PM_StartTorsoAnim(TORSO_ATTACK);
+    }
 
     pm->ps->weaponstate = WEAPON_FIRING;
 

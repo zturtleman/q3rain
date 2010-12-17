@@ -895,7 +895,7 @@ static void CG_CalculateWeaponPosition(vec3_t origin, vec3_t angles) {
 #endif
 
     // idle drift
-    scale = cg.xyspeed + 40;
+    scale = cg.xyspeed + 20;
     fracsin = sin(cg.time * 0.001);
     angles[ROLL] += scale * fracsin * 0.01;
     angles[YAW] += scale * fracsin * 0.01;
@@ -1160,7 +1160,7 @@ void CG_AddPlayerWeapon(refEntity_t *parent, playerState_t *ps, centity_t *cent,
     if (ps) {
         int weapon;
         weapon = cg.predictedPlayerState.weapon;
-        if ((weapon == WP_BARRETT || weapon == WP_ACR || weapon == WP_INTERVENTION)
+        if ((weapon == WP_BARRETT || weapon == WP_ACR)
                 && cg.predictedPlayerState.weaponstate == WEAPON_FIRING) {
             float f;
 
@@ -1290,6 +1290,7 @@ void CG_AddViewWeapon(playerState_t *ps) {
     float fovOffset;
     vec3_t angles;
     weaponInfo_t *weapon;
+    float x, y, z;
 
     if (ps->persistant[PERS_TEAM] == TEAM_SPECTATOR) {
         return;
@@ -1340,9 +1341,17 @@ void CG_AddViewWeapon(playerState_t *ps) {
     // set up gun position
     CG_CalculateWeaponPosition(hand.origin, angles);
 
-    VectorMA(hand.origin, cg_gun_x.value, cg.refdef.viewaxis[0], hand.origin);
-    VectorMA(hand.origin, cg_gun_y.value, cg.refdef.viewaxis[1], hand.origin);
-    VectorMA(hand.origin, (cg_gun_z.value + fovOffset), cg.refdef.viewaxis[2], hand.origin);
+    x = cg_gun_x.value;
+    y = cg_gun_y.value;
+    z = cg_gun_z.value;
+    if (ps->weapon == WP_KNIFE) {
+        z = 3;
+        y = -4.5f;
+        x = 12;
+    }
+    VectorMA(hand.origin, x, cg.refdef.viewaxis[0], hand.origin);
+    VectorMA(hand.origin, y, cg.refdef.viewaxis[1], hand.origin);
+    VectorMA(hand.origin, (z + fovOffset), cg.refdef.viewaxis[2], hand.origin);
 
     AnglesToAxis(angles, hand.axis);
 
