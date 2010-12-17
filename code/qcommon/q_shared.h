@@ -35,8 +35,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #else
 #define PRODUCT_NAME			"Rain"
 #define BASEGAME			"rain"
-#define CLIENT_WINDOW_TITLE     	"Rain"
-#define CLIENT_WINDOW_MIN_TITLE 	"Rain"
+#define CLIENT_WINDOW_TITLE     	"Rain" PRODUCT_VERSION
+#define CLIENT_WINDOW_MIN_TITLE 	"Rain" PRODUCT_VERSION
 #define GAMENAME_FOR_MASTER		"Quake3Arena"
 #endif
 

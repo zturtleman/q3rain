@@ -434,6 +434,9 @@ void Cmd_Kill_f(gentity_t *ent) {
     if (ent->health <= 0) {
         return;
     }
+    if (level.cutscene) {
+        return;
+    }
     ent->flags &= ~FL_GODMODE;
     ent->client->ps.stats[STAT_HEALTH] = ent->health = -500;
     player_die(ent, ent, ent, 500, MOD_SUICIDE);
@@ -634,6 +637,10 @@ Cmd_Team_f
 void Cmd_Team_f(gentity_t *ent) {
     int oldTeam;
     char s[MAX_TOKEN_CHARS];
+
+    if (level.cutscene) {
+        return;
+    }
 
     if (trap_Argc() != 2) {
         oldTeam = ent->client->sess.sessionTeam;
@@ -1533,6 +1540,10 @@ qboolean Cmd_Reload(gentity_t *ent) {
 
     weapon = ent->client->ps.weapon;
 
+    if (level.cutscene) {
+        return qfalse;
+    }
+
     if (weapon == WP_HE
             || weapon == WP_KNIFE
             || weapon == WP_BOMB
@@ -1599,7 +1610,9 @@ WEAPONDROP
 =================
  */
 void Cmd_Drop_f(gentity_t *ent) {
-    ThrowWeapon(ent);
+    if (!level.cutscene) {
+        ThrowWeapon(ent);
+    }
 }
 
 /*
@@ -1613,7 +1626,8 @@ void Cmd_Detonate_f(gentity_t *ent) {
     if (ent->client->ps.stats[STAT_HEALTH] > 0
             && ent->health > 0
             && ent->client->ps.weapon != WP_NONE
-            && ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
+            && ent->client->sess.sessionTeam != TEAM_SPECTATOR
+            && !level.cutscene) {
         for (i = 0; i < MAX_GENTITIES; i++) {
             bomb = &g_entities[i];
             if (bomb->flags == FL_BOMB && bomb->r.ownerNum == ent->s.number) {
@@ -1647,7 +1661,7 @@ void Cmd_Zoom_f(gentity_t *ent) {
         arg = ConcatArgs(1);
         fov = ent->client->ps.zoomFov;
 
-        if (!Q_stricmp(arg, "in")) {
+        if (!Q_stricmp(arg, "in") && !level.cutscene) {
             if (fov == 0) {
                 ent->client->ps.zoomFov = 65;
             } else if (fov == 65) {
@@ -1693,7 +1707,8 @@ void Cmd_Bandage_f(gentity_t *ent) {
             && ent->client->sess.sessionTeam != TEAM_SPECTATOR
             && ps->stats[STAT_BANDAGES] > 0
             && ps->wounds > 0
-            && ps->weaponstate == WEAPON_READY) {
+            && ps->weaponstate == WEAPON_READY
+            && !level.cutscene) {
         ps->stats[STAT_BANDAGES]--;
         ps->wounds--;
         ps->weaponTime += 3000;
@@ -1826,6 +1841,8 @@ void ClientCommand(int clientNum) {
         Cmd_Zoom_f(ent);
     else if (Q_stricmp(cmd, "bandage") == 0)
         Cmd_Bandage_f(ent);
+    else if (!Q_stricmp(cmd, "cutscene") && g_cheats.integer)
+        level.cutscene = !level.cutscene;
     else
         trap_SendServerCommand(clientNum, va("print \"unknown cmd %s\n\"", cmd));
 }

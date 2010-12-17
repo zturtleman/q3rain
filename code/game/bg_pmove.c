@@ -2033,6 +2033,10 @@ static void PM_Weapon(void) {
         return;
     }
 
+    if (pm->ps->pm_type == PM_CUTSCENE) {
+        return;
+    }
+
     // check for dead player
     if (pm->ps->stats[STAT_HEALTH] <= 0) {
         pm->ps->weapon = WP_NONE;
@@ -2389,7 +2393,7 @@ void PmoveSingle(pmove_t * pmove) {
         pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
     }
 
-    if (pm->ps->pm_type >= PM_DEAD) {
+    if (pm->ps->pm_type >= PM_DEAD || pm->ps->pm_type == PM_CUTSCENE) {
         pm->cmd.forwardmove = 0;
         pm->cmd.rightmove = 0;
         pm->cmd.upmove = 0;

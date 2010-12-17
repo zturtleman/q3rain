@@ -671,8 +671,6 @@ void ClientThink_real(gentity_t *ent) {
         msec = 200;
     }
 
-    //GibEntity(ent); // uncomment that line for ultra gore :)
-
     if (pmove_msec.integer < 8) {
         trap_Cvar_Set("pmove_msec", "8");
     } else if (pmove_msec.integer > 33) {
@@ -716,6 +714,8 @@ void ClientThink_real(gentity_t *ent) {
         client->ps.pm_type = PM_NOCLIP;
     } else if (client->ps.stats[STAT_HEALTH] <= 0) {
         client->ps.pm_type = PM_DEAD;
+    } else if (level.cutscene) {
+        client->ps.pm_type = PM_CUTSCENE;
     } else {
         client->ps.pm_type = PM_NORMAL;
     }

@@ -63,7 +63,12 @@ typedef enum {
     MOVER_POS1,
     MOVER_POS2,
     MOVER_1TO2,
-    MOVER_2TO1
+    MOVER_2TO1,
+    // VALKYRIE: angle movements
+    ROTATOR_POS1,
+    ROTATOR_POS2,
+    ROTATOR_1TO2,
+    ROTATOR_2TO1
 } moverState_t;
 
 #define SP_PODIUM_MODEL		"models/mapobjects/podium/podium4.md3"
@@ -196,6 +201,8 @@ struct gentity_s {
     int cvar_value;
     int active_weapon;
     char *teamchar;
+
+    float distance; // VALKYRIE: for rotating door
 
     // RAIN AMMO VARIABLES
     int ammo; // ammo in weapon
@@ -438,6 +445,8 @@ typedef struct {
     gentity_t * bodyQue[BODY_QUEUE_SIZE];
     // weapons
     qboolean allDisallowed;
+    // cutscenes
+    qboolean cutscene;
 } level_locals_t;
 
 // WEAPONDROP

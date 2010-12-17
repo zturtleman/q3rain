@@ -478,6 +478,21 @@ void SP_target_kill(gentity_t * self) {
     self->use = target_kill_use;
 }
 
+//==========================================================
+
+/*QUAKED target_cutscene (.5 .5 .5) (-8 -8 -8) (8 8 8)
+ toggles a cutscene
+ */
+void target_cutscene_use(gentity_t *self, gentity_t *other, gentity_t * activator) {
+    level.cutscene = !level.cutscene;
+}
+
+void SP_target_cutscene(gentity_t * self) {
+    self->use = target_cutscene_use;
+}
+
+//==========================================================
+
 /*QUAKED target_position (0 0.5 0) (-4 -4 -4) (4 4 4)
 Used as a positional target for in-game calculation, like jumppad targets.
  */

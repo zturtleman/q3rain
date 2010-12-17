@@ -116,6 +116,7 @@ field_t fields[] = {
     {"angle", FOFS(s.angles), F_ANGLEHACK},
     {"targetShaderName", FOFS(targetShaderName), F_LSTRING},
     {"targetShaderNewName", FOFS(targetShaderNewName), F_LSTRING},
+    {"distance", FOFS(distance), F_FLOAT}, // VALKYRIE: for rotating doors
 
     {NULL}
 };
@@ -197,8 +198,11 @@ void SP_item_botroam(gentity_t *ent) {
 }
 
 // RAIN ENTITY DECLARATIONS
+void SP_func_door_rotating(gentity_t *ent); // VALKYRIE: for rotating doors
+
 void SP_target_win(gentity_t *ent);
 void SP_target_condition(gentity_t *ent);
+void SP_target_cutscene(gentity_t *ent);
 
 spawn_t spawns[] = {
     // info entities don't do anything at all, but provide positional
@@ -272,6 +276,8 @@ spawn_t spawns[] = {
     // func_* section
     {"func_breakable", SP_func_breakable},
     {"func_shooter", SP_func_shooter},
+    {"func_door_rotating", SP_func_door_rotating}, // VALKYRIE: for rotating doors
+    {"func_rotating_door", SP_func_door_rotating},
 
     // info_* section
     {"info_enemy", 0},
@@ -285,6 +291,7 @@ spawn_t spawns[] = {
     {"target_condition", SP_target_condition},
     {"target_remove", 0},
     {"target_random", 0},
+    {"target_cutscene", SP_target_cutscene},
 
     {NULL, 0}
 };
