@@ -699,6 +699,13 @@ extern void UI_TeamOrdersMenu_f(void);
 extern void UI_TeamOrdersMenu_Cache(void);
 
 //
+// ui_loadout.c
+//
+extern void UI_LoadoutMenu(void);
+extern void UI_LoadoutMenu_f(void);
+extern void UI_LoadoutMenu_Cache(void);
+
+//
 // ui_loadconfig.c
 //
 void UI_LoadConfig_Cache(void);

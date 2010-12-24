@@ -1921,6 +1921,7 @@ Q3UIOBJ_ = \
   $(B)/rain/ui/ui_gameinfo.o \
   $(B)/rain/ui/ui_ingame.o \
   $(B)/rain/ui/ui_loadconfig.o \
+  $(B)/rain/ui/ui_loadout.o \
   $(B)/rain/ui/ui_menu.o \
   $(B)/rain/ui/ui_mfield.o \
   $(B)/rain/ui/ui_mods.o \

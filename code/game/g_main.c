@@ -83,6 +83,11 @@ vmCvar_t g_rankings;
 vmCvar_t g_listEntity;
 
 vmCvar_t g_playerspeed;
+vmCvar_t g_primary;
+vmCvar_t g_secondary;
+vmCvar_t g_pistol;
+vmCvar_t g_grenade;
+vmCvar_t g_misc;
 
 static cvarTable_t gameCvarTable[] = {
     // don't override the cheat state set by the system
@@ -154,6 +159,11 @@ static cvarTable_t gameCvarTable[] = {
     { &g_rankings, "g_rankings", "0", 0, 0, qfalse},
 
     { &g_playerspeed, "g_playerspeed", "320", CVAR_CHEAT, 0, qfalse},
+    { &g_primary, "g_primary", "-1", CVAR_SERVERINFO, 0, qfalse},
+    { &g_secondary, "g_secondary", "-1", CVAR_SERVERINFO, 0, qfalse},
+    { &g_pistol, "g_pistol", "-1", CVAR_SERVERINFO, 0, qfalse},
+    { &g_grenade, "g_grenade", "-1", CVAR_SERVERINFO, 0, qfalse},
+    { &g_misc, "g_misc", "-1", CVAR_SERVERINFO, 0, qfalse},
 
 };
 

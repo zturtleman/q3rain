@@ -570,4 +570,11 @@ void CG_InitConsoleCommands(void) {
     trap_AddCommand("zoom");
     trap_AddCommand("weapreload");
     trap_AddCommand("cutscene");
+    trap_AddCommand("weaponlist");
+    trap_AddCommand("primary");
+    trap_AddCommand("secondary");
+    trap_AddCommand("handgun");
+    trap_AddCommand("pistol");
+    trap_AddCommand("grenade");
+    trap_AddCommand("misc");
 }

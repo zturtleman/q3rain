@@ -305,6 +305,7 @@ gitem_t bg_itemlist[] = {
         "weapon_acr",
         "sound/misc/w_pkup.wav",
         { "models/weapons2/railgun/railgun.md3", NULL, NULL, NULL},
+        //{ "models/weapons/acr/acr.md3", NULL, NULL, NULL},
         /* icon */ "icons/iconw_machinegun",
         /* pickup */ "Remington ACR",
         30,

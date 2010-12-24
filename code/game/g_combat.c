@@ -316,27 +316,6 @@ void player_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
             AddScore(attacker, self->r.currentOrigin, -1);
         } else {
             AddScore(attacker, self->r.currentOrigin, 1);
-
-            if (meansOfDeath == MOD_KNIFE) {
-                // play humiliation on player
-                attacker->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT]++;
-                // add the sprite over the player's head
-                attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP);
-                attacker->client->ps.eFlags |= EF_AWARD_GAUNTLET;
-                attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
-                // also play humiliation on target
-                self->client->ps.persistant[PERS_PLAYEREVENTS] ^= PLAYEREVENT_GAUNTLETREWARD;
-            }
-
-            // check for two kills in a short amount of time
-            // if this is close enough to the last kill, give a reward sound
-            if (level.time - attacker->client->lastKillTime < CARNAGE_REWARD_TIME) {
-                attacker->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
-                // add the sprite over the player's head
-                attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP);
-                attacker->client->ps.eFlags |= EF_AWARD_EXCELLENT;
-                attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
-            }
             attacker->client->lastKillTime = level.time;
         }
     } else {

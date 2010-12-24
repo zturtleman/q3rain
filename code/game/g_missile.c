@@ -74,6 +74,7 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
     }
 
     if (strcmp(ent->classname, "c4") == 0) {
+        Com_Printf("c4 bounce\n");
         if (trace->allsolid == qtrue) {
             // bomb sticks in wall, keep it there
             G_SetOrigin(ent, old);
@@ -87,6 +88,7 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
         ent->s.angles2[2] = DEG2RAD(90);
         if (trace->plane.normal[2] > 0.2) {
             G_SetOrigin(ent, trace->endpos);
+            Com_Printf("bomb stopped\n");
             return;
         }
     }
@@ -282,17 +284,6 @@ void G_ExplodeNuke(gentity_t * ent) {
     trap_LinkEntity(ent);
 }
 
-/*
-================
-G_NukeTouch
-
-Explode a nuke on touch
-================
- */
-void G_NukeTouch(gentity_t *ent, gentity_t *otherent, trace_t * trace) {
-    G_ExplodeNuke(ent);
-}
-
 void G_NukeNextStage(gentity_t * ent) {
     ent->count++;
     ent->think = G_ExplodeNuke;
@@ -457,6 +448,30 @@ void G_RunMissile(gentity_t * ent) {
     G_RunThink(ent);
 }
 
+/*
+================
+G_BombTouch
+================
+ */
+void G_BombTouch(gentity_t *ent, gentity_t *otherent, trace_t * trace) {
+    if (!otherent->client) {
+        return;
+    }
+    if (!(otherent->client->buttons & BUTTON_USE) || otherent->client->ps.stats[STAT_HEALTH] <= 0) {
+        return;
+    }
+    if (otherent->client->ps.weaponstate != WEAPON_READY) {
+        return;
+    }
+    otherent->client->ps.zoomFov = 0;
+    otherent->client->ps.weaponstate = WEAPON_RAISING;
+    otherent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BOMB);
+    otherent->client->clipammo[WP_BOMB]++;
+    otherent->client->ps.weapon = WP_NONE;
+    otherent->client->ps.weaponTime = 1000;
+    trap_UnlinkEntity(ent);
+    G_FreeEntity(ent);
+}
 
 //=============================================================================
 
@@ -577,7 +592,6 @@ gentity_t * fire_nuke(gentity_t *self, vec3_t start, vec3_t dir) {
     bolt->s.eType = ET_MISSILE;
     bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
     bolt->s.weapon = WP_NUKE;
-    bolt->touch = G_NukeTouch;
     bolt->s.eFlags = EF_BOUNCE_HALF;
     bolt->r.ownerNum = self->s.number;
     bolt->parent = self;
@@ -607,6 +621,7 @@ gentity_t * fire_nuke(gentity_t *self, vec3_t start, vec3_t dir) {
 }
 
 //=============================================================================
+
 /*
 =================
 fire_bomb
@@ -633,9 +648,12 @@ gentity_t * fire_bomb(gentity_t *self, vec3_t start, vec3_t dir) {
     bolt->clipmask = MASK_SHOT;
     bolt->target_ent = NULL;
 
-    VectorSet(bolt->r.mins, -10, -5, -6);
+    bolt->r.contents = CONTENTS_TRIGGER;
+    bolt->touch = G_BombTouch;
+
+    VectorSet(bolt->r.mins, -6, -4, -10);
     VectorCopy(bolt->r.mins, bolt->r.absmin);
-    VectorSet(bolt->r.maxs, 10, 5, 6);
+    VectorSet(bolt->r.maxs, 6, 4, 10);
     VectorCopy(bolt->r.maxs, bolt->r.absmax);
 
     bolt->s.pos.trType = TR_GRAVITY;

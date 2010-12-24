@@ -64,16 +64,10 @@ void DeathmatchScoreboardMessage(gentity_t *ent) {
         perfect = (cl->ps.persistant[PERS_RANK] == 0 && cl->ps.persistant[PERS_KILLED] == 0) ? 1 : 0;
 
         Com_sprintf(entry, sizeof (entry),
-                " %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.sortedClients[i],
+                " %i %i %i %i %i %i %i %i", level.sortedClients[i],
                 cl->ps.persistant[PERS_SCORE], ping, (level.time - cl->pers.enterTime) / 60000,
                 scoreFlags, g_entities[level.sortedClients[i]].s.powerups, accuracy,
-                cl->ps.persistant[PERS_IMPRESSIVE_COUNT],
-                cl->ps.persistant[PERS_EXCELLENT_COUNT],
-                cl->ps.persistant[PERS_GAUNTLET_FRAG_COUNT],
-                cl->ps.persistant[PERS_DEFEND_COUNT],
-                cl->ps.persistant[PERS_ASSIST_COUNT],
-                perfect,
-                cl->ps.persistant[PERS_CAPTURES]);
+                perfect);
         j = strlen(entry);
         if (stringlength + j > 1024)
             break;
@@ -249,26 +243,6 @@ void Cmd_Give_f(gentity_t *ent) {
             return;
     }
 
-    if (Q_stricmp(name, "excellent") == 0) {
-        ent->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
-        return;
-    }
-    if (Q_stricmp(name, "impressive") == 0) {
-        ent->client->ps.persistant[PERS_IMPRESSIVE_COUNT]++;
-        return;
-    }
-    if (Q_stricmp(name, "gauntletaward") == 0) {
-        ent->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT]++;
-        return;
-    }
-    if (Q_stricmp(name, "defend") == 0) {
-        ent->client->ps.persistant[PERS_DEFEND_COUNT]++;
-        return;
-    }
-    if (Q_stricmp(name, "assist") == 0) {
-        ent->client->ps.persistant[PERS_ASSIST_COUNT]++;
-        return;
-    }
     if (Q_stricmp(name, "adrenaline") == 0) {
         ent->client->ps.powerups[PW_ADRENALINE] = level.time + ADRENALINE_TIME;
         return;
@@ -1600,6 +1574,19 @@ int ClipAmountForWeapon(int w) {
     else if (w == WP_CROSSBOW) return 1;
     else if (w == WP_ACR) return 30;
     else if (w == WP_WALTHER) return 10;
+    // not reloadable
+    else if (w == WP_INJECTOR) return 1;
+    else if (w == WP_HE) return 2;
+    else if (w == WP_BOMB) return 4;
+    else return 0;
+}
+
+int StartClipsForWeapon(int w) {
+    if (w == WP_BARRETT) return 20;
+    else if (w == WP_INTERVENTION) return 14;
+    else if (w == WP_CROSSBOW) return 4;
+    else if (w == WP_WALTHER) return 40;
+    else if (w == WP_ACR) return 90;
     else return 0;
 }
 
@@ -1725,6 +1712,95 @@ void Cmd_Bandage_f(gentity_t *ent) {
 
 /*
 =================
+Cmd_Primary_f
+=================
+ */
+void Cmd_Primary_f(gentity_t *ent) {
+    char *arg;
+    int w;
+    playerState_t *ps = &ent->client->ps;
+    arg = ConcatArgs(1);
+    w = atoi(arg);
+    if (w != WP_BARRETT
+            && w != WP_INTERVENTION
+            && w != WP_CROSSBOW
+            && w != WP_ACR) {
+        return;
+    }
+    ps->persistant[PERS_PRIMARY] = w;
+}
+
+/*
+=================
+Cmd_Secondary_f
+=================
+ */
+void Cmd_Secondary_f(gentity_t *ent) {
+    char *arg;
+    int w;
+    playerState_t *ps = &ent->client->ps;
+    arg = ConcatArgs(1);
+    w = atoi(arg);
+    if (w != -1) {
+        return;
+    }
+    ps->persistant[PERS_SECONDARY] = -1;
+}
+
+/*
+=================
+Cmd_Handgun_f
+=================
+ */
+void Cmd_Handgun_f(gentity_t *ent) {
+    char *arg;
+    int w;
+    playerState_t *ps = &ent->client->ps;
+    arg = ConcatArgs(1);
+    w = atoi(arg);
+    if (w != WP_WALTHER) {
+        return;
+    }
+    ps->persistant[PERS_PISTOL] = w;
+}
+
+/*
+=================
+Cmd_Grenade_f
+=================
+ */
+void Cmd_Grenade_f(gentity_t *ent) {
+    char *arg;
+    int w;
+    playerState_t *ps = &ent->client->ps;
+    arg = ConcatArgs(1);
+    w = atoi(arg);
+    if (w != WP_HE) {
+        return;
+    }
+    ps->persistant[PERS_GRENADE] = w;
+}
+
+/*
+=================
+Cmd_Misc_f
+=================
+ */
+void Cmd_Misc_f(gentity_t *ent) {
+    char *arg;
+    int w;
+    playerState_t *ps = &ent->client->ps;
+    arg = ConcatArgs(1);
+    w = atoi(arg);
+    if (w != WP_BOMB
+            && w != WP_INJECTOR) {
+        return;
+    }
+    ps->persistant[PERS_MISC] = w;
+}
+
+/*
+=================
 ClientCommand
 =================
  */
@@ -1827,7 +1903,7 @@ void ClientCommand(int clientNum) {
         Cmd_GameCommand_f(ent);
     else if (Q_stricmp(cmd, "setviewpos") == 0)
         Cmd_SetViewpos_f(ent);
-    // RAIN COMMANDS
+        // RAIN COMMANDS
     else if (Q_stricmp(cmd, "weapreload") == 0)
         Cmd_Reload(ent);
     else if (Q_stricmp(cmd, "weapdrop") == 0)
@@ -1842,6 +1918,39 @@ void ClientCommand(int clientNum) {
         Cmd_Bandage_f(ent);
     else if (!Q_stricmp(cmd, "cutscene") && g_cheats.integer)
         level.cutscene = !level.cutscene;
+    else if (!Q_stricmp(cmd, "weaponlist"))
+        trap_SendServerCommand(clientNum, va("print \""
+            "^2= Primary\n^7"
+            "Barrett M82A1 - %i\n"
+            "Cheytac M200 Intervention - %i\n"
+            "Crossbow - %i\n"
+            "Remington ACR - %i\n"
+            "^2= Secondary^7\n"
+            "^2= Grenades^7\n"
+            "Frag - %i\n"
+            "^2= Handguns^7\n"
+            "Walther P22 - %i\n"
+            "^2= Misc^7\n"
+            "C4 - %i\n"
+            "Adrenaline Injector - %i\n",
+            WP_BARRETT,
+            WP_INTERVENTION,
+            WP_CROSSBOW,
+            WP_ACR,
+            WP_HE,
+            WP_WALTHER,
+            WP_BOMB,
+            WP_INJECTOR));
+    else if (!Q_stricmp(cmd, "primary"))
+        Cmd_Primary_f(ent);
+    else if (!Q_stricmp(cmd, "secondary"))
+        Cmd_Secondary_f(ent);
+    else if (!Q_stricmp(cmd, "handgun") || !Q_stricmp(cmd, "pistol"))
+        Cmd_Handgun_f(ent);
+    else if (!Q_stricmp(cmd, "grenade"))
+        Cmd_Grenade_f(ent);
+    else if (!Q_stricmp(cmd, "misc"))
+        Cmd_Misc_f(ent);
     else
         trap_SendServerCommand(clientNum, va("print \"^1Unknown command '%s'\n\"", cmd));
 }

@@ -301,6 +301,7 @@ typedef struct {
 
     qboolean cddialog; // bring up the cd needed dialog next frame
     qboolean authdialog; // bring up the auth dialog next frame RYLIUS AUTH
+    qboolean loadout;
 
     char servername[MAX_OSPATH]; // name of server from original connect (used by reconnect)
 

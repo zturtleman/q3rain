@@ -1345,9 +1345,13 @@ void CG_AddViewWeapon(playerState_t *ps) {
     y = cg_gun_y.value;
     z = cg_gun_z.value;
     if (ps->weapon == WP_KNIFE) {
-        z = 3;
-        y = -4.5f;
         x = 12;
+        y = -4.5f;
+        z = 3;
+    } else if (ps->weapon == WP_INTERVENTION) {
+        x = 8;
+        y = -2;
+        z = 2;
     }
     VectorMA(hand.origin, x, cg.refdef.viewaxis[0], hand.origin);
     VectorMA(hand.origin, y, cg.refdef.viewaxis[1], hand.origin);

@@ -1140,45 +1140,70 @@ void ClientSpawn(gentity_t *ent) {
         client->ps.stats[STAT_WEAPONS] |= (1 << WP_KNIFE);
         client->ps.ammo[WP_KNIFE] = -1;
 
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_BARRETT);
-        client->clipammo[WP_BARRETT] = 10;
-        client->ps.ammo[WP_BARRETT] = 10;
+        if (g_primary.integer >= 0) {
+            client->ps.persistant[PERS_PRIMARY] = g_primary.integer;
+        }
+        if (client->ps.persistant[PERS_PRIMARY] != WP_BARRETT
+                && client->ps.persistant[PERS_PRIMARY] != WP_INTERVENTION
+                && client->ps.persistant[PERS_PRIMARY] != WP_CROSSBOW
+                && client->ps.persistant[PERS_PRIMARY] != WP_ACR) {
+            client->ps.persistant[PERS_PRIMARY] = -1;
+        }
 
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_INTERVENTION);
-        client->clipammo[WP_INTERVENTION] = 7;
-        client->ps.ammo[WP_INTERVENTION] = 7;
+        if (g_secondary.integer >= 0) {
+            client->ps.persistant[PERS_SECONDARY] = g_secondary.integer;
+        }
+        if (client->ps.persistant[PERS_SECONDARY] != WP_NONE) {
+            client->ps.persistant[PERS_SECONDARY] = -1;
+        }
 
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_ACR);
-        client->clipammo[WP_ACR] = 30;
-        client->ps.ammo[WP_ACR] = 30;
+        if (g_pistol.integer >= 0) {
+            client->ps.persistant[PERS_PISTOL] = g_pistol.integer;
+        }
+        if (client->ps.persistant[PERS_PISTOL] != WP_WALTHER) {
+            client->ps.persistant[PERS_PISTOL] = -1;
+        }
 
-        /*if (ent->r.svFlags & SVF_BOT) {
-            client->clipammo[WP_ACR] = 300; // haaaaax!
-        } else {*/
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_WALTHER);
-        client->clipammo[WP_WALTHER] = 10;
-        client->ps.ammo[WP_WALTHER] = 20;
+        if (g_grenade.integer >= 0) {
+            client->ps.persistant[PERS_GRENADE] = g_grenade.integer;
+        }
+        if (client->ps.persistant[PERS_GRENADE] != WP_HE) {
+            client->ps.persistant[PERS_GRENADE] = -1;
+        }
 
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_INJECTOR);
-        client->clipammo[WP_INJECTOR] = 1;
-        client->ps.ammo[WP_INJECTOR] = 0;
+        if (g_misc.integer >= 0) {
+            client->ps.persistant[PERS_MISC] = g_misc.integer;
+        }
+        if (client->ps.persistant[PERS_MISC] != WP_BOMB
+                && client->ps.persistant[PERS_MISC] != WP_INJECTOR) {
+            client->ps.persistant[PERS_MISC] = -1;
+        }
 
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_HE);
-        client->clipammo[WP_HE] = 2;
-        client->ps.ammo[WP_HE] = 0;
-
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_CROSSBOW);
-        client->clipammo[WP_CROSSBOW] = 1;
-        client->ps.ammo[WP_CROSSBOW] = 3;
-
-        /*client->ps.stats[STAT_WEAPONS] |= (1 << WP_NUKE);
-        client->clipammo[WP_NUKE] = 1;
-        client->ps.ammo[WP_NUKE] = 0;*/
-
-        client->ps.stats[STAT_WEAPONS] |= (1 << WP_BOMB);
-        client->clipammo[WP_BOMB] = 5;
-        client->ps.ammo[WP_BOMB] = 0;
-        //}
+        if (client->ps.persistant[PERS_PRIMARY] > 0) {
+            client->ps.stats[STAT_WEAPONS] |= (1 << client->ps.persistant[PERS_PRIMARY]);
+            client->clipammo[client->ps.persistant[PERS_PRIMARY]] = ClipAmountForWeapon(client->ps.persistant[PERS_PRIMARY]);
+            client->ps.ammo[client->ps.persistant[PERS_PRIMARY]] = StartClipsForWeapon(client->ps.persistant[PERS_PRIMARY]);
+        }
+        if (client->ps.persistant[PERS_SECONDARY] > 0) {
+            client->ps.stats[STAT_WEAPONS] |= (1 << client->ps.persistant[PERS_SECONDARY]);
+            client->clipammo[client->ps.persistant[PERS_SECONDARY]] = ClipAmountForWeapon(client->ps.persistant[PERS_SECONDARY]);
+            client->ps.ammo[client->ps.persistant[PERS_SECONDARY]] = StartClipsForWeapon(client->ps.persistant[PERS_SECONDARY]);
+        }
+        if (client->ps.persistant[PERS_PISTOL] > 0) {
+            client->ps.stats[STAT_WEAPONS] |= (1 << client->ps.persistant[PERS_PISTOL]);
+            client->clipammo[client->ps.persistant[PERS_PISTOL]] = ClipAmountForWeapon(client->ps.persistant[PERS_PISTOL]);
+            client->ps.ammo[client->ps.persistant[PERS_PISTOL]] = StartClipsForWeapon(client->ps.persistant[PERS_PISTOL]);
+        }
+        if (client->ps.persistant[PERS_GRENADE] > 0) {
+            client->ps.stats[STAT_WEAPONS] |= (1 << client->ps.persistant[PERS_GRENADE]);
+            client->clipammo[client->ps.persistant[PERS_GRENADE]] = ClipAmountForWeapon(client->ps.persistant[PERS_GRENADE]);
+            client->ps.ammo[client->ps.persistant[PERS_GRENADE]] = StartClipsForWeapon(client->ps.persistant[PERS_GRENADE]);
+        }
+        if (client->ps.persistant[PERS_MISC] > 0) {
+            client->ps.stats[STAT_WEAPONS] |= (1 << client->ps.persistant[PERS_MISC]);
+            client->clipammo[client->ps.persistant[PERS_MISC]] = ClipAmountForWeapon(client->ps.persistant[PERS_MISC]);
+            client->ps.ammo[client->ps.persistant[PERS_MISC]] = StartClipsForWeapon(client->ps.persistant[PERS_MISC]);
+        }
     }
 
     // health will count down towards max_health

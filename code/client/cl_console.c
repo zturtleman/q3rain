@@ -318,6 +318,24 @@ void Cmd_AuthMenu(char *args, int argNum) {
 
 /*
 ==================
+Con_LoadoutMenu_f
+==================
+ */
+void Con_LoadoutMenu_f(void) {
+    cls.loadout = qtrue;
+}
+
+/*
+==================
+Cmd_LoadoutMenu
+==================
+ */
+void Cmd_LoadoutMenu(char *args, int argNum) {
+    Con_LoadoutMenu_f();
+}
+
+/*
+==================
 Con_Auth_f
 ==================
  */
@@ -386,6 +404,7 @@ void Con_Init(void) {
     Cmd_AddCommand("messagemode4", Con_MessageMode4_f);
     Cmd_AddCommand("auth", Con_Auth_f);
     Cmd_AddCommand("authmenu", Con_AuthMenu_f);
+    Cmd_AddCommand("loadout", Con_LoadoutMenu_f);
     Cmd_AddCommand("clear", Con_Clear_f);
     Cmd_AddCommand("condump", Con_Dump_f);
     Cmd_SetCommandCompletionFunc("condump", Cmd_CompleteTxtName);

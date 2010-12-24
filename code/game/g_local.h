@@ -358,6 +358,7 @@ struct gclient_s {
 
 qboolean Cmd_Reload(gentity_t *ent);
 int ClipAmountForWeapon(int w);
+int StartClipsForWeapon(int w);
 
 //
 // this structure is cleared as each map is entered
@@ -804,6 +805,11 @@ extern vmCvar_t g_singlePlayer;
 extern vmCvar_t g_proxMineTimeout;
 
 extern vmCvar_t g_playerspeed;
+extern vmCvar_t g_primary;
+extern vmCvar_t g_secondary;
+extern vmCvar_t g_pistol;
+extern vmCvar_t g_grenade;
+extern vmCvar_t g_misc;
 
 void trap_Printf(const char *fmt);
 void trap_Error(const char *fmt);

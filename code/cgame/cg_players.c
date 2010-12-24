@@ -27,16 +27,13 @@ char *cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
     "*death1.wav",
     "*death2.wav",
     "*death3.wav",
-    "*jump1.wav",
     "*pain25_1.wav",
     "*pain50_1.wav",
     "*pain75_1.wav",
     "*pain100_1.wav",
-    "*falling1.wav",
     "*gasp.wav",
     "*drown.wav",
     "*fall1.wav",
-    "*taunt.wav"
 };
 
 /*
@@ -82,7 +79,7 @@ CLIENT INFO
 ======================
 CG_ParseAnimationFile
 
-Read a configuration file containing animation coutns and rates
+Read a configuration file containing animation counts and rates
 models/players/visor/animation.cfg, etc
 ======================
  */
@@ -331,7 +328,7 @@ static qboolean CG_FindClientModelFile(char *filename, int length, clientInfo_t 
     while (1) {
         for (i = 0; i < 2; i++) {
             if (i == 0 && teamName && *teamName) {
-                //								"models/players/characters/james/stroggs/lower_lily_red.skin"
+                //		"models/players/characters/james/stroggs/lower_lily_red.skin"
                 Com_sprintf(filename, length, "models/players/%s%s/%s%s_%s_%s.%s", charactersFolder, modelName, teamName, base, skinName, team, ext);
             } else {
                 //								"models/players/characters/james/lower_lily_red.skin"
@@ -2005,7 +2002,7 @@ static void CG_PlayerSplash(centity_t *cent) {
     // if the feet aren't in liquid, don't make a mark
     // this won't handle moving water brushes, but they wouldn't draw right anyway...
     contents = trap_CM_PointContents(end, 0);
-    if (!(contents & (CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA))) {
+    if (!(contents & (CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA | CONTENTS_MOOR))) {
         return;
     }
 
@@ -2014,12 +2011,12 @@ static void CG_PlayerSplash(centity_t *cent) {
 
     // if the head isn't out of liquid, don't make a mark
     contents = trap_CM_PointContents(start, 0);
-    if (contents & (CONTENTS_SOLID | CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA)) {
+    if (contents & (CONTENTS_SOLID | CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA | CONTENTS_MOOR)) {
         return;
     }
 
     // trace down to find the surface
-    trap_CM_BoxTrace(&trace, start, end, NULL, NULL, 0, (CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA));
+    trap_CM_BoxTrace(&trace, start, end, NULL, NULL, 0, (CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA | CONTENTS_MOOR));
 
     if (trace.fraction == 1.0) {
         return;
