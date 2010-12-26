@@ -28,6 +28,7 @@ MAIN MENU
 =======================================================================
  */
 
+#define MAX_MENU_SCENES 3
 
 #include "ui_local.h"
 
@@ -35,8 +36,7 @@ MAIN MENU
 #define ID_MULTIPLAYER 11
 #define ID_OPTIONS 12
 #define ID_DEMOS 13
-#define ID_MODS 14
-#define ID_EXIT 15
+#define ID_EXIT 14
 
 #define MAIN_BANNER_MODEL			"models/mapobjects/banner/banner5.md3"
 #define MAIN_MENU_VERTICAL_SPACING		34
@@ -48,10 +48,11 @@ typedef struct {
     menutext_s multiplayer;
     menutext_s options;
     menutext_s demos;
-    menutext_s mods;
     menutext_s exit;
 
-    qhandle_t bannerModel;
+    int currentScene;
+    float fade;
+    qboolean up;
 } mainmenu_t;
 
 
@@ -104,12 +105,8 @@ void Main_MenuEvent(void* ptr, int event) {
             UI_DemosMenu();
             break;
 
-        case ID_MODS:
-            UI_ModsMenu();
-            break;
-
         case ID_EXIT:
-            UI_ConfirmMenu("Exit Rain?", 0, MainMenu_ExitAction);
+            UI_ConfirmMenu("Exit " PRODUCT_NAME "?", 0, MainMenu_ExitAction);
             break;
     }
 }
@@ -120,7 +117,6 @@ MainMenu_Cache
 ===============
  */
 void MainMenu_Cache(void) {
-    s_main.bannerModel = trap_R_RegisterModel(MAIN_BANNER_MODEL);
 }
 
 sfxHandle_t ErrorMessage_Key(int key) {
@@ -143,7 +139,8 @@ static void Main_MenuDraw(void) {
     vec3_t angles;
     float adjust;
     float x, y, w, h;
-    vec4_t color = {0.8, 0.8, 0.8, 1};
+    vec4_t oldColor = {0.8, 0.8, 0.8, 1};
+    vec4_t color;
 
     // options the refdef
 
@@ -179,14 +176,53 @@ static void Main_MenuDraw(void) {
 
     memset(&ent, 0, sizeof (ent));
 
-    adjust = 5.0 * sin((float) uis.realtime / 5000);
+    /*adjust = 5.0 * sin((float) uis.realtime / 5000);
     VectorSet(angles, 0, 180 + adjust, 0);
     AnglesToAxis(angles, ent.axis);
     ent.hModel = s_main.bannerModel;
     VectorCopy(origin, ent.origin);
     VectorCopy(origin, ent.lightingOrigin);
     ent.renderfx = RF_LIGHTING_ORIGIN | RF_NOSHADOW;
-    VectorCopy(ent.origin, ent.oldorigin);
+    VectorCopy(ent.origin, ent.oldorigin);*/
+
+    x = 192;
+    y = 64;
+    w = 448;
+    h = 352;
+
+    if (!s_main.up) {
+        s_main.fade -= ((float) uis.frametime) / 10.0f;
+    } else {
+        s_main.fade += ((float) uis.frametime) / 10.0f;
+    }
+    if (s_main.fade <= -100) {
+        s_main.up = qtrue;
+        s_main.currentScene++;
+        if (s_main.currentScene >= MAX_MENU_SCENES) {
+            s_main.currentScene = 0;
+        }
+    }
+    if (s_main.fade > 1000.0f) {
+        s_main.up = qfalse;
+    }
+
+    Vector4Copy(color, oldColor);
+
+    color[3] = s_main.fade / 1000.0f;
+    if (color[3] > 1) {
+        color[3] = 1;
+    }
+    trap_R_SetColor(color);
+    if (color[3] >= 0.0f) {
+        UI_DrawNamedPic(x, y, w, h, va("gfx/scenes/%i.png", s_main.currentScene));
+    }
+
+    color[0] = color[1] = color[2] = color[3] = 1;
+    trap_R_SetColor(color);
+
+    UI_DrawNamedPic(x, y, w, h, "gfx/scenes/overlay.png");
+
+    trap_R_SetColor(oldColor);
 
     trap_R_AddRefEntityToScene(&ent);
 
@@ -198,8 +234,8 @@ static void Main_MenuDraw(void) {
         Menu_Draw(&s_main.menu);
     }
 
-    UI_DrawString(320, 430, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER | UI_SMALLFONT, color);
-    UI_DrawString(320, 452, "Rain Q3 Mod", UI_CENTER | UI_SMALLFONT, color);
+    UI_DrawString(320, 430, "Rain (c) 2010, Hazewood Development Team, Some Rights Reserved", UI_CENTER | UI_SMALLFONT, oldColor);
+    UI_DrawString(320, 452, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER | UI_SMALLFONT, oldColor);
 }
 
 /*
@@ -213,19 +249,9 @@ and that local cinematics are killed
  */
 void UI_MainMenu(void) {
     int y;
-    int style = UI_CENTER | UI_DROPSHADOW;
+    int style = UI_LEFT | UI_DROPSHADOW;
 
     trap_Cvar_Set("sv_killserver", "1");
-
-    /*if( !uis.demoversion && !ui_cdkeychecked.integer ) {
-            char	key[17];
-
-            trap_GetCDKey( key, sizeof(key) );
-            if( trap_VerifyCDKey( key, NULL ) == qfalse ) {
-                    UI_CDKeyMenu();
-                    return;
-            }
-    }*/
 
     memset(&s_main, 0, sizeof (mainmenu_t));
     memset(&s_errorMessage, 0, sizeof (errorMessage_t));
@@ -248,15 +274,20 @@ void UI_MainMenu(void) {
         return;
     }
 
+    trap_S_StartBackgroundTrack("music/mainmenu.ogg", "");
+
     s_main.menu.draw = Main_MenuDraw;
     s_main.menu.fullscreen = qtrue;
     s_main.menu.wrapAround = qtrue;
     s_main.menu.showlogo = qfalse;
 
+    s_main.fade = 1000.0f;
+    s_main.up = qfalse;
+
     y = 200;
     s_main.singleplayer.generic.type = MTYPE_PTEXT;
     s_main.singleplayer.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.singleplayer.generic.x = 128;
+    s_main.singleplayer.generic.x = 32;
     s_main.singleplayer.generic.y = y;
     s_main.singleplayer.generic.id = ID_SINGLEPLAYER;
     s_main.singleplayer.generic.callback = Main_MenuEvent;
@@ -267,7 +298,7 @@ void UI_MainMenu(void) {
     y += MAIN_MENU_VERTICAL_SPACING;
     s_main.multiplayer.generic.type = MTYPE_PTEXT;
     s_main.multiplayer.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.multiplayer.generic.x = 128;
+    s_main.multiplayer.generic.x = 32;
     s_main.multiplayer.generic.y = y;
     s_main.multiplayer.generic.id = ID_MULTIPLAYER;
     s_main.multiplayer.generic.callback = Main_MenuEvent;
@@ -278,7 +309,7 @@ void UI_MainMenu(void) {
     y += MAIN_MENU_VERTICAL_SPACING;
     s_main.options.generic.type = MTYPE_PTEXT;
     s_main.options.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.options.generic.x = 128;
+    s_main.options.generic.x = 32;
     s_main.options.generic.y = y;
     s_main.options.generic.id = ID_OPTIONS;
     s_main.options.generic.callback = Main_MenuEvent;
@@ -289,7 +320,7 @@ void UI_MainMenu(void) {
     y += MAIN_MENU_VERTICAL_SPACING;
     s_main.demos.generic.type = MTYPE_PTEXT;
     s_main.demos.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.demos.generic.x = 128;
+    s_main.demos.generic.x = 32;
     s_main.demos.generic.y = y;
     s_main.demos.generic.id = ID_DEMOS;
     s_main.demos.generic.callback = Main_MenuEvent;
@@ -298,20 +329,9 @@ void UI_MainMenu(void) {
     s_main.demos.style = style;
 
     y += MAIN_MENU_VERTICAL_SPACING;
-    s_main.mods.generic.type = MTYPE_PTEXT;
-    s_main.mods.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.mods.generic.x = 128;
-    s_main.mods.generic.y = y;
-    s_main.mods.generic.id = ID_MODS;
-    s_main.mods.generic.callback = Main_MenuEvent;
-    s_main.mods.string = "Mods";
-    s_main.mods.color = color_blue;
-    s_main.mods.style = style;
-
-    y += MAIN_MENU_VERTICAL_SPACING;
     s_main.exit.generic.type = MTYPE_PTEXT;
     s_main.exit.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.exit.generic.x = 128;
+    s_main.exit.generic.x = 32;
     s_main.exit.generic.y = y;
     s_main.exit.generic.id = ID_EXIT;
     s_main.exit.generic.callback = Main_MenuEvent;
@@ -323,7 +343,6 @@ void UI_MainMenu(void) {
     Menu_AddItem(&s_main.menu, &s_main.multiplayer);
     Menu_AddItem(&s_main.menu, &s_main.options);
     Menu_AddItem(&s_main.menu, &s_main.demos);
-    Menu_AddItem(&s_main.menu, &s_main.mods);
     Menu_AddItem(&s_main.menu, &s_main.exit);
 
     trap_Key_SetCatcher(KEYCATCH_UI);

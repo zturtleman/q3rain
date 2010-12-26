@@ -725,7 +725,13 @@ void ClientUserinfoChanged(int clientNum) {
             trap_SendServerCommand(-1, va("print \"%s" S_COLOR_WHITE " renamed to %s\n\"", oldname,
                     client->pers.netname));
         }
+        s = Info_ValueForKey(userinfo, "cg_primary");
+        client->ps.persistant[PERS_PRIMARY] = atoi(s);
+        
+        s = Info_ValueForKey(userinfo, "cg_grenade");
+        client->ps.persistant[PERS_GRENADE] = atoi(s);
     }
+
 
     // set max health
     health = 100;

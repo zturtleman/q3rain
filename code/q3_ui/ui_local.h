@@ -280,6 +280,7 @@ extern vec4_t color_blue;
 extern vec4_t color_orange;
 extern vec4_t color_red;
 extern vec4_t color_dim;
+extern vec4_t color_green;
 extern vec4_t name_color;
 extern vec4_t list_color;
 extern vec4_t listbar_color;

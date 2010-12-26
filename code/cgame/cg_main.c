@@ -174,6 +174,12 @@ vmCvar_t cg_trueLightning;
 vmCvar_t cg_atmosphericEffects;
 vmCvar_t cg_lowEffects;
 
+vmCvar_t cg_primary;
+vmCvar_t cg_secondary;
+vmCvar_t cg_pistol;
+vmCvar_t cg_grenade;
+vmCvar_t cg_misc;
+
 typedef struct {
     vmCvar_t *vmCvar;
     char *cvarName;
@@ -276,6 +282,8 @@ static cvarTable_t cvarTable[] = {
     //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE },
     { &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE | CVAR_CHEAT},
 
+    { &cg_primary, "cg_primary", "-1",  CVAR_USERINFO | CVAR_ARCHIVE},
+
 };
 
 static int cvarTableSize = sizeof ( cvarTable) / sizeof ( cvarTable[0]);
@@ -305,6 +313,8 @@ void CG_RegisterCvars(void) {
     trap_Cvar_Register(NULL, "headmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE);
     trap_Cvar_Register(NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE);
     trap_Cvar_Register(NULL, "team_headmodel", DEFAULT_TEAM_HEAD, CVAR_USERINFO | CVAR_ARCHIVE);
+
+    trap_Cvar_Register(NULL, "cg_primary", "6", CVAR_USERINFO | CVAR_ARCHIVE);
 }
 
 /*																																			
