@@ -218,10 +218,7 @@ static void Main_MenuDraw(void) {
         color[3] = 0;
     }
     trap_R_SetColor(color);
-    if (color[3] <= 1.0f) {
-        //UI_DrawNamedPic(x, y, w, h, va("gfx/scenes/%i.png", s_main.currentScene));
-        UI_DrawNamedPic(x, y, w, h, "gfx/colors/blue.jpg");
-    }
+    UI_DrawNamedPic(x, y, w, h, "gfx/colors/blue.jpg");
 
     color[0] = color[1] = color[2] = color[3] = 1;
     trap_R_SetColor(color);
@@ -286,7 +283,7 @@ void UI_MainMenu(void) {
     s_main.menu.wrapAround = qtrue;
     s_main.menu.showlogo = qfalse;
 
-    s_main.fade = 1000.0f;
+    s_main.fade = 2000.0f;
     s_main.up = qfalse;
 
     y = 200;

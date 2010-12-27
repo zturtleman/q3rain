@@ -1342,8 +1342,7 @@ void Menu_Draw(menuframework_s *menu) {
         if (itemptr->ownerdraw) {
             // total subclassing, owner draws everything
             itemptr->ownerdraw(itemptr);
-        }
-        else {
+        } else {
             switch (itemptr->type) {
                 case MTYPE_RADIOBUTTON:
                     RadioButton_Draw((menuradiobutton_s*) itemptr);
@@ -1505,7 +1504,7 @@ sfxHandle_t Menu_DefaultKey(menuframework_s *m, int key) {
             break;
 
         case K_F12:
-            trap_Cmd_ExecuteText(EXEC_APPEND, "screenshot\n");
+            trap_Cmd_ExecuteText(EXEC_APPEND, "screenshotjpeg\n");
             break;
 #endif
         case K_KP_UPARROW:
