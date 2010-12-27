@@ -195,31 +195,36 @@ static void Main_MenuDraw(void) {
     } else {
         s_main.fade += ((float) uis.frametime) / 10.0f;
     }
-    if (s_main.fade <= -100) {
-        s_main.up = qtrue;
+    if (s_main.fade >= 1200.0f) {
+        s_main.up = qfalse;
         s_main.currentScene++;
         if (s_main.currentScene >= MAX_MENU_SCENES) {
             s_main.currentScene = 0;
         }
     }
-    if (s_main.fade > 1000.0f) {
-        s_main.up = qfalse;
+    if (s_main.fade <= -100.0f) {
+        s_main.up = qtrue;
     }
 
     Vector4Copy(color, oldColor);
+
+    UI_DrawHandlePic(x, y, w, h, trap_R_RegisterShaderNoMip(va("gfx/scenes/%i", s_main.currentScene)));
 
     color[3] = s_main.fade / 1000.0f;
     if (color[3] > 1) {
         color[3] = 1;
     }
+    if (color[3] < 0) {
+        color[3] = 0;
+    }
     trap_R_SetColor(color);
-    if (color[3] >= 0.0f) {
-        UI_DrawNamedPic(x, y, w, h, va("gfx/scenes/%i.png", s_main.currentScene));
+    if (color[3] <= 1.0f) {
+        //UI_DrawNamedPic(x, y, w, h, va("gfx/scenes/%i.png", s_main.currentScene));
+        UI_DrawNamedPic(x, y, w, h, "gfx/colors/blue.jpg");
     }
 
     color[0] = color[1] = color[2] = color[3] = 1;
     trap_R_SetColor(color);
-
     UI_DrawNamedPic(x, y, w, h, "gfx/scenes/overlay.png");
 
     trap_R_SetColor(oldColor);
