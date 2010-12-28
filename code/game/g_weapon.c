@@ -1036,6 +1036,46 @@ void Weapon_Nuke_Fire(gentity_t *ent) {
 
 /*
 ===============
+Weapon_Snowboard_Fire
+
+===============
+ */
+#define SNOWBOARD_RANGE 64
+#define SNOWBOARD_DAMAGE 20
+
+void Weapon_Snowboard_Fire(gentity_t *ent) {
+    trace_t tr;
+    vec3_t end;
+    gentity_t *traceEnt;
+    qboolean hit = qfalse;
+
+    AngleVectors(ent->client->ps.viewangles, forward, right, up);
+    CalcMuzzlePoint(ent, forward, right, up, muzzle);
+    VectorMA(muzzle, INJECTOR_RANGE, forward, end);
+    trap_Trace(&tr, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
+
+    traceEnt = &g_entities[tr.entityNum];
+
+    if (tr.contents & CONTENTS_BODY) {
+        hit = qtrue;
+    }
+
+    if (hit) {
+        G_Damage(traceEnt, ent, ent, NULL, NULL, SNOWBOARD_DAMAGE, 0, MOD_SNOWBOARD);
+    } else {
+        if (ent->client->ps.powerups[PW_SNOWBOARD] == 1) {
+        ent->client->ps.weaponTime += 3500;
+            ent->client->ps.powerups[PW_SNOWBOARD] = 0;
+        } else {
+        ent->client->ps.weaponTime += 4500;
+            ent->client->ps.powerups[PW_SNOWBOARD] = 1;
+        }
+        ent->client->ps.weaponstate = WEAPON_SNOWBOARDING;
+    }
+}
+
+/*
+===============
 FireWeapon
 ===============
  */
@@ -1105,6 +1145,9 @@ void FireWeapon(gentity_t *ent) {
             break;
         case WP_NUKE:
             Weapon_Nuke_Fire(ent);
+            break;
+        case WP_SNOWBOARD:
+            Weapon_Snowboard_Fire(ent);
             break;
         default:
             //G_Error( "Bad ent->s.weapon" );

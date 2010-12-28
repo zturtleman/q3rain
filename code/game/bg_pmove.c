@@ -189,6 +189,13 @@ static void PM_Friction(void) {
     float *vel;
     float speed, newspeed, control;
     float drop;
+    qboolean snowboarding = qfalse;
+
+    if (pml.groundTrace.surfaceFlags & SURF_SNOW) {
+        if (pm->ps->powerups[PW_SNOWBOARD] == 1) {
+            snowboarding = qtrue;
+        }
+    }
 
     vel = pm->ps->velocity;
 
@@ -229,6 +236,13 @@ static void PM_Friction(void) {
     // LADDER
     if (pml.ladder) {
         drop += speed * pm_ladderfriction * pml.frametime;
+    }
+
+    if (snowboarding) {
+        drop = 1;
+    }
+    if (pml.groundTrace.surfaceFlags & SURF_SNOW && !snowboarding) {
+        drop += 5;
     }
 
     // scale the velocity
@@ -450,6 +464,7 @@ static qboolean PM_CheckJump(void) {
     }
 
     if (pm->ps->jumpCooldown >= pm->ps->levelTime) {
+        pm->cmd.upmove = 0;
         return qfalse;
     }
 
@@ -502,6 +517,14 @@ static qboolean PM_CheckWaterJump(void) {
 
     // check for water jump
     if (pm->waterlevel != 2) {
+        return qfalse;
+    }
+
+    if (pm->ps->stamina < 1000) {
+        return qfalse;
+    }
+
+    if (pm->ps->jumpCooldown >= pm->ps->levelTime) {
         return qfalse;
     }
 
@@ -1014,6 +1037,137 @@ static void PM_GrappleMove(void) {
 
 /*
 ===================
+PM_SnowMove
+===================
+ */
+
+static void PM_SnowMove(pmove_t * pmove) {
+    int i;
+    vec3_t wishvel;
+    float fmove, smove;
+    vec3_t wishdir;
+    float wishspeed;
+    float scale;
+    usercmd_t cmd;
+    float accelerate;
+    float vel;
+    qboolean snowboarding = qfalse;
+
+    pmove->ps->wallclimbs = 0;
+
+    if (pm->waterlevel > 2 && DotProduct(pml.forward, pml.groundTrace.plane.normal) > 0) {
+        PM_WaterMove();
+        return;
+    }
+
+    if (PM_CheckJump()) {
+        PM_AirMove(pmove);
+        return;
+    }
+
+    if (pm->ps->powerups[PW_SNOWBOARD] == 1) {
+        snowboarding = qtrue;
+    }
+
+    PM_Friction();
+
+    if (snowboarding) {
+        fmove = pm->cmd.forwardmove / 10;
+        smove = pm->cmd.rightmove / 10;
+        pm->cmd.buttons &= ~BUTTON_WALKING;
+        pm->cmd.buttons &= ~BUTTON_SPRINT;
+    } else {
+        fmove = pm->cmd.forwardmove / 1.125;
+        smove = pm->cmd.rightmove / 1.125;
+    }
+
+    cmd = pm->cmd;
+    scale = PM_CmdScale(&cmd);
+
+    // set the movementDir so clients can rotate the legs for strafing
+    PM_SetMovementDir();
+
+    // project moves down to flat plane
+    pml.forward[2] = 0;
+    pml.right[2] = 0;
+
+    // project the forward and right directions onto the ground plane
+    PM_ClipVelocity(pml.forward, pml.groundTrace.plane.normal, pml.forward, OVERCLIP);
+    PM_ClipVelocity(pml.right, pml.groundTrace.plane.normal, pml.right, OVERCLIP);
+    //
+    VectorNormalize(pml.forward);
+    VectorNormalize(pml.right);
+
+    for (i = 0; i < 3; i++) {
+        wishvel[i] = pml.forward[i] * fmove + pml.right[i] * smove;
+    }
+    // when going up or down slopes the wish velocity should Not be zero
+    //  wishvel[2] = 0;
+
+    VectorCopy(wishvel, wishdir);
+    wishspeed = VectorNormalize(wishdir);
+    wishspeed *= scale;
+
+    // clamp the speed lower if ducking
+    if (pm->ps->pm_flags & PMF_DUCKED && !snowboarding) {
+        if (wishspeed > pm->ps->speed * pm_duckScale) {
+            wishspeed = pm->ps->speed * pm_duckScale;
+        }
+    }
+
+    // clamp the speed lower if wading or walking on the bottom
+    if (pm->waterlevel) {
+        float waterScale;
+
+        waterScale = pm->waterlevel / 3.0;
+        waterScale = 1.0 - (1.0 - pm_swimScale) * waterScale;
+        if (wishspeed > pm->ps->speed * waterScale) {
+            wishspeed = pm->ps->speed * waterScale;
+        }
+    }
+
+    // when a player gets hit, they temporarily lose
+    // full control, which allows them to be moved a bit
+    if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
+        accelerate = pm_airaccelerate;
+    } else {
+        accelerate = pm_snowaccelerate;
+    }
+
+    PM_Accelerate(wishdir, wishspeed, accelerate);
+
+    //Com_Printf("velocity = %1.1f %1.1f %1.1f\n", pm->ps->velocity[0], pm->ps->velocity[1], pm->ps->velocity[2]);
+    //Com_Printf("velocity1 = %1.1f\n", VectorLength(pm->ps->velocity));
+
+    if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK || snowboarding) {
+        if (snowboarding) {
+            pm->ps->velocity[2] -= (pm->ps->gravity / 6) * pml.frametime;
+        } else {
+            pm->ps->velocity[2] -= pm->ps->gravity * pml.frametime;
+        }
+    }
+
+    vel = VectorLength(pm->ps->velocity);
+
+    // slide along the ground plane
+    PM_ClipVelocity(pm->ps->velocity, pml.groundTrace.plane.normal, pm->ps->velocity, OVERCLIP);
+
+    // don't decrease velocity when going up or down a slope
+    //VectorNormalize(pm->ps->velocity);
+    //VectorScale(pm->ps->velocity, vel, pm->ps->velocity);
+
+    // don't do anything if standing still
+    if (!pm->ps->velocity[0] && !pm->ps->velocity[1] && !pm->ps->velocity[2]) {
+        return;
+    }
+
+    PM_StepSlideMove(qtrue);
+
+    //Com_Printf("velocity2 = %1.1f\n", VectorLength(pm->ps->velocity));
+}
+
+/*
+===================
 PM_WalkMove
 ===================
  */
@@ -1031,9 +1185,18 @@ static void PM_WalkMove(pmove_t *pmove) {
     pmove->ps->wallclimbs = 0;
     pmove->ps->walljumps = 0;
 
+    if (pm->ps->weaponstate == WEAPON_SNOWBOARDING) {
+        pm->cmd.forwardmove = pm->cmd.rightmove = pm->cmd.upmove = 0;
+    }
+
     if (pm->waterlevel > 2 && DotProduct(pml.forward, pml.groundTrace.plane.normal) > 0) {
         // begin swimming
         PM_WaterMove();
+        return;
+    }
+
+    if (pml.groundTrace.surfaceFlags & SURF_SNOW) {
+        PM_SnowMove(pmove);
         return;
     }
 
@@ -1052,26 +1215,15 @@ static void PM_WalkMove(pmove_t *pmove) {
     fmove = pm->cmd.forwardmove;
     smove = pm->cmd.rightmove;
 
+    if (pm->ps->jumpCooldown >= pm->ps->levelTime) {
+        pm->cmd.upmove = 0;
+    }
+
     cmd = pm->cmd;
     scale = PM_CmdScale(&cmd);
 
     // set the movementDir so clients can rotate the legs for strafing
     PM_SetMovementDir();
-
-    if ((pm->ps->stats[STAT_HEALTH] <= 20) && ((int) (pm->ps->torsoTimer + pm->ps->commandTime * crandom()) % 5) == 0) {
-        if (pml.right[0] != 0 && pml.right[1] != 0) {
-            if (crandom() < 0)
-                pml.forward[0] = crandom()*10000;
-            else
-                pml.forward[1] = crandom()*10000;
-        }
-        if (pml.forward[0] != 0 && pml.forward[1] != 0) {
-            if (crandom() < 0)
-                pml.right[0] = crandom()*10000;
-            else
-                pml.right[1] = crandom()*10000;
-        }
-    }
 
     // project moves down to flat plane
     pml.forward[2] = 0;
@@ -1119,9 +1271,6 @@ static void PM_WalkMove(pmove_t *pmove) {
     // full control, which allows them to be moved a bit
     if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
         accelerate = pm_airaccelerate;
-    } else if (pml.groundTrace.surfaceFlags & SURF_SNOW) {
-        //accelerate = pm_snowaccelerate;
-        accelerate = 1000000000.0f;
     } else {
         accelerate = pm_accelerate;
     }
@@ -1131,11 +1280,23 @@ static void PM_WalkMove(pmove_t *pmove) {
     //Com_Printf("velocity = %1.1f %1.1f %1.1f\n", pm->ps->velocity[0], pm->ps->velocity[1], pm->ps->velocity[2]);
     //Com_Printf("velocity1 = %1.1f\n", VectorLength(pm->ps->velocity));
 
-    if ((pml.groundTrace.surfaceFlags & SURF_SNOW) || (pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
+    if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
         pm->ps->velocity[2] -= pm->ps->gravity * pml.frametime;
-    } else {
-        // don't reset the z velocity for slopes
-        //    pm->ps->velocity[2] = 0;
+    }
+
+    if ((pm->ps->stats[STAT_HEALTH] <= 20) && (pm->ps->levelTime % 2000) == 0) {
+        if (pm->ps->velocity[1] != 0) {
+            if (crandom() < 0)
+                pm->ps->velocity[0] = crandom()*300;
+            else
+                pm->ps->velocity[0] = -(crandom()*300);
+        }
+        if (pm->ps->velocity[0] != 0) {
+            if (crandom() < 0)
+                pm->ps->velocity[1] = crandom()*300;
+            else
+                pm->ps->velocity[1] = -(crandom()*300);
+        }
     }
 
     vel = VectorLength(pm->ps->velocity);
@@ -1157,126 +1318,9 @@ static void PM_WalkMove(pmove_t *pmove) {
 
     //Com_Printf("snow: %i slick: %i surf: %i\n", SURF_SNOW, SURF_SLICK, pml.groundTrace.surfaceFlags);
 
-    if (pml.groundTrace.surfaceFlags & SURF_SNOW) {
-        //pm->ps->velocity[2] = 100000;
+    if ((pml.groundTrace.surfaceFlags & SURF_SNOW) == qtrue) {
+        pm->ps->velocity[2] = 100;
     }
-
-    //Com_Printf("velocity2 = %1.1f\n", VectorLength(pm->ps->velocity));
-}
-
-/*
-===================
-PM_SnowMove
-===================
- */
-static void PM_SnowMove(pmove_t * pmove) {
-    int i;
-    vec3_t wishvel;
-    float fmove, smove;
-    vec3_t wishdir;
-    float wishspeed;
-    float scale;
-    usercmd_t cmd;
-    float accelerate;
-    float vel;
-
-    pmove->ps->wallclimbs = 0;
-
-    if (pm->waterlevel > 2 && DotProduct(pml.forward, pml.groundTrace.plane.normal) > 0) {
-        PM_WaterMove();
-        return;
-    }
-
-    if (PM_CheckJump()) {
-        PM_AirMove(pmove);
-        return;
-    }
-
-    PM_Friction();
-
-    fmove = pm->cmd.forwardmove;
-    smove = pm->cmd.rightmove;
-
-    cmd = pm->cmd;
-    scale = PM_CmdScale(&cmd);
-
-    // set the movementDir so clients can rotate the legs for strafing
-    PM_SetMovementDir();
-
-    // project moves down to flat plane
-    pml.forward[2] = 0;
-    pml.right[2] = 0;
-
-    // project the forward and right directions onto the ground plane
-    PM_ClipVelocity(pml.forward, pml.groundTrace.plane.normal, pml.forward, OVERCLIP);
-    PM_ClipVelocity(pml.right, pml.groundTrace.plane.normal, pml.right, OVERCLIP);
-    //
-    VectorNormalize(pml.forward);
-    VectorNormalize(pml.right);
-
-    for (i = 0; i < 3; i++) {
-        wishvel[i] = pml.forward[i] * fmove + pml.right[i] * smove;
-    }
-    // when going up or down slopes the wish velocity should Not be zero
-    //  wishvel[2] = 0;
-
-    VectorCopy(wishvel, wishdir);
-    wishspeed = VectorNormalize(wishdir);
-    wishspeed *= scale;
-
-    // clamp the speed lower if ducking
-    if (pm->ps->pm_flags & PMF_DUCKED) {
-        if (wishspeed > pm->ps->speed * pm_duckScale) {
-            wishspeed = pm->ps->speed * pm_duckScale;
-        }
-    }
-
-    // clamp the speed lower if wading or walking on the bottom
-    if (pm->waterlevel) {
-        float waterScale;
-
-        waterScale = pm->waterlevel / 3.0;
-        waterScale = 1.0 - (1.0 - pm_swimScale) * waterScale;
-        if (wishspeed > pm->ps->speed * waterScale) {
-            wishspeed = pm->ps->speed * waterScale;
-        }
-    }
-
-    // when a player gets hit, they temporarily lose
-    // full control, which allows them to be moved a bit
-    if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
-        accelerate = pm_airaccelerate;
-    } else {
-        accelerate = pm_snowaccelerate;
-    }
-
-    PM_Accelerate(wishdir, wishspeed, accelerate);
-
-    //Com_Printf("velocity = %1.1f %1.1f %1.1f\n", pm->ps->velocity[0], pm->ps->velocity[1], pm->ps->velocity[2]);
-    //Com_Printf("velocity1 = %1.1f\n", VectorLength(pm->ps->velocity));
-
-    if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
-        pm->ps->velocity[2] -= pm->ps->gravity * pml.frametime;
-    } else {
-        // don't reset the z velocity for slopes
-        //    pm->ps->velocity[2] = 0;
-    }
-
-    vel = VectorLength(pm->ps->velocity);
-
-    // slide along the ground plane
-    PM_ClipVelocity(pm->ps->velocity, pml.groundTrace.plane.normal, pm->ps->velocity, OVERCLIP);
-
-    // don't decrease velocity when going up or down a slope
-    VectorNormalize(pm->ps->velocity);
-    VectorScale(pm->ps->velocity, vel, pm->ps->velocity);
-
-    // don't do anything if standing still
-    if (!pm->ps->velocity[0] && !pm->ps->velocity[1]) {
-        return;
-    }
-
-    PM_StepSlideMove(qfalse);
 
     //Com_Printf("velocity2 = %1.1f\n", VectorLength(pm->ps->velocity));
 }
@@ -1490,6 +1534,14 @@ static void PM_CrashLand(void) {
     // want to take damage or play a crunch sound
     if (!(pml.groundTrace.surfaceFlags & SURF_NODAMAGE)) {
         //Com_Printf("delta = %f\n", delta);
+        // snow dampens fall
+        if (pml.groundTrace.surfaceFlags & SURF_SNOW) {
+            if (pm->ps->powerups[PW_SNOWBOARD] == 1) {
+                delta /= 2.5f;
+            } else {
+                delta /= 2;
+            }
+        }
         if (delta < 50) {
             delta -= 10;
         } else {
@@ -2070,7 +2122,8 @@ static void PM_Weapon(void) {
         }
     }
 
-    if (!(pm->cmd.buttons & 1) && (pm->ps->weaponstate != WEAPON_DROPPING) && (pm->ps->weaponstate != WEAPON_RELOADING)) {
+    if (!(pm->cmd.buttons & 1)
+            && (pm->ps->weaponstate != WEAPON_DROPPING) && (pm->ps->weaponstate != WEAPON_RELOADING)) {
         if (pm->ps->weapon == WP_WALTHER) {
             pm->ps->weaponTime = SEMI_DELAY;
             pm->ps->weaponstate = WEAPON_READY;
@@ -2080,6 +2133,10 @@ static void PM_Weapon(void) {
 
     if (pm->ps->weaponTime > 0) {
         return;
+    }
+
+    if (pm->ps->weaponstate == WEAPON_SNOWBOARDING) {
+        pm->ps->weaponstate = WEAPON_READY;
     }
 
     // change weapon if time
@@ -2171,6 +2228,9 @@ static void PM_Weapon(void) {
             break;
         case WP_WALTHER:
             addTime = INFINITE;
+            break;
+        case WP_SNOWBOARD:
+            addTime = 500;
             break;
     }
 

@@ -539,11 +539,17 @@ void ThrowWeapon(gentity_t *ent) {
     client = ent->client;
     ucmd = &ent->client->pers.cmd;
 
+
+    if (client->ps.weaponstate != WEAPON_READY) {
+        return;
+    }
+
     if (client->ps.weapon == WP_KNIFE
             || client->ps.weapon == WP_NONE
             || client->ps.weapon == WP_HANDS
-            || (ucmd->buttons & BUTTON_ATTACK))
+            || (ucmd->buttons & BUTTON_ATTACK)) {
         return;
+    }
 
     xr_item = BG_FindItemForWeapon(client->ps.weapon);
 
@@ -567,6 +573,7 @@ void ThrowWeapon(gentity_t *ent) {
             break;
         }
     }
+    client->ps.weaponTime = 300;
 
     xr_drop = dropWeapon(ent, xr_item, 0, FL_DROPPED_ITEM | FL_THROWN_ITEM);
     xr_drop->ammo = ammo;
@@ -972,6 +979,9 @@ void ClientEndFrame(gentity_t *ent) {
 
     // turn off any expired powerups
     for (i = 0; i < MAX_POWERUPS; i++) {
+        if (i == PW_SNOWBOARD) {
+            continue;
+        }
         if (ent->client->ps.powerups[ i ] < level.time) {
             ent->client->ps.powerups[ i ] = 0;
         }

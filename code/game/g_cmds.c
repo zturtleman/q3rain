@@ -1574,7 +1574,7 @@ int ClipAmountForWeapon(int w) {
     else if (w == WP_CROSSBOW) return 1;
     else if (w == WP_ACR) return 30;
     else if (w == WP_WALTHER) return 10;
-    // not reloadable
+        // not reloadable
     else if (w == WP_INJECTOR) return 1;
     else if (w == WP_HE) return 2;
     else if (w == WP_BOMB) return 4;
@@ -1597,6 +1597,7 @@ WEAPONDROP
 =================
  */
 void Cmd_Drop_f(gentity_t *ent) {
+    playerState_t *ps = &ent->client->ps;
     if (!level.cutscene) {
         ThrowWeapon(ent);
     }
@@ -1718,16 +1719,26 @@ Cmd_Primary_f
 void Cmd_Primary_f(gentity_t *ent) {
     char *arg;
     int w;
+    char userinfo[MAX_INFO_STRING];
+    int client = ent->client - level.clients;
     playerState_t *ps = &ent->client->ps;
+
+    trap_GetUserinfo(client, userinfo, sizeof (userinfo));
+
     arg = ConcatArgs(1);
     w = atoi(arg);
     if (w != WP_BARRETT
             && w != WP_INTERVENTION
             && w != WP_CROSSBOW
-            && w != WP_ACR) {
+            && w != WP_ACR
+            && w != -1) {
         return;
     }
     ps->persistant[PERS_PRIMARY] = w;
+    Com_Printf("pre %s\n", Info_ValueForKey(userinfo, "cg_primary"));
+    Info_SetValueForKey(userinfo, "cg_primary", va("%i", w));
+    ClientUserinfoChanged(ps->clientNum);
+    Com_Printf("after %s\n", Info_ValueForKey(userinfo, "cg_primary"));
 }
 
 /*
@@ -1738,13 +1749,20 @@ Cmd_Secondary_f
 void Cmd_Secondary_f(gentity_t *ent) {
     char *arg;
     int w;
+    char userinfo[MAX_INFO_STRING];
+    int client = ent->client - level.clients;
     playerState_t *ps = &ent->client->ps;
+
+    trap_GetUserinfo(client, userinfo, sizeof (userinfo));
     arg = ConcatArgs(1);
     w = atoi(arg);
-    if (w != -1) {
+    if (w != -1
+            && w != -1) {
         return;
     }
     ps->persistant[PERS_SECONDARY] = -1;
+    Info_SetValueForKey(userinfo, "cg_secondary", va("%i", w));
+    ClientUserinfoChanged(ps->clientNum);
 }
 
 /*
@@ -1755,13 +1773,20 @@ Cmd_Handgun_f
 void Cmd_Handgun_f(gentity_t *ent) {
     char *arg;
     int w;
+    char userinfo[MAX_INFO_STRING];
+    int client = ent->client - level.clients;
     playerState_t *ps = &ent->client->ps;
+
+    trap_GetUserinfo(client, userinfo, sizeof (userinfo));
     arg = ConcatArgs(1);
     w = atoi(arg);
-    if (w != WP_WALTHER) {
+    if (w != WP_WALTHER
+            && w != -1) {
         return;
     }
     ps->persistant[PERS_PISTOL] = w;
+    Info_SetValueForKey(userinfo, "cg_pistol", va("%i", w));
+    ClientUserinfoChanged(ps->clientNum);
 }
 
 /*
@@ -1772,13 +1797,20 @@ Cmd_Grenade_f
 void Cmd_Grenade_f(gentity_t *ent) {
     char *arg;
     int w;
+    char userinfo[MAX_INFO_STRING];
+    int client = ent->client - level.clients;
     playerState_t *ps = &ent->client->ps;
+
+    trap_GetUserinfo(client, userinfo, sizeof (userinfo));
     arg = ConcatArgs(1);
     w = atoi(arg);
-    if (w != WP_HE) {
+    if (w != WP_HE
+            && w != -1) {
         return;
     }
     ps->persistant[PERS_GRENADE] = w;
+    Info_SetValueForKey(userinfo, "cg_grenade", va("%i", w));
+    ClientUserinfoChanged(ps->clientNum);
 }
 
 /*
@@ -1789,14 +1821,22 @@ Cmd_Misc_f
 void Cmd_Misc_f(gentity_t *ent) {
     char *arg;
     int w;
+    char userinfo[MAX_INFO_STRING];
+    int client = ent->client - level.clients;
     playerState_t *ps = &ent->client->ps;
+
+    trap_GetUserinfo(client, userinfo, sizeof (userinfo));
+
     arg = ConcatArgs(1);
     w = atoi(arg);
     if (w != WP_BOMB
-            && w != WP_INJECTOR) {
+            && w != WP_INJECTOR
+            && w != -1) {
         return;
     }
     ps->persistant[PERS_MISC] = w;
+    Info_SetValueForKey(userinfo, "cg_misc", va("%i", w));
+    ClientUserinfoChanged(ps->clientNum);
 }
 
 /*

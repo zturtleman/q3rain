@@ -380,6 +380,22 @@ gitem_t bg_itemlist[] = {
         "", /* sounds */
     },
 
+    /*QUAKED weapon_snowboard (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+     */
+    {
+        "weapon_snowboard",
+        "sound/misc/w_pkup.wav",
+        { "models/weapons2/rocketl/rocketl.md3",
+            NULL, NULL, NULL},
+        "icons/iconw_rocket", /* icon */
+        "Snowboard", /* pickup */
+        -1,
+        IT_WEAPON,
+        WP_SNOWBOARD,
+        "", /* precache */
+        "", /* sounds */
+    },
+
     //
     // AMMO ITEMS
     //

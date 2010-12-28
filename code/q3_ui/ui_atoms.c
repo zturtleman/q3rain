@@ -724,8 +724,7 @@ void UI_DrawString(int x, int y, const char* str, int style, vec4_t color) {
         lowlight[3] = 0.8 * color[3];
         UI_LerpColor(color, lowlight, newcolor, 0.5 + 0.5 * sin(uis.realtime / PULSE_DIVISOR));
         drawcolor = newcolor;
-    }
-    else
+    } else
         drawcolor = color;
 
     switch (style & UI_FORMATMASK) {
@@ -963,8 +962,8 @@ void UI_Cache_f(void) {
     UI_AddBots_Cache();
     UI_RemoveBots_Cache();
     UI_SetupMenu_Cache();
-    //	UI_LoadConfig_Cache();
-    //	UI_SaveConfigMenu_Cache();
+    UI_LoadConfig_Cache();
+    UI_SaveConfigMenu_Cache();
     UI_BotSelectMenu_Cache();
     UI_CDKeyMenu_Cache();
     UI_ModsMenu_Cache();
@@ -1014,10 +1013,10 @@ qboolean UI_ConsoleCommand(int realTime) {
         return qtrue;
     }
 
-    if (Q_stricmp(cmd, "iamamonkey") == 0) {
+    /*if (Q_stricmp(cmd, "iamamonkey") == 0) {
         UI_SPUnlockMedals_f();
         return qtrue;
-    }
+    }*/
 
     if (Q_stricmp(cmd, "ui_cdkey") == 0) {
         UI_CDKeyMenu_f();

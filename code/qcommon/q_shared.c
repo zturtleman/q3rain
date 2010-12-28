@@ -423,7 +423,7 @@ char *COM_ParseExt(char **data_p, qboolean allowLineBreaks) {
             while (*data && *data != '\n') {
                 data++;
             }
-        }            // skip /* */ comments
+        }// skip /* */ comments
         else if (c == '/' && data[1] == '*') {
             data += 2;
             while (*data && (*data != '*' || data[1] != '/')) {
@@ -852,8 +852,7 @@ char *Q_CleanStr(char *string) {
     while ((c = *s) != 0) {
         if (Q_IsColorString(s)) {
             s++;
-        }
-        else if (c >= 0x20 && c <= 0x7E) {
+        } else if (c >= 0x20 && c <= 0x7E) {
             *d++ = c;
         }
         s++;
@@ -1174,6 +1173,8 @@ Changes or adds a key/value pair
 void Info_SetValueForKey(char *s, const char *key, const char *value) {
     char newi[MAX_INFO_STRING];
     const char* blacklist = "\\;\"";
+
+    //Com_Printf("%s => %s\n", key, value);
 
     if (strlen(s) >= MAX_INFO_STRING) {
         Com_Error(ERR_DROP, "Info_SetValueForKey: oversize infostring");

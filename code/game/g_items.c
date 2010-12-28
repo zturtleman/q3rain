@@ -181,8 +181,9 @@ int Pickup_Weapon(gentity_t *ent, gentity_t *other) {
 
     if (!Q_stricmp(ent->classname, "weapon_bomb") || !Q_stricmp(ent->classname, "weapon_he")) {
         other->client->clipammo[ent->item->giTag] += ammo;
+    } else if (!Q_stricmp(ent->classname, "weapon_snowboard")) {
+        other->client->clipammo[ent->item->giTag] = -1;
     } else {
-
         other->client->ps.ammo[ent->item->giTag] += clipammo;
         other->client->clipammo[ent->item->giTag] = ammo;
     }

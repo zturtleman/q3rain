@@ -726,10 +726,20 @@ void ClientUserinfoChanged(int clientNum) {
                     client->pers.netname));
         }
         s = Info_ValueForKey(userinfo, "cg_primary");
+        //Com_Printf("cuic primary = %s\n", s);
         client->ps.persistant[PERS_PRIMARY] = atoi(s);
-        
+
+        s = Info_ValueForKey(userinfo, "cg_secondary");
+        client->ps.persistant[PERS_SECONDARY] = atoi(s);
+
+        s = Info_ValueForKey(userinfo, "cg_pistol");
+        client->ps.persistant[PERS_PISTOL] = atoi(s);
+
         s = Info_ValueForKey(userinfo, "cg_grenade");
         client->ps.persistant[PERS_GRENADE] = atoi(s);
+
+        s = Info_ValueForKey(userinfo, "cg_misc");
+        client->ps.persistant[PERS_MISC] = atoi(s);
     }
 
 
@@ -1146,6 +1156,8 @@ void ClientSpawn(gentity_t *ent) {
         client->ps.stats[STAT_WEAPONS] |= (1 << WP_KNIFE);
         client->ps.ammo[WP_KNIFE] = -1;
 
+        //Com_Printf("pre primary = %i\n", client->ps.persistant[PERS_PRIMARY]);
+
         if (g_primary.integer >= 0) {
             client->ps.persistant[PERS_PRIMARY] = g_primary.integer;
         }
@@ -1186,6 +1198,7 @@ void ClientSpawn(gentity_t *ent) {
         }
 
         if (client->ps.persistant[PERS_PRIMARY] > 0) {
+            //Com_Printf("primary = %i\n", client->ps.persistant[PERS_PRIMARY]);
             client->ps.stats[STAT_WEAPONS] |= (1 << client->ps.persistant[PERS_PRIMARY]);
             client->clipammo[client->ps.persistant[PERS_PRIMARY]] = ClipAmountForWeapon(client->ps.persistant[PERS_PRIMARY]);
             client->ps.ammo[client->ps.persistant[PERS_PRIMARY]] = StartClipsForWeapon(client->ps.persistant[PERS_PRIMARY]);

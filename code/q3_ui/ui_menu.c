@@ -257,8 +257,7 @@ void UI_MainMenu(void) {
 
     memset(&s_main, 0, sizeof (mainmenu_t));
     memset(&s_errorMessage, 0, sizeof (errorMessage_t));
-
-    // com_errorMessage would need that too
+    
     MainMenu_Cache();
 
     trap_Cvar_VariableStringBuffer("com_errorMessage", s_errorMessage.errorMessage, sizeof (s_errorMessage.errorMessage));
@@ -283,8 +282,8 @@ void UI_MainMenu(void) {
     s_main.menu.wrapAround = qtrue;
     s_main.menu.showlogo = qfalse;
 
-    s_main.fade = 2000.0f;
-    s_main.up = qfalse;
+    s_main.fade = -100.0f;
+    s_main.up = qtrue;
 
     y = 200;
     s_main.singleplayer.generic.type = MTYPE_PTEXT;

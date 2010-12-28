@@ -141,6 +141,7 @@ typedef enum {
     WEAPON_FIRING,
     WEAPON_RELOADING,
     WEAPON_COCKED,
+    WEAPON_SNOWBOARDING, // used when getting on/off snowboard
 } weaponstate_t;
 
 // pmove->pm_flags
@@ -282,9 +283,9 @@ typedef enum {
     PW_DIVESUIT,
     PW_ADRENALINE,
     PW_BLEED, // powerdown? :)
+    PW_SNOWBOARD,
 
     PW_NUM_POWERUPS
-
 } powerup_t;
 
 typedef enum {
@@ -309,6 +310,7 @@ typedef enum {
     WP_BOMB,
     WP_INJECTOR,
     WP_NUKE,
+    WP_SNOWBOARD,
 
     WP_NUM_WEAPONS
 } weapon_t;
@@ -616,6 +618,7 @@ typedef enum {
     MOD_NUKE,
     MOD_SHRAPNEL,
     MOD_BLEED,
+    MOD_SNOWBOARD,
 } meansOfDeath_t;
 
 

@@ -1068,10 +1068,10 @@ void R_Register(void) {
     r_zproj = ri.Cvar_Get("r_zproj", "64", CVAR_ARCHIVE);
     r_stereoSeparation = ri.Cvar_Get("r_stereoSeparation", "64", CVAR_ARCHIVE);
     r_ignoreGLErrors = ri.Cvar_Get("r_ignoreGLErrors", "1", CVAR_ARCHIVE);
-    r_fastsky = ri.Cvar_Get("r_fastsky", "0", CVAR_ARCHIVE);
+    r_fastsky = ri.Cvar_Get("r_fastsky", "0", CVAR_ARCHIVE | CVAR_CHEAT);
     r_inGameVideo = ri.Cvar_Get("r_inGameVideo", "1", CVAR_ARCHIVE);
     r_drawSun = ri.Cvar_Get("r_drawSun", "0", CVAR_ARCHIVE);
-    r_dynamiclight = ri.Cvar_Get("r_dynamiclight", "1", CVAR_ARCHIVE);
+    r_dynamiclight = ri.Cvar_Get("r_dynamiclight", "1", CVAR_ARCHIVE | CVAR_CHEAT);
     r_dlightBacks = ri.Cvar_Get("r_dlightBacks", "1", CVAR_ARCHIVE);
     r_finish = ri.Cvar_Get("r_finish", "0", CVAR_ARCHIVE);
     r_textureMode = ri.Cvar_Get("r_textureMode",

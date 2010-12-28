@@ -44,6 +44,7 @@ WEAPON LOADOUT SCREEN
 #define ID_PASSWORD             11
 #define ID_ACCEPT		12
 #define ID_BACK			13
+#define ID_CLEAR                14
 
 #define ID_BARRETT 20
 #define ID_HE 21
@@ -74,6 +75,8 @@ typedef struct {
     menutext_s bomb;
     menutext_s injector;
 
+    menutext_s clear;
+
     menubitmap_s accept;
     menubitmap_s back;
 } loadoutMenuInfo_t;
@@ -94,39 +97,43 @@ static void UI_LoadoutMenu_Event(void *ptr, int event) {
 
     switch (((menucommon_s*) ptr)->id) {
         case ID_BARRETT:
-            msg = va("seta cg_primary %i\n", WP_BARRETT);
+            msg = va("seta cg_primary %i; primary %i\n", WP_BARRETT, WP_BARRETT);
             trap_Cmd_ExecuteText(EXEC_INSERT, msg);
             break;
         case ID_INTERVENTION:
-            msg = va("seta cg_primary %i\n", WP_INTERVENTION);
+            msg = va("seta cg_primary %i; primary %i\n", WP_INTERVENTION, WP_INTERVENTION);
             trap_Cmd_ExecuteText(EXEC_INSERT, msg);
             break;
         case ID_CROSSBOW:
-            msg = va("seta cg_primary %i\n", WP_CROSSBOW);
+            msg = va("seta cg_primary %i; primary %i\n", WP_CROSSBOW, WP_CROSSBOW);
             trap_Cmd_ExecuteText(EXEC_INSERT, msg);
             break;
         case ID_ACR:
-            msg = va("seta cg_primary %i\n", WP_ACR);
+            msg = va("seta cg_primary %i; primary %i\n", WP_ACR, WP_ACR);
             trap_Cmd_ExecuteText(EXEC_INSERT, msg);
             break;
 
         case ID_WALTHER:
-            msg = va("seta cg_pistol %i\n", WP_WALTHER);
+            msg = va("seta cg_pistol %i; pistol %i\n", WP_WALTHER, WP_WALTHER);
             trap_Cmd_ExecuteText(EXEC_INSERT, msg);
             break;
 
         case ID_HE:
-            msg = va("seta cg_grenade %i\n", WP_HE);
+            msg = va("seta cg_grenade %i; grenade %i\n", WP_HE, WP_HE);
             trap_Cmd_ExecuteText(EXEC_INSERT, msg);
             break;
 
         case ID_BOMB:
-            msg = va("seta cg_misc %i\n", WP_BOMB);
+            msg = va("seta cg_misc %i; misc %i\n", WP_BOMB, WP_BOMB);
             trap_Cmd_ExecuteText(EXEC_INSERT, msg);
             break;
         case ID_INJECTOR:
-            msg = va("seta cg_misc %i\n", WP_INJECTOR);
+            msg = va("seta cg_misc %i; misc %i\n", WP_INJECTOR, WP_INJECTOR);
             trap_Cmd_ExecuteText(EXEC_INSERT, msg);
+            break;
+
+        case ID_CLEAR:
+            trap_Cmd_ExecuteText(EXEC_INSERT, "primary -1; secondary -1; pistol -1; grenade -1; misc -1\n");
             break;
 
         case ID_ACCEPT:
@@ -260,7 +267,7 @@ static void UI_LoadoutMenu_Init(void) {
     loadoutMenuInfo.acr.color = color_white;
     loadoutMenuInfo.acr.style = UI_LEFT | UI_SMALLFONT;
 
-    y += WEAPON_SPACING*2;
+    y += WEAPON_SPACING * 2;
     loadoutMenuInfo.walther.generic.type = MTYPE_PTEXT;
     loadoutMenuInfo.walther.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
     loadoutMenuInfo.walther.generic.callback = UI_LoadoutMenu_Event;
@@ -271,7 +278,7 @@ static void UI_LoadoutMenu_Init(void) {
     loadoutMenuInfo.walther.color = color_white;
     loadoutMenuInfo.walther.style = UI_LEFT | UI_SMALLFONT;
 
-    y += WEAPON_SPACING*2;
+    y += WEAPON_SPACING * 2;
     loadoutMenuInfo.he.generic.type = MTYPE_PTEXT;
     loadoutMenuInfo.he.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
     loadoutMenuInfo.he.generic.callback = UI_LoadoutMenu_Event;
@@ -282,7 +289,7 @@ static void UI_LoadoutMenu_Init(void) {
     loadoutMenuInfo.he.color = color_white;
     loadoutMenuInfo.he.style = UI_LEFT | UI_SMALLFONT;
 
-    y += WEAPON_SPACING*2;
+    y += WEAPON_SPACING * 2;
     loadoutMenuInfo.bomb.generic.type = MTYPE_PTEXT;
     loadoutMenuInfo.bomb.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
     loadoutMenuInfo.bomb.generic.callback = UI_LoadoutMenu_Event;
@@ -303,6 +310,17 @@ static void UI_LoadoutMenu_Init(void) {
     loadoutMenuInfo.injector.string = "Adrenaline Injector";
     loadoutMenuInfo.injector.color = color_white;
     loadoutMenuInfo.injector.style = UI_LEFT | UI_SMALLFONT;
+
+    y += WEAPON_SPACING * 2;
+    loadoutMenuInfo.clear.generic.type = MTYPE_PTEXT;
+    loadoutMenuInfo.clear.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
+    loadoutMenuInfo.clear.generic.callback = UI_LoadoutMenu_Event;
+    loadoutMenuInfo.clear.generic.id = ID_CLEAR;
+    loadoutMenuInfo.clear.generic.x = 32;
+    loadoutMenuInfo.clear.generic.y = y;
+    loadoutMenuInfo.clear.string = "Clear Loadout";
+    loadoutMenuInfo.clear.color = color_yellow;
+    loadoutMenuInfo.clear.style = UI_LEFT | UI_SMALLFONT;
 
     loadoutMenuInfo.accept.generic.type = MTYPE_BITMAP;
     loadoutMenuInfo.accept.generic.name = ART_ACCEPT0;
@@ -343,6 +361,7 @@ static void UI_LoadoutMenu_Init(void) {
     Menu_AddItem(&loadoutMenuInfo.menu, &loadoutMenuInfo.bomb);
     Menu_AddItem(&loadoutMenuInfo.menu, &loadoutMenuInfo.injector);
 
+    Menu_AddItem(&loadoutMenuInfo.menu, &loadoutMenuInfo.clear);
     Menu_AddItem(&loadoutMenuInfo.menu, &loadoutMenuInfo.accept);
     Menu_AddItem(&loadoutMenuInfo.menu, &loadoutMenuInfo.back);
 
