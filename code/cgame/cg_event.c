@@ -274,6 +274,10 @@ static void CG_Obituary(entityState_t *ent) {
                 message = "was pierced by";
                 message2 = "'s shrapnel";
                 break;
+            case MOD_SNOWBOARD:
+                message = "was beaten to death by";
+                message2 = "'s ^1snowboard";
+                break;
             default:
                 message = "was killed by";
                 break;
@@ -565,7 +569,7 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
             break;
         case EV_TAUNT:
             DEBUGNAME("EV_TAUNT");
-            trap_S_StartSound(NULL, es->number, CHAN_VOICE, CG_CustomSound(es->number, "*taunt.wav"));
+            //trap_S_StartSound(NULL, es->number, CHAN_VOICE, CG_CustomSound(es->number, "*taunt.wav"));
             break;
         case EV_WATER_TOUCH:
             DEBUGNAME("EV_WATER_TOUCH");

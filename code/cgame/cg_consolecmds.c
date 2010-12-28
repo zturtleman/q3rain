@@ -543,7 +543,7 @@ void CG_InitConsoleCommands(void) {
     trap_AddCommand("vsay");
     trap_AddCommand("vsay_team");
     trap_AddCommand("vtell");
-    trap_AddCommand("vtaunt");
+    //trap_AddCommand("vtaunt");
     trap_AddCommand("vosay");
     trap_AddCommand("vosay_team");
     trap_AddCommand("votell");

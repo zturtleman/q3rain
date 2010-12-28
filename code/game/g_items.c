@@ -615,16 +615,7 @@ ClearRegisteredItems
 ==============
  */
 void ClearRegisteredItems(void) {
-
     memset(itemRegistered, 0, sizeof ( itemRegistered));
-    // players always start with the base weapon
-
-    // FIXME missing models/shaders if not registered
-    /*RegisterItem( BG_FindItemForWeapon( WP_MACHINEGUN ) );
-    RegisterItem( BG_FindItemForWeapon( WP_GRENADE_LAUNCHER ) );
-    RegisterItem( BG_FindItemForWeapon( WP_RAILGUN ) );
-    RegisterItem( BG_FindItemForWeapon( WP_SHOTGUN ) );
-    RegisterItem( BG_FindItemForWeapon( WP_GAUNTLET ) );*/
 
     RegisterItem(BG_FindItemForWeapon(WP_KNIFE));
     RegisterItem(BG_FindItemForWeapon(WP_HE));
@@ -635,6 +626,7 @@ void ClearRegisteredItems(void) {
     RegisterItem(BG_FindItemForWeapon(WP_WALTHER));
     RegisterItem(BG_FindItemForWeapon(WP_BOMB));
     RegisterItem(BG_FindItemForWeapon(WP_NUKE));
+    RegisterItem(BG_FindItemForWeapon(WP_SNOWBOARD));
 }
 
 /*
