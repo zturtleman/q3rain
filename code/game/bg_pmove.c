@@ -478,11 +478,13 @@ static qboolean PM_CheckJump(void) {
 
     pm->ps->groundEntityNum = ENTITYNUM_NONE;
     if (pm->ps->powerups[PW_ADRENALINE] == 0) {
-        vel = (JUMP_VELOCITY + (pm->ps->sprintAdd / 4)) / (pm->ps->legsfactor / 10);
+        vel = (JUMP_VELOCITY + (pm->ps->sprintAdd / 6)) / (pm->ps->legsfactor / 10);
         if (vel < JUMP_VELOCITY / 1.5) {
             vel = JUMP_VELOCITY / 1.5;
         }
         pm->ps->velocity[2] = vel;
+    } else if (pm->ps->powerups[PW_SNOWBOARD] == 1) {
+        pm->ps->velocity[2] = JUMP_VELOCITY / 1.5;
     } else {
         pm->ps->velocity[2] = JUMP_VELOCITY;
     }
@@ -1208,6 +1210,10 @@ static void PM_WalkMove(pmove_t *pmove) {
             PM_AirMove(pmove);
         }
         return;
+    }
+
+    if (pm->ps->powerups[PW_SNOWBOARD] == 1) {
+        pm->cmd.forwardmove = pm->cmd.rightmove = 0;
     }
 
     PM_Friction();
@@ -2116,7 +2122,9 @@ static void PM_Weapon(void) {
     // check for weapon change
     // can't change if weapon is firing, but can change
     // again if lowering or raising
-    if (pm->ps->weaponTime <= 0 || pm->ps->weaponstate != WEAPON_FIRING) {
+    if (pm->ps->weaponTime <= 0
+            || pm->ps->weaponstate != WEAPON_FIRING
+            && pm->ps->weaponstate != WEAPON_SNOWBOARDING) {
         if (pm->ps->weapon != pm->cmd.weapon) {
             PM_BeginWeaponChange(pm->cmd.weapon);
         }
