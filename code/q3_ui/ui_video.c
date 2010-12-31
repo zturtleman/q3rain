@@ -938,7 +938,7 @@ void GraphicsOptions_MenuInit(void) {
     s_graphicsoptions.graphics.generic.x = 216;
     s_graphicsoptions.graphics.generic.y = 240 - 2 * PROP_HEIGHT;
     s_graphicsoptions.graphics.string = "GRAPHICS";
-    s_graphicsoptions.graphics.style = UI_RIGHT;
+    s_graphicsoptions.graphics.style = UI_RIGHT | UI_SMALLFONT;
     s_graphicsoptions.graphics.color = color_red;
 
     s_graphicsoptions.display.generic.type = MTYPE_PTEXT;
@@ -948,7 +948,7 @@ void GraphicsOptions_MenuInit(void) {
     s_graphicsoptions.display.generic.x = 216;
     s_graphicsoptions.display.generic.y = 240 - PROP_HEIGHT;
     s_graphicsoptions.display.string = "DISPLAY";
-    s_graphicsoptions.display.style = UI_RIGHT;
+    s_graphicsoptions.display.style = UI_RIGHT | UI_SMALLFONT;
     s_graphicsoptions.display.color = color_red;
 
     s_graphicsoptions.sound.generic.type = MTYPE_PTEXT;
@@ -958,7 +958,7 @@ void GraphicsOptions_MenuInit(void) {
     s_graphicsoptions.sound.generic.x = 216;
     s_graphicsoptions.sound.generic.y = 240;
     s_graphicsoptions.sound.string = "SOUND";
-    s_graphicsoptions.sound.style = UI_RIGHT;
+    s_graphicsoptions.sound.style = UI_RIGHT | UI_SMALLFONT;
     s_graphicsoptions.sound.color = color_red;
 
     y = 240 - 7 * (BIGCHAR_HEIGHT + 2);

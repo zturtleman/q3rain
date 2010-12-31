@@ -1061,13 +1061,18 @@ void Weapon_Snowboard_Fire(gentity_t *ent) {
     }
 
     if (hit) {
-        G_Damage(traceEnt, ent, ent, NULL, NULL, SNOWBOARD_DAMAGE, 0, MOD_SNOWBOARD);
+        if (ent->client->ps.powerups[PW_SNOWBOARD] == 1) {
+            G_AddEvent(ent, EV_NOAMMO, 0);
+            ent->client->ps.weaponTime += 200;
+        } else {
+            G_Damage(traceEnt, ent, ent, NULL, NULL, SNOWBOARD_DAMAGE, 0, MOD_SNOWBOARD);
+        }
     } else {
         if (ent->client->ps.powerups[PW_SNOWBOARD] == 1) {
-        ent->client->ps.weaponTime += 3500;
+            ent->client->ps.weaponTime += 3500;
             ent->client->ps.powerups[PW_SNOWBOARD] = 0;
         } else {
-        ent->client->ps.weaponTime += 4500;
+            ent->client->ps.weaponTime += 4500;
             ent->client->ps.powerups[PW_SNOWBOARD] = 1;
         }
         ent->client->ps.weaponstate = WEAPON_SNOWBOARDING;

@@ -176,7 +176,7 @@ static void UI_SoundOptionsMenu_Init(void) {
     soundOptionsInfo.graphics.generic.x = 216;
     soundOptionsInfo.graphics.generic.y = 240 - 2 * PROP_HEIGHT;
     soundOptionsInfo.graphics.string = "GRAPHICS";
-    soundOptionsInfo.graphics.style = UI_RIGHT;
+    soundOptionsInfo.graphics.style = UI_RIGHT | UI_SMALLFONT;
     soundOptionsInfo.graphics.color = color_red;
 
     soundOptionsInfo.display.generic.type = MTYPE_PTEXT;
@@ -186,7 +186,7 @@ static void UI_SoundOptionsMenu_Init(void) {
     soundOptionsInfo.display.generic.x = 216;
     soundOptionsInfo.display.generic.y = 240 - PROP_HEIGHT;
     soundOptionsInfo.display.string = "DISPLAY";
-    soundOptionsInfo.display.style = UI_RIGHT;
+    soundOptionsInfo.display.style = UI_RIGHT | UI_SMALLFONT;
     soundOptionsInfo.display.color = color_red;
 
     soundOptionsInfo.sound.generic.type = MTYPE_PTEXT;
@@ -196,7 +196,7 @@ static void UI_SoundOptionsMenu_Init(void) {
     soundOptionsInfo.sound.generic.x = 216;
     soundOptionsInfo.sound.generic.y = 240;
     soundOptionsInfo.sound.string = "SOUND";
-    soundOptionsInfo.sound.style = UI_RIGHT;
+    soundOptionsInfo.sound.style = UI_RIGHT | UI_SMALLFONT;
     soundOptionsInfo.sound.color = color_red;
 
     y = 240 - 1.5 * (BIGCHAR_HEIGHT + 2);

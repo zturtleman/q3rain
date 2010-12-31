@@ -1322,12 +1322,6 @@ static void PM_WalkMove(pmove_t *pmove) {
 
     PM_StepSlideMove(qfalse);
 
-    //Com_Printf("snow: %i slick: %i surf: %i\n", SURF_SNOW, SURF_SLICK, pml.groundTrace.surfaceFlags);
-
-    if ((pml.groundTrace.surfaceFlags & SURF_SNOW) == qtrue) {
-        pm->ps->velocity[2] = 100;
-    }
-
     //Com_Printf("velocity2 = %1.1f\n", VectorLength(pm->ps->velocity));
 }
 
@@ -2122,10 +2116,12 @@ static void PM_Weapon(void) {
     // check for weapon change
     // can't change if weapon is firing, but can change
     // again if lowering or raising
-    if (pm->ps->weaponTime <= 0
-            || pm->ps->weaponstate != WEAPON_FIRING
-            && pm->ps->weaponstate != WEAPON_SNOWBOARDING) {
+    if (pm->ps->weaponTime <= 0 || pm->ps->weaponstate != WEAPON_FIRING) {
         if (pm->ps->weapon != pm->cmd.weapon) {
+            if (pm->ps->weaponstate == WEAPON_SNOWBOARDING) {
+                pm->ps->powerups[PW_SNOWBOARD] = !pm->ps->powerups[PW_SNOWBOARD];
+                pm->ps->weaponTime = 200;
+            }
             PM_BeginWeaponChange(pm->cmd.weapon);
         }
     }

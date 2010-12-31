@@ -138,8 +138,8 @@ ConfirmMenu_Draw
  */
 static void ConfirmMenu_Draw(void) {
     UI_DrawNamedPic(142, 118, 359, 256, ART_CONFIRM_FRAME);
-    UI_DrawProportionalString(320, 204, s_confirm.question, s_confirm.style, color_red);
-    UI_DrawProportionalString(s_confirm.slashX, 265, "/", UI_LEFT | UI_INVERSE, color_red);
+    UI_DrawProportionalString(320, 204, s_confirm.question, s_confirm.style | UI_SMALLFONT, color_red);
+    UI_DrawProportionalString(s_confirm.slashX, 265, "/", UI_LEFT | UI_INVERSE | UI_SMALLFONT, color_red);
 
     Menu_Draw(&s_confirm.menu);
 
@@ -204,7 +204,7 @@ void UI_ConfirmMenu_Style(const char *question, int style, void (*draw)(void), v
     s_confirm.yes.generic.y = 264;
     s_confirm.yes.string = "YES";
     s_confirm.yes.color = color_red;
-    s_confirm.yes.style = UI_LEFT;
+    s_confirm.yes.style = UI_LEFT | UI_SMALLFONT;
 
     s_confirm.no.generic.type = MTYPE_PTEXT;
     s_confirm.no.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
@@ -214,7 +214,7 @@ void UI_ConfirmMenu_Style(const char *question, int style, void (*draw)(void), v
     s_confirm.no.generic.y = 264;
     s_confirm.no.string = "NO";
     s_confirm.no.color = color_red;
-    s_confirm.no.style = UI_LEFT;
+    s_confirm.no.style = UI_LEFT | UI_SMALLFONT;
 
     Menu_AddItem(&s_confirm.menu, &s_confirm.yes);
     Menu_AddItem(&s_confirm.menu, &s_confirm.no);
@@ -273,7 +273,7 @@ void UI_Message(const char **lines) {
     s_confirm.yes.generic.y = 280;
     s_confirm.yes.string = "OK";
     s_confirm.yes.color = color_red;
-    s_confirm.yes.style = UI_LEFT;
+    s_confirm.yes.style = UI_LEFT | UI_SMALLFONT;
 
     Menu_AddItem(&s_confirm.menu, &s_confirm.yes);
 

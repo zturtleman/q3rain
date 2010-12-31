@@ -334,33 +334,22 @@ void Cmd_LoadoutMenu(char *args, int argNum) {
     Con_LoadoutMenu_f();
 }
 
-/*
-==================
-Con_Auth_f
-==================
- */
-void Con_Auth_f(void) {
+void Con_SendToMaster(char *message) {
     netadr_t master;
-    char *message;
-    if (Cmd_Argc() != 3) {
-        Com_Printf("usage: auth <nickname> <password>\nSpace, \", @ and ^ are not allowed.\n");
-        return;
-    }
     // TODO remove localhost stuff
     if (!NET_StringToAdr("localhost:27950", &master, NA_UNSPEC)) {
-        Com_Printf("^1ERROR: Couldn't resolve master server, trying alternative\n");
+        Com_DPrintf("^1ERROR: Couldn't resolve master server, trying alternative\n");
         if (!NET_StringToAdr("hazewood.de:27950", &master, NA_UNSPEC)) {
-            Com_Printf("^1ERROR: Couldn't resolve master server, trying alternative\n");
+            Com_DPrintf("^1ERROR: Couldn't resolve master server, trying alternative\n");
             if (!NET_StringToAdr("rylius-is-a-geek.org:27950", &master, NA_UNSPEC)) {
-                Com_Printf("^1ERROR: Couldn't resolve master server, trying alternative\n");
+                Com_DPrintf("^1ERROR: Couldn't resolve master server, trying alternative\n");
                 if (!NET_StringToAdr("rylius-is-a-geek.org:1337", &master, NA_UNSPEC)) {
-                    Com_Printf("^1ERROR: Couldn't resolve master server\n");
+                    Com_DPrintf("^1ERROR: Couldn't resolve master server\n");
                     return;
                 }
             }
         }
     }
-    message = va("%s %s %s ", Cmd_Argv(0), Cmd_Argv(1), Cmd_Argv(2));
 
     NET_SendPacket(NS_CLIENT, strlen(message) + 1, message, master);
     NET_OutOfBandPrint(NS_CLIENT, master, "%s", message);
@@ -371,11 +360,33 @@ void Con_Auth_f(void) {
 
 /*
 ==================
-Cmd_Auth
+Con_Auth_f
 ==================
  */
-void Cmd_Auth(char *args, int argNum) {
-    Con_Auth_f();
+void Con_Auth_f(void) {
+    char *message;
+    if (Cmd_Argc() != 3) {
+        Com_Printf("usage: auth <nickname> <password>\nSpace, \", @ and ^ are not allowed.\n");
+        return;
+    }
+    message = va("%s %s %s ", Cmd_Argv(0), Cmd_Argv(1), Cmd_Argv(2));
+    Con_SendToMaster(message);
+}
+
+void Con_FetchPlayers_f(void) {
+    Con_SendToMaster("fetchplayers");
+}
+
+void Con_FetchServers_f(void) {
+    Con_SendToMaster("fetchservers");
+}
+
+void Con_FetchMotd_f(void) {
+    Con_SendToMaster("fetchmotd");
+}
+
+void Con_FetchNews_f(void) {
+    Con_SendToMaster("fetchnews");
 }
 
 /*
@@ -407,6 +418,12 @@ void Con_Init(void) {
     Cmd_AddCommand("loadout", Con_LoadoutMenu_f);
     Cmd_AddCommand("clear", Con_Clear_f);
     Cmd_AddCommand("condump", Con_Dump_f);
+
+    Cmd_AddCommand("fetchservers", Con_FetchServers_f);
+    Cmd_AddCommand("fetchplayers", Con_FetchPlayers_f);
+    Cmd_AddCommand("fetchmotd", Con_FetchMotd_f);
+    Cmd_AddCommand("fetchnews", Con_FetchNews_f);
+
     Cmd_SetCommandCompletionFunc("condump", Cmd_CompleteTxtName);
     Com_Printf(S_COLOR_GREEN "Initialized console.\n");
 }

@@ -149,23 +149,18 @@ void CG_DrawInformation(void) {
     int y;
     int value;
     qhandle_t levelshot;
-    qhandle_t detail;
     char buf[1024];
 
     info = CG_ConfigString(CS_SERVERINFO);
     sysInfo = CG_ConfigString(CS_SYSTEMINFO);
 
     s = Info_ValueForKey(info, "mapname");
-    levelshot = trap_R_RegisterShaderNoMip(va("levelshots/%s.tga", s));
+    levelshot = trap_R_RegisterShaderNoMip(va("levelshots/%s", s));
     if (!levelshot) {
         levelshot = trap_R_RegisterShaderNoMip("menu/art/unknownmap");
     }
     trap_R_SetColor(NULL);
     CG_DrawPic(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, levelshot);
-
-    // blend a detail texture over it
-    detail = trap_R_RegisterShader("levelShotDetail");
-    trap_R_DrawStretchPic(0, 0, cgs.glconfig.vidWidth, cgs.glconfig.vidHeight, 0, 0, 2.5, 2, detail);
 
     // draw the icons of things as they are loaded
     CG_DrawLoadingIcons();
@@ -243,6 +238,9 @@ void CG_DrawInformation(void) {
         case GT_ASSASSINS:
             s = "Assassins";
             break;
+        case GT_TEAMDEATHMATCH:
+            s = "Team Deathmatch";
+            break;
         case GT_TEAMSURVIVOR:
             s = "Team Survivor";
             break;
@@ -261,13 +259,13 @@ void CG_DrawInformation(void) {
         y += PROP_HEIGHT;
     }
 
-    if (cgs.gametype == GT_FFA || cgs.gametype == GT_TEAMSURVIVOR || cgs.gametype == GT_SINGLE_PLAYER) {
-        value = atoi(Info_ValueForKey(info, "fraglimit"));
-        if (value) {
-            UI_DrawProportionalString(320, y, va("fraglimit %i", value),
-                    UI_CENTER | UI_SMALLFONT | UI_DROPSHADOW, colorWhite);
-            y += PROP_HEIGHT;
-        }
+    //if (cgs.gametype == GT_FFA || cgs.gametype == GT_TEAMSURVIVOR || cgs.gametype == GT_SINGLE_PLAYER) {
+    value = atoi(Info_ValueForKey(info, "fraglimit"));
+    if (value) {
+        UI_DrawProportionalString(320, y, va("fraglimit %i", value),
+                UI_CENTER | UI_SMALLFONT | UI_DROPSHADOW, colorWhite);
+        y += PROP_HEIGHT;
     }
+    //}
 }
 

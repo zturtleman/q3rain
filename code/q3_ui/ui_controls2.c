@@ -250,7 +250,7 @@ static bind_t g_bindings[] = {
     {"weapon 7", "Walther P22", ID_WEAPON7, ANIM_WEAPON7, '7', -1, -1, -1},
     {"weapon 8", "Remington ACR", ID_WEAPON8, ANIM_WEAPON8, '8', -1, -1, -1},
     {"weapon 9", "C4 Device", ID_WEAPON9, ANIM_WEAPON9, '9', -1, -1, -1},
-    {"weapon 10", "Injector", ID_WEAPON10, ANIM_WEAPON10, '10', -1, -1, -1},
+    {"weapon 10", "Injector", ID_WEAPON10, ANIM_WEAPON10, '', -1, -1, -1},
     {"+attack", "attack", ID_ATTACK, ANIM_ATTACK, K_CTRL, -1, -1, -1},
     {"weapprev", "prev weapon", ID_WEAPPREV, ANIM_IDLE, '[', -1, -1, -1},
     {"weapnext", "next weapon", ID_WEAPNEXT, ANIM_IDLE, ']', -1, -1, -1},
@@ -1128,7 +1128,7 @@ static void Controls_MenuInit(void) {
     s_controls.banner.generic.y = 16;
     s_controls.banner.string = "CONTROLS";
     s_controls.banner.color = color_white;
-    s_controls.banner.style = UI_CENTER;
+    s_controls.banner.style = UI_CENTER | UI_SMALLFONT;
 
     s_controls.framel.generic.type = MTYPE_BITMAP;
     s_controls.framel.generic.name = ART_FRAMEL;
@@ -1153,7 +1153,7 @@ static void Controls_MenuInit(void) {
     s_controls.looking.generic.x = 152;
     s_controls.looking.generic.y = 240 - 2 * PROP_HEIGHT;
     s_controls.looking.string = "LOOK";
-    s_controls.looking.style = UI_RIGHT;
+    s_controls.looking.style = UI_RIGHT | UI_SMALLFONT;
     s_controls.looking.color = color_red;
 
     s_controls.movement.generic.type = MTYPE_PTEXT;
@@ -1163,7 +1163,7 @@ static void Controls_MenuInit(void) {
     s_controls.movement.generic.x = 152;
     s_controls.movement.generic.y = 240 - PROP_HEIGHT;
     s_controls.movement.string = "MOVE";
-    s_controls.movement.style = UI_RIGHT;
+    s_controls.movement.style = UI_RIGHT | UI_SMALLFONT;
     s_controls.movement.color = color_red;
 
     s_controls.weapons.generic.type = MTYPE_PTEXT;
@@ -1173,7 +1173,7 @@ static void Controls_MenuInit(void) {
     s_controls.weapons.generic.x = 152;
     s_controls.weapons.generic.y = 240;
     s_controls.weapons.string = "SHOOT";
-    s_controls.weapons.style = UI_RIGHT;
+    s_controls.weapons.style = UI_RIGHT | UI_SMALLFONT;
     s_controls.weapons.color = color_red;
 
     s_controls.misc.generic.type = MTYPE_PTEXT;
@@ -1183,7 +1183,7 @@ static void Controls_MenuInit(void) {
     s_controls.misc.generic.x = 152;
     s_controls.misc.generic.y = 240 + PROP_HEIGHT;
     s_controls.misc.string = "MISC";
-    s_controls.misc.style = UI_RIGHT;
+    s_controls.misc.style = UI_RIGHT | UI_SMALLFONT;
     s_controls.misc.color = color_red;
 
     s_controls.back.generic.type = MTYPE_BITMAP;
@@ -1482,7 +1482,7 @@ static void Controls_MenuInit(void) {
     s_controls.name.generic.x = 320;
     s_controls.name.generic.y = 440;
     s_controls.name.string = playername;
-    s_controls.name.style = UI_CENTER;
+    s_controls.name.style = UI_CENTER | UI_SMALLFONT;
     s_controls.name.color = text_color_normal;
 
     Menu_AddItem(&s_controls.menu, &s_controls.banner);

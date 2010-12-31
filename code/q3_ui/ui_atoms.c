@@ -504,6 +504,10 @@ UI_ProportionalSizeScale
 float UI_ProportionalSizeScale(int style) {
     if (style & UI_SMALLFONT) {
         return PROP_SMALL_SIZE_SCALE;
+    } else if (style & UI_SMALLERFONT) {
+        return PROP_SMALLER_SIZE_SCALE;
+    } else if (style & UI_TINYFONT) {
+        return PROP_TINY_SIZE_SCALE;
     }
 
     return 1.00;

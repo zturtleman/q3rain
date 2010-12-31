@@ -783,14 +783,14 @@ static float CG_DrawTeamOverlay(float y, qboolean right, qboolean upper) {
     if (lwidth > TEAM_OVERLAY_MAXLOCATION_WIDTH)
         lwidth = TEAM_OVERLAY_MAXLOCATION_WIDTH;
 
-    w = (pwidth + lwidth + 4 + 7) * TINYCHAR_WIDTH;
+    w = (pwidth + lwidth + 4 + 7) * SMALLERCHAR_WIDTH;
 
     if (right)
         x = 640 - w;
     else
         x = 0;
 
-    h = plyrs * TINYCHAR_HEIGHT;
+    h = plyrs * SMALLERCHAR_HEIGHT;
 
     if (upper) {
         ret_y = y + h;
@@ -820,11 +820,11 @@ static float CG_DrawTeamOverlay(float y, qboolean right, qboolean upper) {
 
             hcolor[0] = hcolor[1] = hcolor[2] = hcolor[3] = 1.0;
 
-            xx = x + TINYCHAR_WIDTH;
+            xx = x + SMALLERCHAR_WIDTH;
 
             CG_DrawStringExt(xx, y,
                     ci->name, hcolor, qfalse, qfalse,
-                    TINYCHAR_WIDTH, TINYCHAR_HEIGHT, TEAM_OVERLAY_MAXNAME_WIDTH);
+                    SMALLERCHAR_WIDTH, SMALLERCHAR_HEIGHT, TEAM_OVERLAY_MAXNAME_WIDTH);
 
             if (lwidth) {
                 p = CG_ConfigString(CS_LOCATIONS + ci->location);
@@ -834,11 +834,11 @@ static float CG_DrawTeamOverlay(float y, qboolean right, qboolean upper) {
                 if (len > lwidth)
                     len = lwidth;
 
-                //				xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth +
-                //					((lwidth/2 - len/2) * TINYCHAR_WIDTH);
-                xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth;
+                //				xx = x + SMALLERCHAR_WIDTH * 2 + SMALLERCHAR_WIDTH * pwidth +
+                //					((lwidth/2 - len/2) * SMALLERCHAR_WIDTH);
+                xx = x + SMALLERCHAR_WIDTH * 2 + SMALLERCHAR_WIDTH * pwidth;
                 CG_DrawStringExt(xx, y,
-                        p, hcolor, qfalse, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
+                        p, hcolor, qfalse, qfalse, SMALLERCHAR_WIDTH, SMALLERCHAR_HEIGHT,
                         TEAM_OVERLAY_MAXLOCATION_WIDTH);
             }
 
@@ -846,21 +846,21 @@ static float CG_DrawTeamOverlay(float y, qboolean right, qboolean upper) {
 
             Com_sprintf(st, sizeof (st), "%3i %3i", ci->health, ci->armor);
 
-            xx = x + TINYCHAR_WIDTH * 3 +
-                    TINYCHAR_WIDTH * pwidth + TINYCHAR_WIDTH * lwidth;
+            xx = x + SMALLERCHAR_WIDTH * 3 +
+                    SMALLERCHAR_WIDTH * pwidth + SMALLERCHAR_WIDTH * lwidth;
 
             CG_DrawStringExt(xx, y,
                     st, hcolor, qfalse, qfalse,
-                    TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+                    SMALLERCHAR_WIDTH, SMALLERCHAR_HEIGHT, 0);
 
             // draw weapon icon
-            xx += TINYCHAR_WIDTH * 3;
+            xx += SMALLERCHAR_WIDTH * 3;
 
             if (cg_weapons[ci->curWeapon].weaponIcon) {
-                CG_DrawPic(xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
+                CG_DrawPic(xx, y, SMALLERCHAR_WIDTH, SMALLERCHAR_HEIGHT,
                         cg_weapons[ci->curWeapon].weaponIcon);
             } else {
-                CG_DrawPic(xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
+                CG_DrawPic(xx, y, SMALLERCHAR_WIDTH, SMALLERCHAR_HEIGHT,
                         cgs.media.deferShader);
             }
 
@@ -868,7 +868,7 @@ static float CG_DrawTeamOverlay(float y, qboolean right, qboolean upper) {
             if (right) {
                 xx = x;
             } else {
-                xx = x + w - TINYCHAR_WIDTH;
+                xx = x + w - SMALLERCHAR_WIDTH;
             }
             for (j = 0; j <= PW_NUM_POWERUPS; j++) {
                 if (ci->powerups & (1 << j)) {
@@ -876,18 +876,18 @@ static float CG_DrawTeamOverlay(float y, qboolean right, qboolean upper) {
                     item = BG_FindItemForPowerup(j);
 
                     if (item) {
-                        CG_DrawPic(xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
+                        CG_DrawPic(xx, y, SMALLERCHAR_WIDTH, SMALLERCHAR_HEIGHT,
                                 trap_R_RegisterShader(item->icon));
                         if (right) {
-                            xx -= TINYCHAR_WIDTH;
+                            xx -= SMALLERCHAR_WIDTH;
                         } else {
-                            xx += TINYCHAR_WIDTH;
+                            xx += SMALLERCHAR_WIDTH;
                         }
                     }
                 }
             }
 
-            y += TINYCHAR_HEIGHT;
+            y += SMALLERCHAR_HEIGHT;
         }
     }
 
@@ -1203,7 +1203,7 @@ static void CG_DrawTeamInfo(void) {
             cgs.teamLastChatPos++;
         }
 
-        h = (cgs.teamChatPos - cgs.teamLastChatPos) * TINYCHAR_HEIGHT;
+        h = (cgs.teamChatPos - cgs.teamLastChatPos) * SMALLERCHAR_HEIGHT;
 
         w = 0;
 
@@ -1212,8 +1212,8 @@ static void CG_DrawTeamInfo(void) {
             if (len > w)
                 w = len;
         }
-        w *= TINYCHAR_WIDTH;
-        w += TINYCHAR_WIDTH * 2;
+        w *= SMALLERCHAR_WIDTH;
+        w += SMALLERCHAR_WIDTH * 2;
 
         if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED) {
             hcolor[0] = 1.0f;
@@ -1240,10 +1240,10 @@ static void CG_DrawTeamInfo(void) {
         hcolor[3] = 1.0f;
 
         for (i = cgs.teamChatPos - 1; i >= cgs.teamLastChatPos; i--) {
-            CG_DrawStringExt(CHATLOC_X + TINYCHAR_WIDTH,
-                    CHATLOC_Y - (cgs.teamChatPos - i) * TINYCHAR_HEIGHT,
+            CG_DrawStringExt(CHATLOC_X + SMALLERCHAR_WIDTH,
+                    CHATLOC_Y - (cgs.teamChatPos - i) * SMALLERCHAR_HEIGHT,
                     cgs.teamChatMsgs[i % chatHeight], hcolor, qfalse, qfalse,
-                    TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+                    SMALLERCHAR_WIDTH, SMALLERCHAR_HEIGHT, 0);
         }
     }
 }

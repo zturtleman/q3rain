@@ -93,67 +93,33 @@ static void CG_DrawClientScore(int y, score_t *score, float *color, float fade, 
     iconx = SB_BOTICON_X + (SB_RATING_WIDTH / 2);
     headx = SB_HEAD_X + (SB_RATING_WIDTH / 2);
 
-    // draw the handicap or bot skill marker (unless player has flag)
-    if (ci->powerups & (1 << PW_NEUTRALFLAG)) {
-        if (largeFormat) {
-            CG_DrawFlagModel(iconx, y - (32 - BIGCHAR_HEIGHT) / 2, 32, 32, TEAM_FREE, qfalse);
-        } else {
-            CG_DrawFlagModel(iconx, y, 16, 16, TEAM_FREE, qfalse);
-        }
-    } else if (ci->powerups & (1 << PW_REDFLAG)) {
-        if (largeFormat) {
-            CG_DrawFlagModel(iconx, y - (32 - BIGCHAR_HEIGHT) / 2, 32, 32, TEAM_RED, qfalse);
-        } else {
-            CG_DrawFlagModel(iconx, y, 16, 16, TEAM_RED, qfalse);
-        }
-    } else if (ci->powerups & (1 << PW_BLUEFLAG)) {
-        if (largeFormat) {
-            CG_DrawFlagModel(iconx, y - (32 - BIGCHAR_HEIGHT) / 2, 32, 32, TEAM_BLUE, qfalse);
-        } else {
-            CG_DrawFlagModel(iconx, y, 16, 16, TEAM_BLUE, qfalse);
-        }
-    } else {
-        if (ci->botSkill > 0 && ci->botSkill <= 5) {
-            if (cg_drawIcons.integer) {
-                if (largeFormat) {
-                    CG_DrawPic(iconx, y - (32 - BIGCHAR_HEIGHT) / 2, 32, 32, cgs.media.botSkillShaders[ ci->botSkill - 1 ]);
-                } else {
-                    CG_DrawPic(iconx, y, 16, 16, cgs.media.botSkillShaders[ ci->botSkill - 1 ]);
-                }
+    if (ci->botSkill > 0 && ci->botSkill <= 5) {
+        if (cg_drawIcons.integer) {
+            if (largeFormat) {
+                CG_DrawPic(iconx, y - (32 - BIGCHAR_HEIGHT) / 2, 32, 32, cgs.media.botSkillShaders[ ci->botSkill - 1 ]);
+            } else {
+                CG_DrawPic(iconx, y, 16, 16, cgs.media.botSkillShaders[ ci->botSkill - 1 ]);
             }
-        } else if (ci->handicap < 100) {
-            Com_sprintf(string, sizeof ( string), "%i", ci->handicap);
-            CG_DrawSmallStringColor(iconx, y, string, color);
         }
     }
 
     // draw the face
-    VectorClear(headAngles);
+    /*VectorClear(headAngles);
     headAngles[YAW] = 180;
     if (largeFormat) {
         CG_DrawHead(headx, y - (ICON_SIZE - BIGCHAR_HEIGHT) / 2, ICON_SIZE, ICON_SIZE,
                 score->client, headAngles);
     } else {
         CG_DrawHead(headx, y, 16, 16, score->client, headAngles);
-    }
-
-#ifdef MISSIONPACK
-    // draw the team task
-    if (ci->teamTask != TEAMTASK_NONE) {
-        if (ci->teamTask == TEAMTASK_OFFENSE) {
-            CG_DrawPic(headx + 48, y, 16, 16, cgs.media.assaultShader);
-        } else if (ci->teamTask == TEAMTASK_DEFENSE) {
-            CG_DrawPic(headx + 48, y, 16, 16, cgs.media.defendShader);
-        }
-    }
-#endif
+    }*/
+    
     // draw the score line
     if (score->ping == -1) {
         Com_sprintf(string, sizeof (string),
                 " connecting    %s", ci->name);
     } else if (ci->team == TEAM_SPECTATOR) {
         Com_sprintf(string, sizeof (string),
-                " SPECT %3i %4i %s", score->ping, score->time, ci->name);
+                " SPEC %3i %4i %s", score->ping, score->time, ci->name);
     } else {
         Com_sprintf(string, sizeof (string),
                 "%5i %4i %4i %s", score->score, score->ping, score->time, ci->name);

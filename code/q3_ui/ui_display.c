@@ -145,7 +145,7 @@ static void UI_DisplayOptionsMenu_Init(void) {
     displayOptionsInfo.graphics.generic.x = 216;
     displayOptionsInfo.graphics.generic.y = 240 - 2 * PROP_HEIGHT;
     displayOptionsInfo.graphics.string = "GRAPHICS";
-    displayOptionsInfo.graphics.style = UI_RIGHT;
+    displayOptionsInfo.graphics.style = UI_RIGHT | UI_SMALLFONT;
     displayOptionsInfo.graphics.color = color_red;
 
     displayOptionsInfo.display.generic.type = MTYPE_PTEXT;
@@ -155,7 +155,7 @@ static void UI_DisplayOptionsMenu_Init(void) {
     displayOptionsInfo.display.generic.x = 216;
     displayOptionsInfo.display.generic.y = 240 - PROP_HEIGHT;
     displayOptionsInfo.display.string = "DISPLAY";
-    displayOptionsInfo.display.style = UI_RIGHT;
+    displayOptionsInfo.display.style = UI_RIGHT | UI_SMALLFONT;
     displayOptionsInfo.display.color = color_red;
 
     displayOptionsInfo.sound.generic.type = MTYPE_PTEXT;
@@ -165,7 +165,7 @@ static void UI_DisplayOptionsMenu_Init(void) {
     displayOptionsInfo.sound.generic.x = 216;
     displayOptionsInfo.sound.generic.y = 240;
     displayOptionsInfo.sound.string = "SOUND";
-    displayOptionsInfo.sound.style = UI_RIGHT;
+    displayOptionsInfo.sound.style = UI_RIGHT | UI_SMALLFONT;
     displayOptionsInfo.sound.color = color_red;
 
     y = 240 - 1 * (BIGCHAR_HEIGHT + 2);

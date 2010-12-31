@@ -40,6 +40,7 @@ MAIN MENU
 
 #define MAIN_BANNER_MODEL			"models/mapobjects/banner/banner5.md3"
 #define MAIN_MENU_VERTICAL_SPACING		34
+#define MAIN_MENU_HORIZONTAL_SPACING    128
 
 typedef struct {
     menuframework_s menu;
@@ -53,6 +54,11 @@ typedef struct {
     int currentScene;
     float fade;
     qboolean up;
+
+    int servers;
+    int players;
+    char* motd;
+    qboolean loggedin;
 } mainmenu_t;
 
 
@@ -117,6 +123,14 @@ MainMenu_Cache
 ===============
  */
 void MainMenu_Cache(void) {
+    int i;
+    for (i = 0; i < MAX_MENU_SCENES; i++) {
+        trap_R_RegisterShaderNoMip(va("gfx/scenes/%i", i));
+    }
+    trap_Cmd_ExecuteText(EXEC_INSERT, "fetchnews");
+    trap_Cmd_ExecuteText(EXEC_INSERT, "fetchmotd");
+    trap_Cmd_ExecuteText(EXEC_INSERT, "fetchplayers");
+    trap_Cmd_ExecuteText(EXEC_INSERT, "fetchservers");
 }
 
 sfxHandle_t ErrorMessage_Key(int key) {
@@ -139,8 +153,19 @@ static void Main_MenuDraw(void) {
     vec3_t angles;
     float adjust;
     float x, y, w, h;
-    vec4_t oldColor = {0.8, 0.8, 0.8, 1};
     vec4_t color;
+    qboolean connected = qtrue;
+    vec4_t oldColor = {0.8, 0.8, 0.8, 1};
+
+    // FIXME dont call on every update...
+    s_main.servers = (int) trap_Cvar_VariableValue("ma_servers");
+    s_main.players = (int) trap_Cvar_VariableValue("ma_players");
+    s_main.motd = UI_Cvar_VariableString("ma_motd");
+
+    if (!s_main.motd || !Q_stricmp(s_main.motd, "")) {
+        s_main.motd = "Failed to connect to master server";
+        connected = qfalse;
+    }
 
     // options the refdef
 
@@ -185,10 +210,50 @@ static void Main_MenuDraw(void) {
     ent.renderfx = RF_LIGHTING_ORIGIN | RF_NOSHADOW;
     VectorCopy(ent.origin, ent.oldorigin);*/
 
-    x = 192;
+    x = 0;
+    y = 0;
+    w = 640;
+    h = 64;
+    UI_FillRect(x, y, w, h, color_black);
+
+    x = 16;
+    y = 16;
+    UI_DrawProportionalString(x, y, "Hazewood", UI_LEFT, color_green);
+
+
+    x = 196;
+    y = 28;
+    if (connected) {
+        UI_DrawProportionalString(x, y, va("%s", s_main.motd), UI_LEFT | UI_TINYFONT, color_white);
+    } else {
+        UI_DrawProportionalString(x, y, va("%s", s_main.motd), UI_LEFT | UI_TINYFONT, color_red);
+    }
+
+    x = 640 - 196 + 48;
+    y = 12;
+    if (s_main.servers > 0) {
+        UI_DrawProportionalString(x, y, va("%i Servers", s_main.servers), UI_LEFT | UI_SMALLERFONT, color_blue);
+    } else {
+        UI_DrawProportionalString(x, y, va("%i Servers", s_main.servers), UI_LEFT | UI_SMALLERFONT, color_red);
+    }
+
+    y = 36;
+    if (s_main.players > 0) {
+        UI_DrawProportionalString(x, y, va("%i Players", s_main.players), UI_LEFT | UI_SMALLERFONT, color_blue);
+    } else {
+        UI_DrawProportionalString(x, y, va("%i Players", s_main.players), UI_LEFT | UI_SMALLERFONT, color_red);
+    }
+
+    x = 0;
+    y = 480 - 64;
+    w = 640;
+    h = 64;
+    UI_FillRect(x, y, w, h, color_black);
+
+    x = 0;
     y = 64;
-    w = 448;
-    h = 352;
+    w = 640;
+    h = 480 - 128;
 
     if (!s_main.up) {
         s_main.fade -= ((float) uis.frametime) / 10.0f;
@@ -206,7 +271,7 @@ static void Main_MenuDraw(void) {
         s_main.up = qtrue;
     }
 
-    Vector4Copy(color, oldColor);
+    Vector4Copy(oldColor, color);
 
     UI_DrawHandlePic(x, y, w, h, trap_R_RegisterShaderNoMip(va("gfx/scenes/%i", s_main.currentScene)));
 
@@ -220,10 +285,6 @@ static void Main_MenuDraw(void) {
     trap_R_SetColor(color);
     UI_DrawNamedPic(x, y, w, h, "gfx/colors/blue.jpg");
 
-    color[0] = color[1] = color[2] = color[3] = 1;
-    trap_R_SetColor(color);
-    UI_DrawNamedPic(x, y, w, h, "gfx/scenes/overlay.png");
-
     trap_R_SetColor(oldColor);
 
     trap_R_AddRefEntityToScene(&ent);
@@ -235,9 +296,6 @@ static void Main_MenuDraw(void) {
     } else {
         Menu_Draw(&s_main.menu);
     }
-
-    UI_DrawString(320, 430, "Rain (c) 2010, Hazewood Development Team, Some Rights Reserved", UI_CENTER | UI_SMALLFONT, oldColor);
-    UI_DrawString(320, 452, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER | UI_SMALLFONT, oldColor);
 }
 
 /*
@@ -250,14 +308,14 @@ and that local cinematics are killed
 ===============
  */
 void UI_MainMenu(void) {
-    int y;
-    int style = UI_LEFT | UI_DROPSHADOW;
+    int x, y;
+    int style = UI_LEFT | UI_DROPSHADOW | UI_SMALLERFONT;
 
     trap_Cvar_Set("sv_killserver", "1");
 
     memset(&s_main, 0, sizeof (mainmenu_t));
     memset(&s_errorMessage, 0, sizeof (errorMessage_t));
-    
+
     MainMenu_Cache();
 
     trap_Cvar_VariableStringBuffer("com_errorMessage", s_errorMessage.errorMessage, sizeof (s_errorMessage.errorMessage));
@@ -285,66 +343,70 @@ void UI_MainMenu(void) {
     s_main.fade = -100.0f;
     s_main.up = qtrue;
 
-    y = 200;
-    s_main.singleplayer.generic.type = MTYPE_PTEXT;
-    s_main.singleplayer.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.singleplayer.generic.x = 32;
-    s_main.singleplayer.generic.y = y;
-    s_main.singleplayer.generic.id = ID_SINGLEPLAYER;
-    s_main.singleplayer.generic.callback = Main_MenuEvent;
-    s_main.singleplayer.string = "Singleplayer";
-    s_main.singleplayer.color = color_blue;
-    s_main.singleplayer.style = style;
-
-    y += MAIN_MENU_VERTICAL_SPACING;
+    x = 40;
     s_main.multiplayer.generic.type = MTYPE_PTEXT;
     s_main.multiplayer.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.multiplayer.generic.x = 32;
-    s_main.multiplayer.generic.y = y;
+    s_main.multiplayer.generic.x = x;
+    s_main.multiplayer.generic.y = 440;
     s_main.multiplayer.generic.id = ID_MULTIPLAYER;
     s_main.multiplayer.generic.callback = Main_MenuEvent;
     s_main.multiplayer.string = "Multiplayer";
     s_main.multiplayer.color = color_blue;
     s_main.multiplayer.style = style;
 
-    y += MAIN_MENU_VERTICAL_SPACING;
+    x += MAIN_MENU_HORIZONTAL_SPACING;
+    s_main.singleplayer.generic.type = MTYPE_PTEXT;
+    s_main.singleplayer.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
+    s_main.singleplayer.generic.x = x;
+    s_main.singleplayer.generic.y = 440;
+    s_main.singleplayer.generic.id = ID_SINGLEPLAYER;
+    s_main.singleplayer.generic.callback = Main_MenuEvent;
+    s_main.singleplayer.string = "Singleplayer";
+    s_main.singleplayer.color = color_blue;
+    s_main.singleplayer.style = style;
+
+    x += MAIN_MENU_HORIZONTAL_SPACING;
     s_main.options.generic.type = MTYPE_PTEXT;
     s_main.options.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.options.generic.x = 32;
-    s_main.options.generic.y = y;
+    s_main.options.generic.x = x;
+    s_main.options.generic.y = 440;
     s_main.options.generic.id = ID_OPTIONS;
     s_main.options.generic.callback = Main_MenuEvent;
     s_main.options.string = "Options";
     s_main.options.color = color_blue;
     s_main.options.style = style;
 
-    y += MAIN_MENU_VERTICAL_SPACING;
+    x += MAIN_MENU_HORIZONTAL_SPACING;
     s_main.demos.generic.type = MTYPE_PTEXT;
     s_main.demos.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.demos.generic.x = 32;
-    s_main.demos.generic.y = y;
+    s_main.demos.generic.x = x;
+    s_main.demos.generic.y = 440;
     s_main.demos.generic.id = ID_DEMOS;
     s_main.demos.generic.callback = Main_MenuEvent;
     s_main.demos.string = "Demos";
     s_main.demos.color = color_blue;
     s_main.demos.style = style;
 
-    y += MAIN_MENU_VERTICAL_SPACING;
+    x += MAIN_MENU_HORIZONTAL_SPACING;
     s_main.exit.generic.type = MTYPE_PTEXT;
     s_main.exit.generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
-    s_main.exit.generic.x = 32;
-    s_main.exit.generic.y = y;
+    s_main.exit.generic.x = x;
+    s_main.exit.generic.y = 440;
     s_main.exit.generic.id = ID_EXIT;
     s_main.exit.generic.callback = Main_MenuEvent;
     s_main.exit.string = "Exit";
     s_main.exit.color = color_blue;
     s_main.exit.style = style;
 
-    Menu_AddItem(&s_main.menu, &s_main.singleplayer);
     Menu_AddItem(&s_main.menu, &s_main.multiplayer);
+    Menu_AddItem(&s_main.menu, &s_main.singleplayer);
     Menu_AddItem(&s_main.menu, &s_main.options);
     Menu_AddItem(&s_main.menu, &s_main.demos);
     Menu_AddItem(&s_main.menu, &s_main.exit);
+
+    s_main.servers = (int) trap_Cvar_VariableValue("ma_servers");
+    s_main.players = (int) trap_Cvar_VariableValue("ma_players");
+    s_main.motd = UI_Cvar_VariableString("ma_motd");
 
     trap_Key_SetCatcher(KEYCATCH_UI);
     uis.menusp = 0;

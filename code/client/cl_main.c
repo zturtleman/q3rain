@@ -2142,26 +2142,75 @@ CL_MotdPacket
 ===================
  */
 void CL_MotdPacket(netadr_t from) {
-    char *challenge;
     char *info;
 
+    // FIXME reenable
     // if not from our server, ignore it
-    if (!NET_CompareAdr(from, cls.updateServer)) {
+    /*if (!NET_CompareAdr(from, cls.updateServer)) {
         return;
-    }
+    }*/
 
     info = Cmd_Argv(1);
 
-    // check challenge
-    challenge = Info_ValueForKey(info, "challenge");
-    if (strcmp(challenge, cls.updateChallenge)) {
-        return;
-    }
-
-    challenge = Info_ValueForKey(info, "motd");
-
     Q_strncpyz(cls.updateInfoString, info, sizeof ( cls.updateInfoString));
-    Cvar_Set("cl_motdString", challenge);
+    Cvar_Set("ma_motd", info);
+}
+
+/*
+===================
+CL_NewsPacket
+
+===================
+ */
+void CL_NewsPacket(netadr_t from) {
+    char *info;
+
+    // FIXME reenable
+    // if not from our server, ignore it
+    /*if (!NET_CompareAdr(from, cls.updateServer)) {
+        return;
+    }*/
+
+    info = Cmd_Argv(1);
+    Cvar_Set("ma_news", info);
+}
+
+/*
+===================
+CL_ServerCount
+
+===================
+ */
+void CL_ServerCount(netadr_t from) {
+    char *info;
+
+    // FIXME reenable
+    // if not from our server, ignore it
+    /*if (!NET_CompareAdr(from, cls.updateServer)) {
+        return;
+    }*/
+
+    info = Cmd_Argv(1);
+    Cvar_Set("ma_servers", info);
+}
+
+/*
+===================
+CL_PlayerCount
+
+===================
+ */
+void CL_PlayerCount(netadr_t from) {
+    char *info;
+
+    // FIXME reenable
+    // if not from our server, ignore it
+    /*if (!NET_CompareAdr(from, cls.updateServer)) {
+        return;
+    }*/
+
+    info = Cmd_Argv(1);
+    Cvar_Set("ma_players", info);
 }
 
 /*
@@ -2388,13 +2437,6 @@ void CL_ConnectionlessPacket(netadr_t from, msg_t *msg) {
 
     // cd check
     if (!Q_stricmp(c, "keyAuthorize")) {
-        // we don't use these now, so dump them on the floor
-        return;
-    }
-
-    // global MOTD from id
-    if (!Q_stricmp(c, "motd")) {
-        CL_MotdPacket(from);
         return;
     }
 
@@ -2428,8 +2470,27 @@ void CL_ConnectionlessPacket(netadr_t from, msg_t *msg) {
         return;
     }
 
+    if (!Q_stricmp(c, "playerCount")) {
+        CL_PlayerCount(from);
+        return;
+    }
+
+    if (!Q_stricmp(c, "serverCount")) {
+        CL_ServerCount(from);
+        return;
+    }
+    
+    if (!Q_stricmp(c, "motd")) {
+        CL_MotdPacket(from);
+        return;
+    }
+
+    if (!Q_stricmp(c, "news")) {
+        CL_NewsPacket(from);
+        return;
+    }
+
     Com_DPrintf("Unknown connectionless packet command.\nWas: '%s'\n", c);
-    Com_Printf("Unknown connectionless packet command.\nWas: '%s'\n", c);
 }
 
 /*
