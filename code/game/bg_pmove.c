@@ -306,7 +306,7 @@ static void PM_Accelerate(vec3_t wishdir, float wishspeed, float accel) {
     if (addspeed <= 0) {
         return;
     }
-    accelspeed = accel * pml.frametime*wishspeed;
+    accelspeed = accel * pml.frametime * wishspeed;
     if (accelspeed > addspeed) {
         accelspeed = addspeed;
     }
@@ -1055,7 +1055,8 @@ static void PM_SnowMove(pmove_t * pmove) {
     float vel;
     qboolean snowboarding = qfalse;
 
-    pmove->ps->wallclimbs = 0;
+    pmove->ps->wallclimbs = MAX_WALLCLIMBS;
+    pmove->ps->walljumps = MAX_WALLJUMPS;
 
     if (pm->waterlevel > 2 && DotProduct(pml.forward, pml.groundTrace.plane.normal) > 0) {
         PM_WaterMove();
