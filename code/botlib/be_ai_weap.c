@@ -412,7 +412,7 @@ int BotChooseBestFightWeapon(int weaponstate, int *inventory) {
         }
         //Com_Printf("BotChooseBestFightWeapon loop i = %i weight = %d bestweight = %d\n", i, weight, bestweight);
     }
-    Com_Printf("^2BotChooseBestFightWeapon = %i\n", bestweapon);
+    //Com_Printf("^2BotChooseBestFightWeapon = %i\n", bestweapon);
     return bestweapon;
 } //end of the function BotChooseBestFightWeapon
 //===========================================================================
