@@ -105,6 +105,7 @@ typedef enum {
     GT_ASSASSINS, // mission mode
     GT_TEAMDEATHMATCH, //deathmatch
     GT_TEAMSURVIVOR, //deathmatch, roundbased
+    GT_FREEZETAG,
     GT_MAX_GAME_TYPE
 } gametype_t;
 
@@ -132,6 +133,7 @@ typedef enum {
     PM_FREEZE, // stuck in place with no control
     PM_INTERMISSION, // no movement or status bar
     PM_SPINTERMISSION, // no movement or status bar
+    PM_FROZEN, // freezetag
 } pmtype_t;
 
 typedef enum {

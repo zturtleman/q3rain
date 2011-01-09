@@ -397,6 +397,7 @@ typedef struct {
     int numConnectedClients;
     int numNonSpectatorClients; // includes connecting clients
     int numPlayingClients; // connected, non-spectators
+    int numSpawnedClients;
     int sortedClients[MAX_CLIENTS]; // sorted by score
     int follow1, follow2; // clientNums for auto-follow spectators
 
@@ -448,7 +449,18 @@ typedef struct {
     qboolean allDisallowed;
     // cutscenes
     qboolean cutscene;
+    // ts
+    int roundState;
+    int nextState;
+    int nextStateTime;
 } level_locals_t;
+
+typedef enum {
+    ROUND_SPAWNING,
+    ROUND_WARMUP,
+    ROUND_PROGRESS,
+    ROUND_END,
+} round_states_t;
 
 // WEAPONDROP
 void ThrowWeapon(gentity_t *ent);

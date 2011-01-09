@@ -250,7 +250,7 @@ static bind_t g_bindings[] = {
     {"weapon 7", "Walther P22", ID_WEAPON7, ANIM_WEAPON7, '7', -1, -1, -1},
     {"weapon 8", "Remington ACR", ID_WEAPON8, ANIM_WEAPON8, '8', -1, -1, -1},
     {"weapon 9", "C4 Device", ID_WEAPON9, ANIM_WEAPON9, '9', -1, -1, -1},
-    {"weapon 10", "Injector", ID_WEAPON10, ANIM_WEAPON10, '', -1, -1, -1},
+    {"weapon 10", "Injector", ID_WEAPON10, ANIM_WEAPON10, '0', -1, -1, -1},
     {"+attack", "attack", ID_ATTACK, ANIM_ATTACK, K_CTRL, -1, -1, -1},
     {"weapprev", "prev weapon", ID_WEAPPREV, ANIM_IDLE, '[', -1, -1, -1},
     {"weapnext", "next weapon", ID_WEAPNEXT, ANIM_IDLE, ']', -1, -1, -1},

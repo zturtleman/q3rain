@@ -721,6 +721,9 @@ void ClientThink_real(gentity_t *ent) {
         client->ps.pm_type = PM_NOCLIP;
     } else if (client->ps.stats[STAT_HEALTH] <= 0) {
         client->ps.pm_type = PM_DEAD;
+        if (g_gametype.integer == GT_FREEZETAG) {
+            client->ps.pm_type = PM_FROZEN;
+        }
     } else if (level.cutscene) {
         client->ps.pm_type = PM_CUTSCENE;
     } else {
@@ -861,10 +864,19 @@ void ClientThink_real(gentity_t *ent) {
     // check for respawning
     if (client->ps.stats[STAT_HEALTH] <= 0) {
         // wait for the attack button to be pressed
-        if (level.time > client->respawnTime) {
+        if (level.time > client->respawnTime
+                && g_gametype.integer != GT_FREEZETAG
+                && g_gametype.integer != GT_ASSASSINS) {
+            if (g_gametype.integer == GT_TEAMSURVIVOR) {
+                if (level.roundState != ROUND_SPAWNING
+                        || level.roundState != ROUND_WARMUP) {
+                    return;
+                }
+            }
             // forcerespawn is to prevent users from waiting out powerups
-            if (g_forcerespawn.integer > 0 &&
-                    (level.time - client->respawnTime) > g_forcerespawn.integer * 1000) {
+            if (g_forcerespawn.integer > 0
+                    &&  (level.time - client->respawnTime) > g_forcerespawn.integer * 1000
+                    || g_gametype.integer == GT_TEAMSURVIVOR) {
                 respawn(ent);
                 return;
             }

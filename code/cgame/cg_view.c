@@ -332,6 +332,7 @@ static void CG_OffsetFirstPersonView(void) {
         angles[PITCH] = -15;
         angles[YAW] = cg.snap->ps.stats[STAT_DEAD_YAW];
         origin[2] += cg.predictedPlayerState.viewheight;
+        origin[2] += 10000;
         return;
     }
 
