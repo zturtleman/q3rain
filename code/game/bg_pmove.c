@@ -2369,8 +2369,6 @@ void PmoveSingle(pmove_t * pmove) {
         pm->ps->eFlags &= ~EF_TALK;
     }
 
-    // ! because of some wrong setting in cl_input.c and lazy rylius
-
     if (pm->cmd.buttons & BUTTON_SPRINT
             && pm->ps->stats[STAT_HEALTH] > 60
             && !(pm->cmd.buttons & BUTTON_WALKING)
@@ -2380,7 +2378,7 @@ void PmoveSingle(pmove_t * pmove) {
         if (pm->ps->sprintAdd > 270) {
             pm->ps->sprintAdd = 270;
         }
-        pm->ps->stamina -= (pml.msec / 4)*6;
+        pm->ps->stamina -= (pml.msec / 4)*8;
         regain = 0;
     } else {
         pm->ps->sprintAdd -= pml.msec / 2;

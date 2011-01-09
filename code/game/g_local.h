@@ -456,8 +456,8 @@ typedef struct {
 } level_locals_t;
 
 typedef enum {
-    ROUND_SPAWNING,
     ROUND_WARMUP,
+    ROUND_SPAWNING,
     ROUND_PROGRESS,
     ROUND_END,
 } round_states_t;
@@ -678,6 +678,7 @@ void QDECL G_LogPrintf(const char *fmt, ...);
 void SendScoreboardMessageToAllClients(void);
 void QDECL G_Printf(const char *fmt, ...);
 void QDECL G_Error(const char *fmt, ...);
+void UpdateLevel(void);
 
 //
 // g_client.c
