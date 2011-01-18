@@ -102,7 +102,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 typedef enum {
     GT_FFA, // free for all
     GT_SINGLE_PLAYER, // single player
-    GT_ASSASSINS, // mission mode
+    GT_ASSASSINS, // coop mode
     GT_TEAMDEATHMATCH, //deathmatch
     GT_TEAMSURVIVOR, //deathmatch, roundbased
     GT_FREEZETAG,

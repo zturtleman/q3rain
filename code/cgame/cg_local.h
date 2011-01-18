@@ -906,6 +906,8 @@ typedef struct {
     qhandle_t sha_pda;
     qhandle_t sha_pdaMinimap;
 
+    qhandle_t mod_nuke;
+
     qhandle_t sha_viewScope;
 
     qhandle_t sha_fewBloodSpurts;
@@ -1174,6 +1176,7 @@ void CG_DrawSmallStringColor(int x, int y, const char *s, vec4_t color);
 int CG_DrawStrlen(const char *str);
 
 float *CG_FadeColor(int startMsec, int totalMsec);
+float *CG_FadeColorTime(int startMsec, int totalMsec, int time);
 float *CG_TeamColor(int team);
 void CG_TileClear(void);
 void CG_ColorForHealth(vec4_t hcolor);

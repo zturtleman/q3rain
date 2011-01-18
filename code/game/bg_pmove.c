@@ -1291,7 +1291,7 @@ static void PM_WalkMove(pmove_t *pmove) {
         pm->ps->velocity[2] -= pm->ps->gravity * pml.frametime;
     }
 
-    if ((pm->ps->stats[STAT_HEALTH] <= 20) && (pm->ps->levelTime % 2000) == 0) {
+    /*if ((pm->ps->stats[STAT_HEALTH] <= 20) && (pm->ps->levelTime % 2000) == 0) {
         if (pm->ps->velocity[1] != 0) {
             if (crandom() < 0)
                 pm->ps->velocity[0] = crandom()*300;
@@ -1304,7 +1304,7 @@ static void PM_WalkMove(pmove_t *pmove) {
             else
                 pm->ps->velocity[1] = -(crandom()*300);
         }
-    }
+    }*/
 
     vel = VectorLength(pm->ps->velocity);
 

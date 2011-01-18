@@ -176,7 +176,6 @@ qboolean trap_AreasConnected( int area1, int area2 ) {
 }
 
 void trap_LinkEntity( gentity_t *ent ) {
-  Com_Printf("Linking entity %s\n", ent->classname);
 	syscall( G_LINKENTITY, ent );
 }
 

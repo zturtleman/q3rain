@@ -987,8 +987,8 @@ qboolean G_RadiusDamage(vec3_t origin, gentity_t *attacker, float damage, float 
             // get knocked into the air more
             dir[2] += 24;
             if (mod == MOD_NUKE && damage == -1) {
-                ent->client->ps.blindTime = ent->client->ps.levelTime + 10000;
-                Com_Printf("^1Blinding\n");
+                ent->client->ps.blindTime = ent->client->ps.levelTime;
+                //Com_Printf("^1Blinding\n");
             } else {
                 G_Damage(ent, NULL, attacker, dir, origin, (int) points, DAMAGE_RADIUS, mod);
             }

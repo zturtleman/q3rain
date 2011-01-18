@@ -346,10 +346,30 @@ void CG_Nuke(vec3_t origin, int stage) {
     int number, index, light;
     float stagefactor;
     vec3_t up, lightColor;
-    localEntity_t *le;
+    localEntity_t *le, *nuke;
+    refEntity_t *re;
     int offset, msec;
 
-    Com_Printf("CG_Nuke stage = %i\n", stage);
+    if (stage == 1) {
+      nuke = CG_AllocLocalEntity();
+      re = &nuke->refEntity;
+
+      nuke->leType = LE_FRAGMENT;
+      nuke->startTime = cg.time;
+      nuke->endTime = nuke->startTime + 60000;
+
+      VectorCopy(origin, re->origin);
+      AxisCopy(axisDefault, re->axis);
+      re->hModel = cgs.media.mod_nuke;
+
+      nuke->pos.trType = TR_GRAVITY;
+      VectorCopy(origin, nuke->pos.trBase);
+      VectorCopy(origin, nuke->pos.trDelta);
+      nuke->pos.trTime = cg.time;
+
+      nuke->leBounceSoundType = LEBS_NONE;
+      nuke->leMarkType = LEMT_NONE;
+    }
 
     number = 128;
     stagefactor = 1.0f;
@@ -409,7 +429,7 @@ void CG_Nuke(vec3_t origin, int stage) {
             msec = 50000;
         }
         // smoke dat shit up
-        ent = CG_MakeNukeSmoke(origin, up, msec);
+        //ent = CG_MakeNukeSmoke(origin, up, msec);
     }
     for (index = 0; index < 3; index++) {
         le = CG_AllocLocalEntity();
