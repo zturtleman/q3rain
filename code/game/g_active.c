@@ -1,37 +1,37 @@
 /*
-===========================================================================
-Copyright (C) 1999-2005 Id Software, Inc.
+ ===========================================================================
+ Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Quake III Arena source code.
+ This file is part of Quake III Arena source code.
 
-Quake III Arena source code is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 2 of the License,
-or (at your option) any later version.
+ Quake III Arena source code is free software; you can redistribute it
+ and/or modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2 of the License,
+ or (at your option) any later version.
 
-Quake III Arena source code is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+ Quake III Arena source code is distributed in the hope that it will be
+ useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with Quake III Arena source code; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-===========================================================================
+ You should have received a copy of the GNU General Public License
+ along with Quake III Arena source code; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ ===========================================================================
  */
 //
 
 #include "g_local.h"
 
 /*
-===============
-G_DamageFeedback
+ ===============
+ G_DamageFeedback
 
-Called just before a snapshot is sent to the given player.
-Totals up all damage and generates both the player_state_t
-damage values to that client for pain blends and kicks, and
-global pain sound events for all clients.
-===============
+ Called just before a snapshot is sent to the given player.
+ Totals up all damage and generates both the player_state_t
+ damage values to that client for pain blends and kicks, and
+ global pain sound events for all clients.
+ ===============
  */
 void P_DamageFeedback(gentity_t *player) {
   gclient_t *client;
@@ -69,12 +69,12 @@ void P_DamageFeedback(gentity_t *player) {
   }
 
   // play an apropriate pain sound
-  if ((level.time > player->pain_debounce_time) && !(player->flags & FL_GODMODE) && client->lasthurt_mod != MOD_BLEED) {
+  if ((level.time > player->pain_debounce_time)
+      && !(player->flags & FL_GODMODE) && client->lasthurt_mod != MOD_BLEED) {
     player->pain_debounce_time = level.time + 700;
     G_AddEvent(player, EV_PAIN, player->health);
     client->ps.damageEvent++;
   }
-
 
   client->ps.damageCount = count;
 
@@ -98,11 +98,11 @@ static void P_KickBack(gentity_t *player, int pitch, int yaw, int damage) {
 }
 
 /*
-=============
-P_WorldEffects
+ =============
+ P_WorldEffects
 
-Check for lava / slime contents and drowning
-=============
+ Check for lava / slime contents and drowning
+ =============
  */
 void P_WorldEffects(gentity_t *ent) {
   qboolean divesuit;
@@ -139,7 +139,7 @@ void P_WorldEffects(gentity_t *ent) {
         // play a gurp sound instead of a normal pain sound
         if (ent->health <= ent->damage) {
           G_Sound(ent, CHAN_VOICE, G_SoundIndex("*drown.wav"));
-        } else if (rand()&1) {
+        } else if (rand() & 1) {
           G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp1.wav"));
         } else {
           G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp2.wav"));
@@ -175,9 +175,9 @@ void P_WorldEffects(gentity_t *ent) {
 }
 
 /*
-===============
-G_SetClientSound
-===============
+ ===============
+ G_SetClientSound
+ ===============
  */
 void G_SetClientSound(gentity_t *ent) {
   if (ent->waterlevel && (ent->watertype & (CONTENTS_LAVA | CONTENTS_SLIME))) {
@@ -187,21 +187,19 @@ void G_SetClientSound(gentity_t *ent) {
   }
 }
 
-
-
 //==============================================================
 
 /*
-==============
-ClientImpacts
-==============
+ ==============
+ ClientImpacts
+ ==============
  */
 void ClientImpacts(gentity_t *ent, pmove_t *pm) {
   int i, j;
   trace_t trace;
   gentity_t *other;
 
-  memset(&trace, 0, sizeof ( trace));
+  memset(&trace, 0, sizeof(trace));
   for (i = 0; i < pm->numtouch; i++) {
     for (j = 0; j < i; j++) {
       if (pm->touchents[j] == pm->touchents[i]) {
@@ -211,7 +209,7 @@ void ClientImpacts(gentity_t *ent, pmove_t *pm) {
     if (j != i) {
       continue; // duplicated
     }
-    other = &g_entities[ pm->touchents[i] ];
+    other = &g_entities[pm->touchents[i]];
 
     if ((ent->r.svFlags & SVF_BOT) && (ent->touch)) {
       ent->touch(ent, other, &trace);
@@ -227,12 +225,12 @@ void ClientImpacts(gentity_t *ent, pmove_t *pm) {
 }
 
 /*
-============
-G_TouchTriggers
+ ============
+ G_TouchTriggers
 
-Find all trigger entities that ent's current position touches.
-Spectators will only interact with teleporters.
-============
+ Find all trigger entities that ent's current position touches.
+ Spectators will only interact with teleporters.
+ ============
  */
 void G_TouchTriggers(gentity_t *ent) {
   int i, num;
@@ -240,7 +238,8 @@ void G_TouchTriggers(gentity_t *ent) {
   gentity_t *hit;
   trace_t trace;
   vec3_t mins, maxs;
-  static vec3_t range = {40, 40, 52};
+  static vec3_t range = { 40, 40, 52 };
+  qboolean bomb = qfalse;
 
   if (!ent->client) {
     return;
@@ -272,7 +271,8 @@ void G_TouchTriggers(gentity_t *ent) {
 
     // ignore most entities if a spectator
     if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
-      if (hit->s.eType != ET_TELEPORT_TRIGGER && hit->touch != Touch_DoorTrigger) {
+      if (hit->s.eType != ET_TELEPORT_TRIGGER && hit->touch
+          != Touch_DoorTrigger) {
         continue;
       }
     }
@@ -289,15 +289,26 @@ void G_TouchTriggers(gentity_t *ent) {
       }
     }
 
-    memset(&trace, 0, sizeof (trace));
+    memset(&trace, 0, sizeof(trace));
 
     if (hit->touch) {
+      if ((hit->flags & FL_BOMB) && bomb) {
+        continue;
+      }
       hit->touch(hit, ent, &trace);
+    }
+
+    if (hit->flags & FL_BOMB) {
+      bomb = qtrue;
     }
 
     if ((ent->r.svFlags & SVF_BOT) && (ent->touch)) {
       ent->touch(ent, hit, &trace);
     }
+  }
+
+  if (!bomb) {
+    ent->pickupTime = -1;
   }
 
   // if we didn't touch a jump pad this pmove frame
@@ -308,9 +319,9 @@ void G_TouchTriggers(gentity_t *ent) {
 }
 
 /*
-=================
-SpectatorThink
-=================
+ =================
+ SpectatorThink
+ =================
  */
 void SpectatorThink(gentity_t *ent, usercmd_t *ucmd) {
   pmove_t pm;
@@ -323,7 +334,7 @@ void SpectatorThink(gentity_t *ent, usercmd_t *ucmd) {
     client->ps.speed = 400; // faster than normal
 
     // set up for pmove
-    memset(&pm, 0, sizeof (pm));
+    memset(&pm, 0, sizeof(pm));
     pm.ps = &client->ps;
     pm.cmd = *ucmd;
     pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY; // spectators can fly through bodies
@@ -343,17 +354,18 @@ void SpectatorThink(gentity_t *ent, usercmd_t *ucmd) {
   client->buttons = ucmd->buttons;
 
   // attack button cycles through spectators
-  if ((client->buttons & BUTTON_ATTACK) && !(client->oldbuttons & BUTTON_ATTACK)) {
+  if ((client->buttons & BUTTON_ATTACK)
+      && !(client->oldbuttons & BUTTON_ATTACK)) {
     Cmd_FollowCycle_f(ent, 1);
   }
 }
 
 /*
-=================
-ClientInactivityTimer
+ =================
+ ClientInactivityTimer
 
-Returns qfalse if the client is dropped
-=================
+ Returns qfalse if the client is dropped
+ =================
  */
 qboolean ClientInactivityTimer(gclient_t *client) {
   if (!g_inactivity.integer) {
@@ -361,10 +373,8 @@ qboolean ClientInactivityTimer(gclient_t *client) {
     // gameplay, everyone isn't kicked
     client->inactivityTime = level.time + 60 * 1000;
     client->inactivityWarning = qfalse;
-  } else if (client->pers.cmd.forwardmove ||
-      client->pers.cmd.rightmove ||
-      client->pers.cmd.upmove ||
-      (client->pers.cmd.buttons & BUTTON_ATTACK)) {
+  } else if (client->pers.cmd.forwardmove || client->pers.cmd.rightmove
+      || client->pers.cmd.upmove || (client->pers.cmd.buttons & BUTTON_ATTACK)) {
     client->inactivityTime = level.time + g_inactivity.integer * 1000;
     client->inactivityWarning = qfalse;
   } else if (!client->pers.localClient) {
@@ -372,7 +382,8 @@ qboolean ClientInactivityTimer(gclient_t *client) {
       trap_DropClient(client - level.clients, "Dropped due to inactivity");
       return qfalse;
     }
-    if (level.time > client->inactivityTime - 10000 && !client->inactivityWarning) {
+    if (level.time > client->inactivityTime - 10000
+        && !client->inactivityWarning) {
       client->inactivityWarning = qtrue;
       trap_SendServerCommand(client - level.clients, "cp \"^1Ten seconds until inactivity drop!\n\"");
     }
@@ -381,11 +392,11 @@ qboolean ClientInactivityTimer(gclient_t *client) {
 }
 
 /*
-==================
-ClientTimerActions
+ ==================
+ ClientTimerActions
 
-Actions that happen once a second
-==================
+ Actions that happen once a second
+ ==================
  */
 void ClientTimerActions(gentity_t *ent, int msec) {
   gclient_t *client;
@@ -406,9 +417,9 @@ void ClientTimerActions(gentity_t *ent, int msec) {
 }
 
 /*
-====================
-ClientIntermissionThink
-====================
+ ====================
+ ClientIntermissionThink
+ ====================
  */
 void ClientIntermissionThink(gclient_t *client) {
   client->ps.eFlags &= ~EF_TALK;
@@ -419,19 +430,20 @@ void ClientIntermissionThink(gclient_t *client) {
   // swap and latch button actions
   client->oldbuttons = client->buttons;
   client->buttons = client->pers.cmd.buttons;
-  if (client->buttons & (BUTTON_ATTACK | BUTTON_USE_HOLDABLE) & (client->oldbuttons ^ client->buttons)) {
+  if (client->buttons & (BUTTON_ATTACK | BUTTON_USE_HOLDABLE)
+      & (client->oldbuttons ^ client->buttons)) {
     // this used to be an ^1 but once a player says ready, it should stick
     client->readyToExit = 1;
   }
 }
 
 /*
-================
-ClientEvents
+ ================
+ ClientEvents
 
-Events will be passed on to the clients for presentation,
-but any server game effects are handled here
-================
+ Events will be passed on to the clients for presentation,
+ but any server game effects are handled here
+ ================
  */
 void ClientEvents(gentity_t *ent, int oldEventSequence) {
   int i, j;
@@ -453,7 +465,7 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
   }
 
   for (i = oldEventSequence; i < client->ps.eventSequence; i++) {
-    event = client->ps.events[ i & (MAX_PS_EVENTS - 1) ];
+    event = client->ps.events[i & (MAX_PS_EVENTS - 1)];
 
     switch (event) {
       case EV_FALL_SHORT:
@@ -482,7 +494,8 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
         if (ent->client->ps.powerups[PW_ADRENALINE] > 0) {
           factor /= 2;
         }
-        ent->client->ps.jumpCooldown = ent->client->ps.levelTime + (damage * factor);
+        ent->client->ps.jumpCooldown = ent->client->ps.levelTime + (damage
+            * factor);
         break;
 
       case EV_FIRE_WEAPON:
@@ -496,12 +509,12 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
         if (item) {
           drop = Drop_Item(ent, item, 0);
           // decide how many seconds it has left
-          drop->count = (ent->client->ps.powerups[ j ] - level.time) / 1000;
+          drop->count = (ent->client->ps.powerups[j] - level.time) / 1000;
           if (drop->count < 1) {
             drop->count = 1;
           }
 
-          ent->client->ps.powerups[ j ] = 0;
+          ent->client->ps.powerups[j] = 0;
         }
 
         SelectSpawnPoint(ent->client->ps.origin, origin, angles, qfalse, qfalse, qfalse, qfalse);
@@ -521,11 +534,11 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
 }
 
 /*
-=============
-ThrowWeapon
-WEAPONDROP
-XRAY FMJ
-=============
+ =============
+ ThrowWeapon
+ WEAPONDROP
+ XRAY FMJ
+ =============
  */
 
 void ThrowWeapon(gentity_t *ent) {
@@ -539,15 +552,12 @@ void ThrowWeapon(gentity_t *ent) {
   client = ent->client;
   ucmd = &ent->client->pers.cmd;
 
-
   if (client->ps.weaponstate != WEAPON_READY) {
     return;
   }
 
-  if (client->ps.weapon == WP_KNIFE
-      || client->ps.weapon == WP_NONE
-      || client->ps.weapon == WP_HANDS
-      || (ucmd->buttons & BUTTON_ATTACK)) {
+  if (client->ps.weapon == WP_KNIFE || client->ps.weapon == WP_NONE
+      || client->ps.weapon == WP_HANDS || (ucmd->buttons & BUTTON_ATTACK)) {
     return;
   }
 
@@ -584,9 +594,9 @@ void ThrowWeapon(gentity_t *ent) {
 void BotTestSolid(vec3_t origin);
 
 /*
-==============
-SendPendingPredictableEvents
-==============
+ ==============
+ SendPendingPredictableEvents
+ ==============
  */
 void SendPendingPredictableEvents(playerState_t *ps) {
   gentity_t *t;
@@ -598,7 +608,7 @@ void SendPendingPredictableEvents(playerState_t *ps) {
     // create a temporary entity for this event which is sent to everyone
     // except the client who generated the event
     seq = ps->entityEventSequence & (MAX_PS_EVENTS - 1);
-    event = ps->events[ seq ] | ((ps->entityEventSequence & 3) << 8);
+    event = ps->events[seq] | ((ps->entityEventSequence & 3) << 8);
     // set external event to zero before calling BG_PlayerStateToEntityState
     extEvent = ps->externalEvent;
     ps->externalEvent = 0;
@@ -631,15 +641,15 @@ static void G_ExplodeClient(gclient_t *client, gentity_t *ent) {
 }
 
 /*
-==============
-ClientThink
+ ==============
+ ClientThink
 
-This will be called once for each client frame, which will
-usually be a couple times for each server frame on fast clients.
+ This will be called once for each client frame, which will
+ usually be a couple times for each server frame on fast clients.
 
-If "g_synchronousClients 1" is set, this will be called exactly
-once for each server frame, which makes for smooth demo recording.
-==============
+ If "g_synchronousClients 1" is set, this will be called exactly
+ once for each server frame, which makes for smooth demo recording.
+ ==============
  */
 void ClientThink_real(gentity_t *ent) {
   gclient_t *client;
@@ -685,7 +695,8 @@ void ClientThink_real(gentity_t *ent) {
   }
 
   if (pmove_fixed.integer || client->pers.pmoveFixed) {
-    ucmd->serverTime = ((ucmd->serverTime + pmove_msec.integer - 1) / pmove_msec.integer) * pmove_msec.integer;
+    ucmd->serverTime = ((ucmd->serverTime + pmove_msec.integer - 1)
+        / pmove_msec.integer) * pmove_msec.integer;
     //if (ucmd->serverTime - client->ps.commandTime <= 0)
     //	return;
   }
@@ -714,7 +725,8 @@ void ClientThink_real(gentity_t *ent) {
 
   // clear the rewards if time
   if (level.time > client->rewardTime) {
-    client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET);
+    client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT
+        | EF_AWARD_GAUNTLET);
   }
 
   if (client->noclip) {
@@ -741,15 +753,18 @@ void ClientThink_real(gentity_t *ent) {
   if (adrenaline) {
     client->ps.speed = client->ps.maxspeed * 1.3;
   } else {
-    client->ps.speed = (int) ((float) client->ps.maxspeed / ((float) client->ps.legsfactor / 10));
+    client->ps.speed = (int) ((float) client->ps.maxspeed
+        / ((float) client->ps.legsfactor / 10));
   }
 
   client->ps.speed += client->ps.sprintAdd;
 
   bleed = client->ps.powerups[PW_BLEED];
   if (client->ps.wounds > 0 && bleed <= level.time) {
-    G_Damage(ent, NULL, NULL, NULL, NULL, 1, DAMAGE_NO_KNOCKBACK | DAMAGE_NO_ARMOR, MOD_BLEED);
-    client->ps.powerups[PW_BLEED] = level.time + (BLEEDTIME / client->ps.wounds);
+    G_Damage(ent, NULL, NULL, NULL, NULL, 1, DAMAGE_NO_KNOCKBACK
+        | DAMAGE_NO_ARMOR, MOD_BLEED);
+    client->ps.powerups[PW_BLEED] = level.time
+        + (BLEEDTIME / client->ps.wounds);
   }
 
   ent->client->ps.levelTime = level.time;
@@ -777,7 +792,7 @@ void ClientThink_real(gentity_t *ent) {
   // set up for pmove
   oldEventSequence = client->ps.eventSequence;
 
-  memset(&pm, 0, sizeof (pm));
+  memset(&pm, 0, sizeof(pm));
 
   if (ent->flags & FL_FORCE_GESTURE) {
     ent->flags &= ~FL_FORCE_GESTURE;
@@ -858,25 +873,24 @@ void ClientThink_real(gentity_t *ent) {
   client->latched_buttons |= client->buttons & ~client->oldbuttons;
 
   /*if (client->ps.stats[STAT_HEALTH] > 0 && client->ps.stats[STAT_HEALTH] <= 20 && (level.time % 53 == 0) && (client->ps.powerups[PW_ADRENALINE] == 0)) {
-      P_KickBack(ent, (int) crandom()*10, (int) crandom()*10, 3);
-  }*/
+   P_KickBack(ent, (int) crandom()*10, (int) crandom()*10, 3);
+   }*/
 
   // check for respawning
   if (client->ps.stats[STAT_HEALTH] <= 0) {
     // wait for the attack button to be pressed
-    if (level.time > client->respawnTime
-        && g_gametype.integer != GT_FREEZETAG
+    if (level.time > client->respawnTime && g_gametype.integer != GT_FREEZETAG
         && g_gametype.integer != GT_ASSASSINS) {
       if (g_gametype.integer == GT_TEAMSURVIVOR) {
-        if (level.roundState != ROUND_SPAWNING
-            || level.roundState != ROUND_WARMUP) {
+        if (level.roundState != ROUND_SPAWNING || level.roundState
+            != ROUND_WARMUP) {
           return;
         }
       }
       // forcerespawn is to prevent users from waiting out powerups
-      if (g_forcerespawn.integer > 0
-          && (level.time - client->respawnTime) > g_forcerespawn.integer * 1000
-          || g_gametype.integer == GT_TEAMSURVIVOR) {
+      if (g_forcerespawn.integer > 0 && (level.time - client->respawnTime)
+          > g_forcerespawn.integer * 1000 || g_gametype.integer
+          == GT_TEAMSURVIVOR) {
         respawn(ent);
         return;
       }
@@ -887,7 +901,8 @@ void ClientThink_real(gentity_t *ent) {
       }
     }
     return;
-  } else if (g_gametype.integer == GT_TEAMSURVIVOR && level.roundState == ROUND_SPAWNING) {
+  } else if (g_gametype.integer == GT_TEAMSURVIVOR && level.roundState
+      == ROUND_SPAWNING) {
     respawn(ent);
     return;
   }
@@ -897,11 +912,11 @@ void ClientThink_real(gentity_t *ent) {
 }
 
 /*
-==================
-ClientThink
+ ==================
+ ClientThink
 
-A new command has arrived from the client
-==================
+ A new command has arrived from the client
+ ==================
  */
 void ClientThink(int clientNum) {
   gentity_t *ent;
@@ -927,10 +942,10 @@ void G_RunClient(gentity_t *ent) {
 }
 
 /*
-==================
-SpectatorClientEndFrame
+ ==================
+ SpectatorClientEndFrame
 
-==================
+ ==================
  */
 void SpectatorClientEndFrame(gentity_t *ent) {
   gclient_t *cl;
@@ -948,9 +963,11 @@ void SpectatorClientEndFrame(gentity_t *ent) {
       clientNum = level.follow2;
     }
     if (clientNum >= 0) {
-      cl = &level.clients[ clientNum ];
-      if (cl->pers.connected == CON_CONNECTED && cl->sess.sessionTeam != TEAM_SPECTATOR) {
-        flags = (cl->ps.eFlags & ~(EF_VOTED | EF_TEAMVOTED)) | (ent->client->ps.eFlags & (EF_VOTED | EF_TEAMVOTED));
+      cl = &level.clients[clientNum];
+      if (cl->pers.connected == CON_CONNECTED && cl->sess.sessionTeam
+          != TEAM_SPECTATOR) {
+        flags = (cl->ps.eFlags & ~(EF_VOTED | EF_TEAMVOTED))
+            | (ent->client->ps.eFlags & (EF_VOTED | EF_TEAMVOTED));
         ent->client->ps = cl->ps;
         ent->client->ps.pm_flags |= PMF_FOLLOW;
         ent->client->ps.eFlags = flags;
@@ -973,13 +990,13 @@ void SpectatorClientEndFrame(gentity_t *ent) {
 }
 
 /*
-==============
-ClientEndFrame
+ ==============
+ ClientEndFrame
 
-Called at the end of each server frame for each connected client
-A fast client will have multiple ClientThink for each ClientEdFrame,
-while a slow client may have multiple ClientEndFrame between ClientThink.
-==============
+ Called at the end of each server frame for each connected client
+ A fast client will have multiple ClientThink for each ClientEdFrame,
+ while a slow client may have multiple ClientEndFrame between ClientThink.
+ ==============
  */
 void ClientEndFrame(gentity_t *ent) {
   int i;
@@ -997,8 +1014,8 @@ void ClientEndFrame(gentity_t *ent) {
     if (i == PW_SNOWBOARD) {
       continue;
     }
-    if (ent->client->ps.powerups[ i ] < level.time) {
-      ent->client->ps.powerups[ i ] = 0;
+    if (ent->client->ps.powerups[i] < level.time) {
+      ent->client->ps.powerups[i] = 0;
     }
   }
   if (ent->client->ps.powerups[PW_ADRENALINE] < level.time) {
@@ -1035,7 +1052,8 @@ void ClientEndFrame(gentity_t *ent) {
   }
 
   //Update the Ammo Amount in weapon RELOADING
-  ent->client->ps.stats[STAT_AMMO] = ent->client->clipammo[ent->client->ps.weapon];
+  ent->client->ps.stats[STAT_AMMO]
+      = ent->client->clipammo[ent->client->ps.weapon];
 
   ent->client->ps.stats[STAT_HEALTH] = ent->health; // FIXME: get rid of ent->health...
 
@@ -1053,5 +1071,4 @@ void ClientEndFrame(gentity_t *ent) {
   //	i = trap_AAS_PointReachabilityAreaIndex( ent->client->ps.origin );
   //	ent->client->areabits[i >> 3] |= 1 << (i & 7);
 }
-
 

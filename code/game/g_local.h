@@ -204,9 +204,12 @@ struct gentity_s {
 
     float distance; // VALKYRIE: for rotating door
 
-    // RAIN AMMO VARIABLES
+    // Rain
+    // ammo
     int ammo; // ammo in weapon
     int clipammo; // bullets in all clips together
+    // pickup
+    int pickupTime;
 };
 
 typedef enum {
