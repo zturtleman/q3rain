@@ -1646,6 +1646,10 @@ static void CG_DrawCrosshair(void) {
     return;
   }
 
+  if (cg.snap->ps.stats[STAT_HEALTH] <= 20) {
+    return;
+  }
+
   // set color based on health
   if (cg_crosshairHealth.integer) {
     vec4_t hcolor;
@@ -1716,6 +1720,10 @@ static void CG_DrawCrosshair3D(void) {
   }
 
   if (cg.snap->ps.sprintAdd > 10) {
+    return;
+  }
+
+  if (cg.snap->ps.stats[STAT_HEALTH] <= 20) {
     return;
   }
 
