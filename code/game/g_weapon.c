@@ -980,7 +980,9 @@ void Weapon_Crossbow_Fire(gentity_t *ent) {
  */
 #define WALTHER_RANGE 8192
 #define WALTHER_DAMAGE 40
-#define WALTHER_SPREAD 15
+#define WALTHER_MINSPREAD 15
+#define WALTHER_SPREADADD 5
+#define WALTHER_MAXSPREAD 200
 
 void Weapon_Walther_Fire(gentity_t *ent) {
   trace_t tr;
@@ -993,11 +995,17 @@ void Weapon_Walther_Fire(gentity_t *ent) {
 
 
   if (ent->client != NULL) {
-    ent->client->ps.spread = WALTHER_SPREAD;
+    ent->client->ps.spammed++;
+    ent->client->ps.spread = WALTHER_MINSPREAD + (WALTHER_SPREADADD
+        * (ent->client->ps.spammed - 1));
     ent->client->ps.spread += ent->client->ps.sprintAdd / 4;
+    if (ent->client->ps.spread > WALTHER_MAXSPREAD) {
+      ent->client->ps.spread = WALTHER_MAXSPREAD;
+    }
+
     r = random() * M_PI * 2.0f;
-    u = sin(r) * crandom() * ent->client->ps.spread * 16;
-    r = cos(r) * crandom() * ent->client->ps.spread * 16;
+    u = sin(r) * crandom() * (ent->client->ps.spread + WALTHER_SPREADADD) * 16;
+    r = cos(r) * crandom() * (ent->client->ps.spread + WALTHER_SPREADADD) * 16;
   } else {
     r = u = 0;
   }

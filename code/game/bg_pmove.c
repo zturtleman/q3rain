@@ -2074,6 +2074,17 @@ static void PM_TorsoAnimation(void) {
   }
 }
 
+static int BG_BulletCooldownForWeapon(int w) {
+  switch (w) {
+    case WP_WALTHER:
+      return 150;
+    case WP_ACR:
+      return 70;
+    default:
+      return 0;
+  }
+}
+
 /*
  ==============
  PM_Weapon
@@ -2138,9 +2149,26 @@ static void PM_Weapon(void) {
     }
   }
 
-  if (!(pm->cmd.buttons & 1) && (pm->ps->weaponstate != WEAPON_DROPPING)
-      && (pm->ps->weaponstate != WEAPON_RELOADING)) {
-    if (pm->ps->weapon == WP_WALTHER) {
+  if (!(pm->cmd.buttons & 1)) {
+    if (pm->ps->cooldown <= 0) {
+      if (pm->ps->spammed > 0) {
+        pm->ps->cooldown = BG_BulletCooldownForWeapon(pm->ps->weapon);
+        // speed it up a bit if we have spammed a lot
+        if (pm->ps->spammed > 15) {
+          pm->ps->cooldown /= 2;
+        }
+        Com_Printf("spammed = %i\n", pm->ps->spammed);
+      }
+      pm->ps->spammed--;
+      if (pm->ps->spammed < 0) {
+        pm->ps->spammed = 0;
+      }
+    } else if (pm->ps->cooldown > 0) {
+      pm->ps->cooldown -= pml.msec;
+    }
+    if (pm->ps->weapon == WP_WALTHER
+        && (pm->ps->weaponstate != WEAPON_DROPPING)
+        && (pm->ps->weaponstate != WEAPON_RELOADING)) {
       pm->ps->weaponTime = SEMI_DELAY;
       pm->ps->weaponstate = WEAPON_READY;
       return;
@@ -2182,7 +2210,6 @@ static void PM_Weapon(void) {
   // check for fire release
   // if they aren't pressing attack
   if (!(pm->cmd.buttons & 1)) {
-    pm->ps->spammed = 0;
     if (pm->ps->weaponstate == WEAPON_COCKED) {
       pm->ps->weaponstate = WEAPON_READY;
     } else {

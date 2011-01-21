@@ -1130,6 +1130,7 @@ typedef struct playerState_s {
     int stamina;
     // combat
     int wounds;
+    int cooldown;
 } playerState_t;
 
 
