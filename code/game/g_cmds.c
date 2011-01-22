@@ -218,7 +218,7 @@ void Cmd_Give_f(gentity_t *ent) {
     }
 
     if (Q_stricmp(name, "bandage") == 0) {
-        ent->client->ps.stats[STAT_BANDAGES] += 1;
+        ent->client->ps.stats[STAT_BANDAGES] = 999;
         return;
     }
 

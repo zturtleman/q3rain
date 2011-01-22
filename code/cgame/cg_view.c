@@ -601,8 +601,8 @@ static void CG_DamageBlendBlob(void) {
     ent.shaderRGBA[0] = 255;
     ent.shaderRGBA[1] = 255;
     ent.shaderRGBA[2] = 255;
-    ent.shaderRGBA[3] = 200 * (1.0 - ((float) t / maxTime));
-    //trap_R_AddRefEntityToScene(&ent);
+    ent.shaderRGBA[3] = CG_FadeColorTime(cg.time, 1000, 1000)[3];
+    trap_R_AddRefEntityToScene(&ent);
     hcolor[0] = 1;
     hcolor[1] = 0;
     hcolor[2] = 1;

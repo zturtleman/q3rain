@@ -347,6 +347,7 @@ void CG_DrawTeamBackground(int x, int y, int w, int h, float alpha, int team) {
 }
 
 #define BLINDTIME 7500
+#define DAMAGETIME 2000
 
 /*
  ================
@@ -355,19 +356,28 @@ void CG_DrawTeamBackground(int x, int y, int w, int h, float alpha, int team) {
  ================
  */
 static void CG_DrawDamagePic(void) {
-  float x, y, w, h;
+  float x, y, w, h, t;
   playerState_t *ps;
   int health, time;
+  float *color;
 
   ps = &cg.snap->ps;
   health = ps->stats[STAT_HEALTH];
-  x = y = 0;
-  w = 640;
-  h = 480;
-  CG_AdjustFrom640(&x, &y, &w, &h);
 
-  if (cg_blood.integer == 1) {
-    if (health > 0) {
+  if (health > 0) {
+    x = y = 0;
+    w = 640;
+    h = 480;
+    CG_AdjustFrom640(&x, &y, &w, &h);
+
+    if (cg_blood.integer == 1) {
+      t = cg.time - cg.damageTime;
+      if (t > 0 && t < DAMAGETIME && cg.damageValue > 0) {
+        color = CG_FadeColorTime(cg.damageTime, DAMAGETIME, DAMAGETIME / 2);
+        trap_R_SetColor(color);
+        trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.viewBloodShader);
+        trap_R_SetColor(NULL);
+      }
       if (health < 60) {
         trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.viewBloodSpurts);
       } else if (health < 80) {
@@ -381,21 +391,20 @@ static void CG_DrawDamagePic(void) {
         }
       }
     }
-  }
 
-  if (ps->zoomFov > 0) {
-    trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.sha_viewScope);
-  }
-
-  if (health > 0 && ps->blindTime > 0) {
-    float *color;
-    color = CG_FadeColorTime(ps->blindTime, BLINDTIME, BLINDTIME - 2500);
-    if (!color) {
-      ps->blindTime = 0;
-      return;
+    if (ps->zoomFov > 0) {
+      trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.sha_viewScope);
     }
-    trap_R_SetColor(NULL);
-    CG_FillRect(0, 0, 640, 480, color);
+
+    if (ps->blindTime > 0) {
+      color = CG_FadeColorTime(ps->blindTime, BLINDTIME, BLINDTIME - 2500);
+      if (!color) {
+        ps->blindTime = 0;
+        return;
+      }
+      trap_R_SetColor(NULL);
+      CG_FillRect(0, 0, 640, 480, color);
+    }
   }
 }
 
@@ -434,16 +443,16 @@ static void CG_DrawStatusBar(void) {
   VectorClear(angles);
 
   // draw any 3D icons first, so the changes back to 2D are minimized
-  if (cent->currentState.weapon
-      && cg_weapons[cent->currentState.weapon].ammoModel) {
-    origin[0] = 70;
-    origin[1] = 0;
-    origin[2] = 0;
-    angles[YAW] = 90 + 20 * sin(cg.time / 1000.0);
-    CG_Draw3DModel(CHAR_WIDTH * 3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, cg_weapons[cent->currentState.weapon].ammoModel, 0, origin, angles);
-  }
+  /*if (cent->currentState.weapon
+   && cg_weapons[cent->currentState.weapon].ammoModel) {
+   origin[0] = 70;
+   origin[1] = 0;
+   origin[2] = 0;
+   angles[YAW] = 90 + 20 * sin(cg.time / 1000.0);
+   CG_Draw3DModel(CHAR_WIDTH * 3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, cg_weapons[cent->currentState.weapon].ammoModel, 0, origin, angles);
+   }
 
-  CG_DrawStatusBarHead(185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE);
+   CG_DrawStatusBarHead(185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE);*/
 
   if (cg.predictedPlayerState.powerups[PW_REDFLAG]) {
     CG_DrawStatusBarFlag(185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + ICON_SIZE, TEAM_RED);
@@ -451,66 +460,6 @@ static void CG_DrawStatusBar(void) {
     CG_DrawStatusBarFlag(185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + ICON_SIZE, TEAM_BLUE);
   } else if (cg.predictedPlayerState.powerups[PW_NEUTRALFLAG]) {
     CG_DrawStatusBarFlag(185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + ICON_SIZE, TEAM_FREE);
-  }
-
-  if (ps->stats[STAT_ARMOR]) {
-    origin[0] = 90;
-    origin[1] = 0;
-    origin[2] = -10;
-    angles[YAW] = (cg.time & 2047) * 360 / 2048.0;
-    CG_Draw3DModel(370 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, cgs.media.armorModel, 0, origin, angles);
-  }
-  //
-  // ammo
-  //
-  if (cent->currentState.weapon) {
-    value = ps->ammo[cent->currentState.weapon];
-    if (value > -1) {
-      switch (cent->currentState.weapon) {
-        case WP_ACR:
-          value = value / 30;
-          break;
-        case WP_BARRETT:
-          value = value / 10;
-          break;
-        case WP_INTERVENTION:
-          value = value / 7;
-          break;
-        case WP_CROSSBOW:
-          value = value / 1;
-          break;
-        case WP_WALTHER:
-          value = value / 10;
-          break;
-          /*case WP_BOMB:
-           return;*/
-      }
-      if (cg.predictedPlayerState.weaponstate == WEAPON_FIRING
-          && cg.predictedPlayerState.weaponTime > 100) {
-        // draw as dark grey when reloading
-        color = 2; // dark grey
-      } else {
-        if (value >= 0) {
-          color = 0; // green
-        } else {
-          color = 1; // red
-        }
-      }
-      trap_R_SetColor(colors[color]);
-
-      CG_DrawField(0, 432, 3, value);
-      trap_R_SetColor(NULL);
-
-      // if we didn't draw a 3D icon, draw a 2D icon for ammo
-      if (!cg_draw3dIcons.integer && cg_drawIcons.integer) {
-        qhandle_t icon;
-
-        icon = cg_weapons[cg.predictedPlayerState.weapon].ammoIcon;
-        if (icon) {
-          CG_DrawPic(CHAR_WIDTH * 3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, icon);
-        }
-      }
-    }
   }
 
   //
@@ -533,27 +482,45 @@ static void CG_DrawStatusBar(void) {
   CG_ColorForHealth(hcolor);
   trap_R_SetColor(hcolor);
 
-  //
-  // ammo in gun RELOADING
-  //
+  // ammo
+  if (cent->currentState.weapon) {
+    value = ps->ammo[cent->currentState.weapon];
+    if (value > -1) {
+      switch (cent->currentState.weapon) {
+        case WP_ACR:
+          value = value / 30;
+          break;
+        case WP_BARRETT:
+          value = value / 10;
+          break;
+        case WP_INTERVENTION:
+          value = value / 7;
+          break;
+        case WP_CROSSBOW:
+          value = value / 1;
+          break;
+        case WP_WALTHER:
+          value = value / 10;
+          break;
+      }
+      if (value >= 0) {
+        color = 0; // green
+      } else {
+        color = 1; // red
+      }
+      trap_R_SetColor(colors[color]);
+
+      CG_DrawField(488, 432, 3, value);
+      trap_R_SetColor(NULL);
+    }
+  }
   value = ps->stats[STAT_AMMO];
   if (value > 0) {
-    //First Draw the 3D Model of the Weapon
-    angles[YAW] = (cg.time & 2047) * 360 / 2048.0;
-    origin[0] = 80;
-    origin[1] = 0;
-    origin[2] = 0;
-    CG_Draw3DModel(CHAR_WIDTH * 3 + TEXT_ICON_SPACE, 360, 96, 96, cg_weapons[cent->currentState.weapon].weaponModel, 0, origin, angles);
-
     //Draw the Text
     trap_R_SetColor(colors[0]);
-    CG_DrawField(0, 384, 3, value);
+    CG_DrawField(488, 384, 3, value);
     trap_R_SetColor(NULL);
-
-    // if we didn't draw a 3D icon, draw a 2D icon for weapon
-    if (!cg_draw3dIcons.integer && cg_drawIcons.integer) {
-      CG_DrawPic(CHAR_WIDTH * 3 + TEXT_ICON_SPACE, 384, ICON_SIZE, ICON_SIZE, cg_weapons[cg.predictedPlayerState.weapon].weaponIcon);
-    }
+    CG_DrawPic(488 + (CHAR_WIDTH * 3 + TEXT_ICON_SPACE), 384, ICON_SIZE, ICON_SIZE, cg_weapons[cg.predictedPlayerState.weapon].weaponIcon);
   }
 
 }
@@ -1782,9 +1749,18 @@ static void CG_ScanForCrosshairEntity(void) {
   trace_t trace;
   vec3_t start, end;
   int content;
+  int range = 512;
+
+  if (cg.snap->ps.zoomFov <= 95) {
+    range *= 2;
+  } else if (cg.snap->ps.zoomFov <= 85) {
+    range *= 3;
+  } else if (cg.snap->ps.zoomFov <= 65) {
+    range *= 5;
+  }
 
   VectorCopy(cg.refdef.vieworg, start);
-  VectorMA(start, 512, cg.refdef.viewaxis[0], end);
+  VectorMA(start, range, cg.refdef.viewaxis[0], end);
 
   CG_Trace(&trace, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, CONTENTS_SOLID
       | CONTENTS_BODY);

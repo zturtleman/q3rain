@@ -659,7 +659,7 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
 
   count++;
 
-  if (count > MAX_INTERVENTION_WALLS) {
+  if (count > MAX_INTERVENTION_WALLS + 1) {
     return;
   } else if (count >= 2) {
     damage = damage / 1.5;
@@ -789,7 +789,7 @@ void Weapon_Barrett_Fire(gentity_t *ent, int count) {
   damage = 100;
   count++;
 
-  if (count > MAX_BARRETT_WALLS) {
+  if (count > MAX_BARRETT_WALLS + 1) {
     return;
   }
 
@@ -992,7 +992,6 @@ void Weapon_Walther_Fire(gentity_t *ent) {
   gentity_t *tent;
   gentity_t *traceEnt;
   int i, passent;
-
 
   if (ent->client != NULL) {
     ent->client->ps.spammed++;

@@ -2157,7 +2157,6 @@ static void PM_Weapon(void) {
         if (pm->ps->spammed > 15) {
           pm->ps->cooldown /= 2;
         }
-        Com_Printf("spammed = %i\n", pm->ps->spammed);
       }
       pm->ps->spammed--;
       if (pm->ps->spammed < 0) {
