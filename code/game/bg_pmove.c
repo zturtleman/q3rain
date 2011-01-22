@@ -2590,6 +2590,8 @@ void PmoveSingle(pmove_t * pmove) {
   pm->ps->stamina += regain;
   if (pm->ps->stamina > 10000) {
     pm->ps->stamina = 10000;
+  } else if (pm->ps->stamina < 0) {
+    pm->ps->stamina = 0;
   }
 
   //Com_Printf("stamina = %i regain = %i\n", pm->ps->stamina, regain);

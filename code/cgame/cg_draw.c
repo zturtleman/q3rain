@@ -419,20 +419,19 @@ static void CG_DrawDamagePic(void) {
  ================
  */
 static void CG_DrawStatusBar(void) {
-  int color;
+  int color, value;
   centity_t *cent;
   playerState_t *ps;
-  int value;
   vec4_t hcolor;
-  vec3_t angles;
   vec3_t origin;
 
-  static float colors[4][4] = {
+  static float colors[5][4] = {
   //		{ 0.2, 1.0, 0.2, 1.0 } , { 1.0, 0.2, 0.2, 1.0 }, {0.5, 0.5, 0.5, 1} };
-  { 1.0f, 0.69f, 0.0f, 1.0f }, // normal
-  { 1.0f, 0.2f, 0.2f, 1.0f }, // low health
-  { 0.5f, 0.5f, 0.5f, 1.0f }, // weapon firing
-  { 1.0f, 1.0f, 1.0f, 1.0f } }; // health > 100
+  { 1.0f, 0.69f, 0.0f, 1.0f }, // yellow
+  { 1.0f, 0.2f, 0.2f, 1.0f }, // red
+  { 0.5f, 0.5f, 0.5f, 1.0f }, // grey
+  { 1.0f, 1.0f, 1.0f, 1.0f }, // red
+  { 0.0f, 0.75f, 0.0f, 1.0f }}; // green
 
   if (cg_drawStatus.integer == 0) {
     return;
@@ -443,20 +442,6 @@ static void CG_DrawStatusBar(void) {
 
   cent = &cg_entities[cg.snap->ps.clientNum];
   ps = &cg.snap->ps;
-
-  VectorClear(angles);
-
-  // draw any 3D icons first, so the changes back to 2D are minimized
-  /*if (cent->currentState.weapon
-   && cg_weapons[cent->currentState.weapon].ammoModel) {
-   origin[0] = 70;
-   origin[1] = 0;
-   origin[2] = 0;
-   angles[YAW] = 90 + 20 * sin(cg.time / 1000.0);
-   CG_Draw3DModel(CHAR_WIDTH * 3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, cg_weapons[cent->currentState.weapon].ammoModel, 0, origin, angles);
-   }
-
-   CG_DrawStatusBarHead(185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE);*/
 
   if (cg.predictedPlayerState.powerups[PW_REDFLAG]) {
     CG_DrawStatusBarFlag(185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + ICON_SIZE, TEAM_RED);
@@ -470,21 +455,27 @@ static void CG_DrawStatusBar(void) {
   // health
   //
   value = ps->stats[STAT_HEALTH];
-  if (value > 100) {
-    trap_R_SetColor(colors[3]); // white
-  } else if (value > 25) {
-    trap_R_SetColor(colors[0]); // green
-  } else if (value > 0) {
-    color = (cg.time >> 8) & 1; // flash
-    trap_R_SetColor(colors[color]);
+  if (value > 75) {
+    trap_R_SetColor(colors[4]); // green
+  } else if (value > 50) {
+    trap_R_SetColor(colors[0]); // yellow
   } else {
     trap_R_SetColor(colors[1]); // red
   }
-
-  // stretch the health up when taking damage
   CG_DrawField(185, 432, 3, value);
-  CG_ColorForHealth(hcolor);
-  trap_R_SetColor(hcolor);
+  trap_R_SetColor(NULL);
+
+  // stamina
+  value = (int) ps->stamina / 100;
+  if (value > 75) {
+    trap_R_SetColor(colors[4]); // green
+  } else if (value > 25) {
+    trap_R_SetColor(colors[0]); // yellow
+  } else {
+    trap_R_SetColor(colors[1]); // red
+  }
+  CG_DrawField(16, 432, 3, value);
+  trap_R_SetColor(NULL);
 
   // ammo
   if (cent->currentState.weapon) {
@@ -508,12 +499,11 @@ static void CG_DrawStatusBar(void) {
           break;
       }
       if (value >= 0) {
-        color = 0; // green
+        color = 4; // green
       } else {
         color = 1; // red
       }
       trap_R_SetColor(colors[color]);
-
       CG_DrawField(488, 432, 3, value);
       trap_R_SetColor(NULL);
     }

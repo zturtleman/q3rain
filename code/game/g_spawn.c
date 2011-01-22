@@ -680,6 +680,9 @@ void SP_worldspawn(void) {
     G_SpawnString("message", "", &s);
     trap_SetConfigstring(CS_MESSAGE, s); // map specific message
 
+    G_SpawnString("location", "", &s);
+    trap_SetConfigstring(CS_LOCATION, s); // map location
+
     trap_SetConfigstring(CS_MOTD, g_motd.string); // message of the day
 
     G_SpawnString("gravity", "800", &s);
