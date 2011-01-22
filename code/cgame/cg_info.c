@@ -150,6 +150,7 @@ void CG_DrawInformation(void) {
   const char *s;
   const char *info;
   const char *sysInfo;
+  const char *gt;
   int y;
   int value;
   qhandle_t levelshot;
@@ -174,10 +175,10 @@ void CG_DrawInformation(void) {
   // the first 150 rows are reserved for the client connection
   // screen to write into
   if (cg.infoScreenText[0]) {
-    CG_DrawStringExt(224, 64, va("Loading %s...", cg.infoScreenText), colorWhite, qfalse, qfalse, size, size
+    CG_DrawStringExt(32, 96, va("Loading %s...", cg.infoScreenText), colorWhite, qfalse, qfalse, size, size
         * 2, 512);
   } else {
-    CG_DrawStringExt(224, 64, "Awaiting snapshot...", colorWhite, qtrue, qfalse, size, size
+    CG_DrawStringExt(32, 96, "Awaiting snapshot...", colorWhite, qtrue, qfalse, size, size
         * 2, 64);
   }
 
@@ -186,37 +187,31 @@ void CG_DrawInformation(void) {
   // don't print server lines if playing a local game
   trap_Cvar_VariableStringBuffer("sv_running", buf, sizeof(buf));
   if (!atoi(buf)) {
-    // server hostname
-    Q_strncpyz(buf, Info_ValueForKey(info, "sv_hostname"), 1024);
-    Q_CleanStr(buf);
-    CG_DrawStringExt(32, 32, buf, colorWhite, qfalse, qfalse, size, size * 2, 64);
-
     // game type
     switch (cgs.gametype) {
       case GT_FFA:
-        s = "Free For All";
+        gt = "FFA";
         break;
       case GT_SINGLE_PLAYER:
-        s = "Single Player";
+        gt = "SP";
         break;
       case GT_ASSASSINS:
-        s = "Assassins";
+        gt = "ASS"; // :D
         break;
       case GT_TEAMDEATHMATCH:
-        s = "Team Deathmatch";
+        gt = "TDM";
         break;
       case GT_TEAMSURVIVOR:
-        s = "Team Survivor";
+        gt = "TS";
         break;
       case GT_FREEZETAG:
-        s = "Freeze Tag";
+        gt = "FT";
         break;
       default:
-        s = "Unknown Gametype";
+        gt = "Unknown,";
         break;
     }
-    CG_DrawStringExt(32, 64, s, colorWhite, qfalse, qfalse, size, size * 2, 64);
-
+    pure = cheats = qfalse;
     // pure/cheat server
     s = Info_ValueForKey(sysInfo, "sv_pure");
     if (s[0] == '1') {
@@ -227,20 +222,25 @@ void CG_DrawInformation(void) {
       cheats = qtrue;
     }
     if (pure && cheats) {
-      s = "Pure & Cheats on";
+      s = "Pure + Cheats";
     } else if (pure && !cheats) {
-      s = "Pure Server";
+      s = "Pure";
     } else if (!pure && cheats) {
-      s = "Unpure & Cheats on";
+      s = "Unpure + Cheats";
     } else if (!pure && !cheats) {
-      s = "Unpure Server";
+      s = "Unpure";
     }
-    CG_DrawStringExt(32, 64, s, colorWhite, qfalse, qfalse, size, size * 2, 64);
+    // server hostname
+    Q_strncpyz(buf, Info_ValueForKey(info, "sv_hostname"), 1024);
+    Q_CleanStr(buf);
+    CG_DrawStringExt(32, 32, va("%s (%s, %s)", buf, gt, s), colorWhite, qfalse, qfalse, size, size
+        * 2, 64);
 
     // server-specific message of the day
     s = CG_ConfigString(CS_MOTD);
     if (s[0]) {
-      CG_DrawStringExt(32, 128, s, colorWhite, qfalse, qfalse, size, size * 2, 1024);
+      CG_DrawStringExt(32, 64, s, colorWhite, qfalse, qfalse, size, size
+          * 2, 1024);
     }
   }
 
