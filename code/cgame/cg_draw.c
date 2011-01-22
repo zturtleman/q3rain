@@ -361,6 +361,10 @@ static void CG_DrawDamagePic(void) {
   int health, time;
   float *color;
 
+  if (cg.renderingThirdPerson) {
+    return;
+  }
+
   ps = &cg.snap->ps;
   health = ps->stats[STAT_HEALTH];
 
