@@ -155,6 +155,10 @@ ifndef DEBUG_CFLAGS
 DEBUG_CFLAGS=-g -O0
 endif
 
+ifndef USE_RUBY
+USE_RUBY=1
+endif
+
 #############################################################################
 
 BD=$(BUILD_DIR)/debug-$(PLATFORM)-$(ARCH)
@@ -274,6 +278,11 @@ ifeq ($(PLATFORM),linux)
     ifeq ($(USE_CURL_DLOPEN),1)
       CLIENT_CFLAGS += -DUSE_CURL_DLOPEN
     endif
+  endif
+
+  ifeq ($(USE_RUBY),1)
+    CLIENT_CFLAGS += -DUSE_RUBY
+    SERVER_CFLAGS += -DUSE_RUBY
   endif
 
   ifeq ($(USE_CODEC_VORBIS),1)
@@ -910,6 +919,15 @@ endif
 
 ifeq ($(BUILD_STANDALONE),1)
   BASE_CFLAGS += -DSTANDALONE
+endif
+
+ifeq ($(USE_RUBY),1)
+  BASE_CFLAGS += -DUSE_RUBY
+  CLIENT_CFLAGS += -I/usr/lib/ruby/1.8/i486-linux -I/usr/lib/
+  CLIENT_CFLAGS += -L/usr/lib/ruby/1.8/i486-linux -L/usr/lib/
+  SERVER_CFLAGS += -I/usr/lib/ruby/1.8/i486-linux -I/usr/lib/
+  SERVER_CFLAGS += -L/usr/lib/ruby/1.8/i486-linux -L/usr/lib/
+  LIBS += /usr/lib/libruby1.8.so.1.8.7 -ldl -lcrypt
 endif
 
 ifeq ($(GENERATE_DEPENDENCIES),1)

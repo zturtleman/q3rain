@@ -44,6 +44,10 @@ cvar_t *cl_voipShowMeter;
 cvar_t *cl_voip;
 #endif
 
+#ifdef USE_RUBY
+#include "ruby.h"
+#endif
+
 cvar_t *cl_nodelta;
 cvar_t *cl_debugMove;
 
@@ -3086,6 +3090,35 @@ static void CL_GenerateQKey(void) {
 CL_Init
 ====================
  */
+#ifdef USE_RUBY
+static int CL_RubyExec(void) {
+  int status;
+  status = ruby_exec();
+  return status;
+}
+
+static VALUE CL_RubyPuts(VALUE self, VALUE str) {
+  if (TYPE(str) == T_STRING) {
+    Com_Printf("%s\n", StringValuePtr(str));
+  }
+  return Qnil;
+}
+
+static VALUE CL_RubyClientConsole(VALUE self, VALUE str) {
+  if (TYPE(str) == T_STRING) {
+    Cmd_ExecuteString(StringValuePtr(str));
+  }
+  return Qnil;
+}
+
+static void CL_RegisterRubyData(void) {
+  rb_define_global_const("CLIENT", Qtrue);
+  rb_define_global_const("SERVER", Qfalse);
+  rb_define_global_function("puts", CL_RubyPuts, 1);
+  rb_define_global_function("console", CL_RubyClientConsole, 1);
+}
+#endif
+
 void CL_Init(void) {
     Com_Printf("----- Client Initialization -----\n");
 
@@ -3280,6 +3313,17 @@ void CL_Init(void) {
     CL_InitRef();
 
     SCR_Init();
+
+#ifdef USE_RUBY
+    Com_Printf("Initializing Ruby Interpreter...\n");
+    ruby_init();
+    ruby_init_loadpath();
+    rb_set_safe_level(0);
+    ruby_script("rain");
+    CL_RegisterRubyData();
+    rb_load_file("autoexec.rb");
+    CL_RubyExec();
+#endif
 
     //	Cbuf_Execute ();
 

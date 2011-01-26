@@ -153,7 +153,7 @@ void CG_DrawInformation(void) {
   const char *gt;
   int y;
   int value;
-  qhandle_t levelshot;
+  qhandle_t levelshot, overlay;
   char buf[1024];
   qboolean pure, cheats;
   int size = 10;
@@ -163,6 +163,7 @@ void CG_DrawInformation(void) {
 
   s = Info_ValueForKey(info, "mapname");
   levelshot = trap_R_RegisterShaderNoMip(va("levelshots/%s", s));
+  overlay = trap_R_RegisterShaderNoMip("levelshots/overlay.png");
   if (!levelshot) {
     levelshot = trap_R_RegisterShaderNoMip("menu/art/unknownmap");
   }
@@ -170,7 +171,7 @@ void CG_DrawInformation(void) {
   CG_DrawPic(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, levelshot);
 
   // draw the icons of things as they are loaded
-  CG_DrawLoadingIcons();
+  //CG_DrawLoadingIcons();
 
   // the first 150 rows are reserved for the client connection
   // screen to write into

@@ -22,6 +22,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "server.h"
 
+#ifdef USE_RUBY
+#include "ruby.h"
+#endif
 /*
 ===============================================================================
 
@@ -1250,6 +1253,25 @@ static void SV_CompleteMapName(char *args, int argNum) {
     }
 }
 
+#ifdef USE_RUBY
+/*
+=================
+SV_Ruby
+=================
+ */
+void SV_Ruby_f(void) {
+  int state;
+  if (Cmd_Argc() != 2) {
+    Com_Printf("usage: ruby \"code_to_execute\"\nPlease note the \"\", also use single-quotes for ruby strings\n");
+    return;
+  }
+  rb_eval_string_protect(Cmd_Argv(1), &state);
+  if (state != 0) {
+      Com_Printf("^1ruby: error: %i\nYour syntax may be invalid, or you are referencing a non-existing class/variable.\n", state);
+  }
+}
+#endif
+
 /*
 ==================
 SV_AddOperatorCommands
@@ -1302,6 +1324,9 @@ void SV_AddOperatorCommands(void) {
     Cmd_AddCommand("flushbans", SV_FlushBans_f);
 
     Cmd_AddCommand("forcecvar", SV_ForceCvar_f);
+#ifdef USE_RUBY
+    Cmd_AddCommand("ruby", SV_Ruby_f);
+#endif
 }
 
 /*

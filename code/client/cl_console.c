@@ -23,6 +23,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "client.h"
 
+#ifdef USE_RUBY
+#include "ruby.h"
+#endif
+
 
 int g_console_field_width = 78;
 
@@ -389,6 +393,20 @@ void Con_FetchNews_f(void) {
     Con_SendToMaster("fetchnews");
 }
 
+#ifdef USE_RUBY
+void Con_Ruby_f(void) {
+  int state;
+  if (Cmd_Argc() != 2) {
+    Com_Printf("usage: ruby \"code_to_execute\"\nPlease note the \"\", also use single-quotes for ruby strings\n");
+    return;
+  }
+  rb_eval_string_protect(Cmd_Argv(1), &state);
+  if (state != 0) {
+      Com_Printf("^1ruby: error: %i\nYour syntax may be invalid, or you are referencing a non-existing class/variable.\n", state);
+  }
+}
+#endif
+
 /*
 ================
 Con_Init
@@ -396,6 +414,8 @@ Con_Init
  */
 void Con_Init(void) {
     int i;
+
+    Com_Printf("Initializing console...\n");
 
     con_notifytime = Cvar_Get("con_notifytime", "3", 0);
     con_conspeed = Cvar_Get("scr_conspeed", "3", 0);
@@ -424,8 +444,11 @@ void Con_Init(void) {
     Cmd_AddCommand("fetchmotd", Con_FetchMotd_f);
     Cmd_AddCommand("fetchnews", Con_FetchNews_f);
 
+#ifdef USE_RUBY
+    Cmd_AddCommand("ruby", Con_Ruby_f);
+#endif
+
     Cmd_SetCommandCompletionFunc("condump", Cmd_CompleteTxtName);
-    Com_Printf(S_COLOR_GREEN "Initialized console.\n");
 }
 
 /*

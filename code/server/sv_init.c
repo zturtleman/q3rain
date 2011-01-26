@@ -22,6 +22,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "server.h"
 
+#ifdef USE_RUBY
+#include "ruby.h"
+#endif
 
 /*
 ===============
@@ -619,6 +622,40 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 
 /*
 ===============
+SV_Ruby
+===============
+*/
+#ifdef USE_RUBY
+static int SV_RubyExec(void) {
+  int status;
+  status = ruby_exec();
+  return status;
+}
+
+static VALUE SV_RubyPuts(VALUE self, VALUE str) {
+  if (TYPE(str) == T_STRING) {
+    Com_Printf("%s\n", StringValuePtr(str));
+  }
+  return Qnil;
+}
+
+static VALUE SV_RubyServerConsole(VALUE self, VALUE str) {
+  if (TYPE(str) == T_STRING) {
+    Cmd_ExecuteString(StringValuePtr(str));
+  }
+  return Qnil;
+}
+
+static void SV_RegisterRubyData(void) {
+  rb_define_global_const("CLIENT", Qfalse);
+  rb_define_global_const("SERVER", Qtrue);
+  rb_define_global_function("puts", SV_RubyPuts, 1);
+  rb_define_global_function("console", SV_RubyServerConsole, 1);
+}
+#endif
+
+/*
+===============
 SV_Init
 
 Only called at main exe startup, not for each game
@@ -690,6 +727,17 @@ void SV_Init (void) {
 	
 	// Load saved bans
 	Cbuf_AddText("rehashbans\n");
+
+#ifdef USE_RUBY
+    Com_Printf("Initializing Ruby Interpreter...\n");
+    ruby_init();
+    ruby_init_loadpath();
+    rb_set_safe_level(0);
+    ruby_script("cloud");
+    SV_RegisterRubyData();
+    rb_load_file("autoexec.rb");
+    SV_RubyExec();
+#endif
 }
 
 
