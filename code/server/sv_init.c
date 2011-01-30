@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef USE_RUBY
 #include "ruby.h"
+cvar_t *sv_ruby;
 #endif
 
 /*
@@ -620,12 +621,12 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	Com_Printf ("-----------------------------------\n");
 }
 
+#ifdef USE_RUBY
 /*
 ===============
 SV_Ruby
 ===============
 */
-#ifdef USE_RUBY
 static int SV_RubyExec(void) {
   int status;
   status = ruby_exec();
@@ -718,6 +719,10 @@ void SV_Init (void) {
 	sv_lanForceRate = Cvar_Get ("sv_lanForceRate", "1", CVAR_ARCHIVE );
 	sv_strictAuth = Cvar_Get ("sv_strictAuth", "1", CVAR_ARCHIVE );
 	sv_banFile = Cvar_Get("sv_banFile", "serverbans.dat", CVAR_ARCHIVE);
+  
+  #ifdef USE_RUBY
+  sv_ruby = Cvar_Get("sv_ruby", "0", CVAR_ARCHIVE | CVAR_LATCH);
+  #endif
 
 	// initialize bot cvars so they are listed and can be set before loading the botlib
 	SV_BotInitCvars();
@@ -729,6 +734,7 @@ void SV_Init (void) {
 	Cbuf_AddText("rehashbans\n");
 
 #ifdef USE_RUBY
+  if (sv_ruby->integer) {
     Com_Printf("Initializing Ruby Interpreter...\n");
     ruby_init();
     ruby_init_loadpath();
@@ -737,6 +743,7 @@ void SV_Init (void) {
     SV_RegisterRubyData();
     rb_load_file("autoexec.rb");
     SV_RubyExec();
+  }
 #endif
 }
 

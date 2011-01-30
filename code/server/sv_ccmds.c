@@ -1349,5 +1349,8 @@ void SV_RemoveOperatorCommands(void) {
     Cmd_RemoveCommand("sectorlist");
     Cmd_RemoveCommand("say");
 #endif
+#ifdef USE_RUBY
+  Cmd_RemoveCommand("ruby");
+#endif
 }
 

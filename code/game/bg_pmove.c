@@ -334,12 +334,16 @@ static void PM_LadderMove(void) {
   vec3_t wishdir;
   float scale;
   float vel;
+  
+  if (pm->ps->pm_flags & PMF_DUCKED) {
+    pml.ladder = qfalse;
+    return;
+  }
 
   PM_Friction();
-
+  
   scale = PM_CmdScale(&pm->cmd);
-
-  // user intentions [what the user is attempting to do]
+  // user intentions
   if (!scale) {
     wishvel[0] = 0;
     wishvel[1] = 0;
@@ -349,16 +353,14 @@ static void PM_LadderMove(void) {
       //wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
       wishvel[i] = pml.right[i] * pm->cmd.rightmove;
     }
-    if (pm->cmd.upmove) {
-      wishvel[2] = scale * pm->cmd.upmove;
-    } else if (pm->cmd.forwardmove) {
+    if (pm->cmd.forwardmove) {
       wishvel[2] = scale * pm->cmd.forwardmove;
     }
   }
 
   VectorCopy(wishvel, wishdir);
   wishspeed = VectorNormalize(wishdir);
-
+  
   if (wishspeed > pm->ps->speed * pm_ladderScale) {
     wishspeed = pm->ps->speed * pm_ladderScale;
   }
@@ -375,7 +377,6 @@ static void PM_LadderMove(void) {
     VectorNormalize(pm->ps->velocity);
     VectorScale(pm->ps->velocity, vel, pm->ps->velocity);
   }
-
   PM_SlideMove(qfalse); // move without gravity
 }
 
@@ -2556,6 +2557,11 @@ void PmoveSingle(pmove_t * pmove) {
     PM_WaterMove();
   } else if (pml.ladder) {
     PM_LadderMove();
+    if (!pml.ladder) {
+      pmove->cmd.forwardmove = 0;
+      pmove->cmd.rightmove = 0;
+      PM_AirMove(pmove);
+    }
   } else if (pml.walking) {
     PM_WalkMove(pmove);
   } else {

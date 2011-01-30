@@ -422,11 +422,13 @@ static int GLimp_SetMode(int mode, qboolean fullscreen) {
     displayAspect = (float) desktop_w / (float) desktop_h;
 
     ri.Printf(PRINT_DEVELOPER, "Estimated display aspect: %.3f\n", displayAspect);
-    ri.Printf(PRINT_ALL, "...setting mode %d:", mode);
+    ri.Printf(PRINT_ALL, "...setting mode %d", mode);
 
     if (!R_GetModeInfo(&glConfig.vidWidth, &glConfig.vidHeight, &glConfig.windowAspect, mode)) {
-        ri.Printf(PRINT_ALL, " invalid mode\n");
+        ri.Printf(PRINT_ALL, " - invalid mode\n");
         return RSERR_INVALID_MODE;
+    } else {
+      ri.Printf(PRINT_ALL, "\n");
     }
     ri.Printf(PRINT_DEVELOPER, " %d %d\n", glConfig.vidWidth, glConfig.vidHeight);
 

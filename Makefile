@@ -190,6 +190,8 @@ SDLHDIR=$(MOUNT_DIR)/SDL12
 LIBSDIR=$(MOUNT_DIR)/libs
 TEMPDIR=/tmp
 
+RUBYDIR=$(MOUNT_DIR)/ruby-1.9.2
+
 bin_path=$(shell which $(1) 2> /dev/null)
 
 # We won't need this if we only build the server
@@ -923,10 +925,10 @@ endif
 
 ifeq ($(USE_RUBY),1)
   BASE_CFLAGS += -DUSE_RUBY
-  CLIENT_CFLAGS += -I/usr/lib/ruby/1.8/i486-linux -I/usr/lib/
-  CLIENT_CFLAGS += -L/usr/lib/ruby/1.8/i486-linux -L/usr/lib/
-  SERVER_CFLAGS += -I/usr/lib/ruby/1.8/i486-linux -I/usr/lib/
-  SERVER_CFLAGS += -L/usr/lib/ruby/1.8/i486-linux -L/usr/lib/
+  CLIENT_CFLAGS += -I/usr/lib/ruby/1.8/i486-linux
+  CLIENT_CFLAGS += -L/usr/lib/ruby/1.8/i486-linux
+  SERVER_CFLAGS += -I/usr/lib/ruby/1.8/i486-linux
+  SERVER_CFLAGS += -L/usr/lib/ruby/1.8/i486-linux
   LIBS += /usr/lib/libruby1.8.so.1.8.7 -ldl -lcrypt
 endif
 
