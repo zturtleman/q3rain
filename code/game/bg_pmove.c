@@ -2410,6 +2410,7 @@ void PmoveSingle(pmove_t * pmove) {
   if (pm->cmd.buttons & BUTTON_SPRINT && pm->ps->stats[STAT_HEALTH] > 60
       && !(pm->cmd.buttons & BUTTON_WALKING) && pm->ps->stamina > 0
       && (abs(pm->cmd.forwardmove) != 0 || abs(pm->cmd.rightmove) != 0)
+      && pml.groundPlane
       && !(pm->ps->pm_flags & PMF_DUCKED)) {
     pm->ps->sprintAdd += pml.msec / 5;
     if (pm->ps->sprintAdd > 270) {

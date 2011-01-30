@@ -1841,6 +1841,30 @@ void Cmd_Misc_f(gentity_t *ent) {
 
 /*
 =================
+Cmd_Flip_f
+=================
+ */
+void Cmd_Flip_f(gentity_t *ent) {
+    usercmd_t *cmd;
+    int i, temp;
+    playerState_t *ps = &ent->client->ps;
+    if (ps->stats[STAT_HEALTH] > 0
+            && ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
+                cmd = &ent->client->pers.cmd;
+                  for (i = 0; i < 3; i++) {
+                    temp = cmd->angles[i] + ps->delta_angles[i];
+                    if (i == 1) {
+                        // TODO inaccurate as fuck
+                        ps->delta_angles[i] = ps->delta_angles[i] - (DEG2RAD(180)*10000);
+                        temp = -(DEG2RAD(180)*10000);
+                    }
+                    ps->viewangles[i] = SHORT2ANGLE(temp);
+                  }
+    }
+}
+
+/*
+=================
 ClientCommand
 =================
  */
@@ -1958,6 +1982,8 @@ void ClientCommand(int clientNum) {
         Cmd_Bandage_f(ent);
     else if (!Q_stricmp(cmd, "cutscene") && g_cheats.integer)
         level.cutscene = !level.cutscene;
+    else if (Q_stricmp(cmd, "flip") == 0)
+        Cmd_Flip_f(ent);
     else if (!Q_stricmp(cmd, "weaponlist"))
         trap_SendServerCommand(clientNum, va("print \""
             "^2= Primary\n^7"
