@@ -349,26 +349,38 @@ void CG_Nuke(vec3_t origin, int stage) {
     localEntity_t *le, *nuke;
     refEntity_t *re;
     int offset, msec;
+    vec3_t test;
 
     if (stage == 1) {
-      nuke = CG_AllocLocalEntity();
-      re = &nuke->refEntity;
+        int i;
+        nuke = CG_AllocLocalEntity();
+        re = &nuke->refEntity;
+        test[0] = nuke->angles.trBase[0];
+        test[1] = nuke->angles.trBase[1];
+        test[2] = nuke->angles.trBase[2];
+        AnglesToAxis(test, re->axis);
+        VectorScale(re->axis[0], 50, re->axis[0]);
+        VectorScale(re->axis[1], 50, re->axis[1]);
+        VectorScale(re->axis[2], 50, re->axis[2]);
+        for (i = 0; i < 3; i++) {
+            Com_Printf("re->axis[%i] = %f %f %f\n", i, re->axis[i][0], re->axis[i][1], re->axis[i][2]);
+        }
+        re->nonNormalizedAxes = qtrue;
 
-      nuke->leType = LE_FRAGMENT;
-      nuke->startTime = cg.time;
-      nuke->endTime = nuke->startTime + 60000;
+        nuke->leType = LE_FRAGMENT;
+        nuke->startTime = cg.time;
+        nuke->endTime = nuke->startTime + 60000;
 
-      VectorCopy(origin, re->origin);
-      AxisCopy(axisDefault, re->axis);
-      re->hModel = cgs.media.mod_nuke;
+        VectorCopy(origin, re->origin);
+        re->hModel = cgs.media.mod_nuke;
 
-      nuke->pos.trType = TR_GRAVITY;
-      VectorCopy(origin, nuke->pos.trBase);
-      VectorCopy(origin, nuke->pos.trDelta);
-      nuke->pos.trTime = cg.time;
+        nuke->pos.trType = TR_GRAVITY;
+        VectorCopy(origin, nuke->pos.trBase);
+        VectorCopy(origin, nuke->pos.trDelta);
+        nuke->pos.trTime = cg.time;
 
-      nuke->leBounceSoundType = LEBS_NONE;
-      nuke->leMarkType = LEMT_NONE;
+        nuke->leBounceSoundType = LEBS_NONE;
+        nuke->leMarkType = LEMT_NONE;
     }
 
     number = 128;

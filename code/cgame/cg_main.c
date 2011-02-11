@@ -700,7 +700,7 @@ static void CG_RegisterGraphics(void) {
   cgs.media.armorIcon = trap_R_RegisterShaderNoMip("icons/iconr_yellow");
 
   cgs.media.machinegunBrassModel
-      = trap_R_RegisterModel("models/weapons2/shells/m_shell.md3");
+      = trap_R_RegisterModel("models/ammo/shell_1.md3");
   cgs.media.shotgunBrassModel
       = trap_R_RegisterModel("models/weapons2/shells/s_shell.md3");
 
@@ -770,8 +770,13 @@ static void CG_RegisterGraphics(void) {
   cgs.media.shadowMarkShader = trap_R_RegisterShader("markShadow");
   cgs.media.wakeMarkShader = trap_R_RegisterShader("wake");
   cgs.media.bloodMarkShader = trap_R_RegisterShader("bloodMark");
+  
+  // bullet shells
+    cgs.media.mod_sniperShell = trap_R_RegisterModel("models/ammo/shell_sniper.md3");
+    cgs.media.mod_autoShell = trap_R_RegisterModel("models/ammo/shell_auto.md3");
+    cgs.media.mod_pistolShell = trap_R_RegisterModel("models/ammo/shell_pistol.md3");
 
-  // explosion SPARKs
+  // explosion sparks
   cgs.media.sha_spark = trap_R_RegisterShader("spark");
 
   // zoom

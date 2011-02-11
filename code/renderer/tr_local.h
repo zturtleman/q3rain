@@ -1417,6 +1417,8 @@ extern cvar_t *r_fog_r;
 extern cvar_t *r_fog_g;
 extern cvar_t *r_fog_b;
 
+extern cvar_t *r_farclipFactor;
+
 extern cvar_t *r_ext_framebuffer_object;
 
 //====================================================================

@@ -183,6 +183,8 @@ cvar_t *r_debugSort;
 cvar_t *r_printShaders;
 cvar_t *r_saveFontData;
 
+cvar_t *r_farclipFactor;
+
 cvar_t *r_maxpolys;
 int max_polys;
 cvar_t *r_maxpolyverts;
@@ -1004,7 +1006,7 @@ void R_Register(void) {
     // 2 for full
     r_ext_vertex_buffer_object = ri.Cvar_Get("r_ext_vertex_buffer_object", "0", CVAR_ARCHIVE | CVAR_LATCH);
 
-    // FIXME segfaults
+    // FIXME segfaults at aliases
 
     ri.Cvar_CheckRange(r_ext_vertex_buffer_object, 0, 2, qtrue);
     //ri.Cvar_Alias(r_ext_vertex_buffer_object, "r_vbo");
@@ -1094,6 +1096,8 @@ void R_Register(void) {
 
     r_minEntityLight = ri.Cvar_Get("r_minEntityLight", "1.5", CVAR_ARCHIVE);
     ri.Cvar_CheckRange(r_minEntityLight, 0.0f, 2.0f, qfalse);
+    
+    r_farclipFactor = ri.Cvar_Get("r_farclipFactor", "2", CVAR_ARCHIVE);
 
     // both 1
     r_bloom = ri.Cvar_Get("r_glslbloom", "0", CVAR_ARCHIVE);

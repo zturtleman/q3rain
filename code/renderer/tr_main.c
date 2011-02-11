@@ -531,7 +531,7 @@ static void R_SetFarClip(void) {
             farthestCornerDistance = distance;
         }
     }
-    tr.viewParms.zFar = sqrt(farthestCornerDistance);
+    tr.viewParms.zFar = sqrt(farthestCornerDistance * r_farclipFactor->integer);
 }
 
 /*

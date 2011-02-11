@@ -1352,6 +1352,10 @@ void CG_AddViewWeapon(playerState_t *ps) {
         x = 8;
         y = -2;
         z = 2;
+    } else if (ps->weapon == WP_ACR) {
+        x = 16;
+        y = -3;
+        z = 3;
     }
     VectorMA(hand.origin, x, cg.refdef.viewaxis[0], hand.origin);
     VectorMA(hand.origin, y, cg.refdef.viewaxis[1], hand.origin);

@@ -900,7 +900,11 @@ typedef struct {
     sfxHandle_t wstbimpdSound;
     sfxHandle_t wstbactvSound;
 
-    qhandle_t sha_spark; // SPARK
+    qhandle_t sha_spark;
+    
+    qhandle_t mod_sniperShell;
+    qhandle_t mod_autoShell;
+    qhandle_t mod_pistolShell;
 
     qhandle_t mod_pda;
     qhandle_t sha_pda;
