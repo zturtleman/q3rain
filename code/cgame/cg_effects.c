@@ -362,10 +362,9 @@ void CG_Nuke(vec3_t origin, int stage) {
         VectorScale(re->axis[0], 50, re->axis[0]);
         VectorScale(re->axis[1], 50, re->axis[1]);
         VectorScale(re->axis[2], 50, re->axis[2]);
-        for (i = 0; i < 3; i++) {
-            Com_Printf("re->axis[%i] = %f %f %f\n", i, re->axis[i][0], re->axis[i][1], re->axis[i][2]);
-        }
         re->nonNormalizedAxes = qtrue;
+        
+        re->renderfx = RF_MINLIGHT;
 
         nuke->leType = LE_FRAGMENT;
         nuke->startTime = cg.time;

@@ -76,7 +76,7 @@ static void CG_DrawField(int x, int y, int width, int value) {
       break;
   }
 
-  Com_sprintf(num, sizeof(num), "%i", value);
+  Com_sprintf(num, sizeof (num), "%i", value);
   l = strlen(num);
   if (l > width)
     l = width;
@@ -113,9 +113,9 @@ void CG_Draw3DModel(float x, float y, float w, float h, qhandle_t model,
 
   CG_AdjustFrom640(&x, &y, &w, &h);
 
-  memset(&refdef, 0, sizeof(refdef));
+  memset(&refdef, 0, sizeof (refdef));
 
-  memset(&ent, 0, sizeof(ent));
+  memset(&ent, 0, sizeof (ent));
   AnglesToAxis(angles, ent.axis);
   VectorCopy(origin, ent.origin);
   ent.hModel = model;
@@ -426,12 +426,13 @@ static void CG_DrawStatusBar(void) {
   vec3_t origin;
 
   static float colors[5][4] = {
-  //		{ 0.2, 1.0, 0.2, 1.0 } , { 1.0, 0.2, 0.2, 1.0 }, {0.5, 0.5, 0.5, 1} };
-  { 1.0f, 0.69f, 0.0f, 1.0f }, // yellow
-  { 1.0f, 0.2f, 0.2f, 1.0f }, // red
-  { 0.5f, 0.5f, 0.5f, 1.0f }, // grey
-  { 1.0f, 1.0f, 1.0f, 1.0f }, // red
-  { 0.0f, 0.75f, 0.0f, 1.0f }}; // green
+    //		{ 0.2, 1.0, 0.2, 1.0 } , { 1.0, 0.2, 0.2, 1.0 }, {0.5, 0.5, 0.5, 1} };
+    { 1.0f, 0.69f, 0.0f, 1.0f}, // yellow
+    { 1.0f, 0.2f, 0.2f, 1.0f}, // red
+    { 0.5f, 0.5f, 0.5f, 1.0f}, // grey
+    { 1.0f, 1.0f, 1.0f, 1.0f}, // red
+    { 0.0f, 0.75f, 0.0f, 1.0f}
+  }; // green
 
   if (cg_drawStatus.integer == 0) {
     return;
@@ -785,7 +786,7 @@ static float CG_DrawTeamOverlay(float y, qboolean right, qboolean upper) {
 
       CG_GetColorForHealth(ci->health, ci->armor, hcolor);
 
-      Com_sprintf(st, sizeof(st), "%3i %3i", ci->health, ci->armor);
+      Com_sprintf(st, sizeof (st), "%3i %3i", ci->health, ci->armor);
 
       xx = x + SMALLERCHAR_WIDTH * 3 + SMALLERCHAR_WIDTH * pwidth
           + SMALLERCHAR_WIDTH * lwidth;
@@ -971,7 +972,10 @@ static float CG_DrawPowerups(float y) {
   float size;
   float f;
   static float
-      colors[2][4] = { { 0.2f, 1.0f, 0.2f, 1.0f }, { 1.0f, 0.2f, 0.2f, 1.0f } };
+  colors[2][4] = {
+    { 0.2f, 1.0f, 0.2f, 1.0f},
+    { 1.0f, 0.2f, 0.2f, 1.0f}
+  };
 
   ps = &cg.snap->ps;
 
@@ -1175,8 +1179,8 @@ static void CG_DrawTeamInfo(void) {
 
     for (i = cgs.teamChatPos - 1; i >= cgs.teamLastChatPos; i--) {
       CG_DrawStringExt(CHATLOC_X + SMALLERCHAR_WIDTH, CHATLOC_Y
-          - (cgs.teamChatPos - i) * SMALLERCHAR_HEIGHT, cgs.teamChatMsgs[i
-          % chatHeight], hcolor, qfalse, qfalse, SMALLERCHAR_WIDTH, SMALLERCHAR_HEIGHT, 0);
+                       - (cgs.teamChatPos - i) * SMALLERCHAR_HEIGHT, cgs.teamChatMsgs[i
+                       % chatHeight], hcolor, qfalse, qfalse, SMALLERCHAR_WIDTH, SMALLERCHAR_HEIGHT, 0);
     }
   }
 }
@@ -1250,7 +1254,7 @@ static void CG_DrawReward(void) {
     y = 56;
     x = 320 - ICON_SIZE / 2;
     CG_DrawPic(x, y, ICON_SIZE - 4, ICON_SIZE - 4, cg.rewardShader[0]);
-    Com_sprintf(buf, sizeof(buf), "%d", cg.rewardCount[0]);
+    Com_sprintf(buf, sizeof (buf), "%d", cg.rewardCount[0]);
     x = (SCREEN_WIDTH - SMALLCHAR_WIDTH * CG_DrawStrlen(buf)) / 2;
     CG_DrawStringExt(x, y + ICON_SIZE, buf, color, qfalse, qtrue, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0);
   } else {
@@ -1278,11 +1282,11 @@ static void CG_DrawReward(void) {
 #define	LAG_SAMPLES		128
 
 typedef struct {
-int frameSamples[LAG_SAMPLES];
-int frameCount;
-int snapshotFlags[LAG_SAMPLES];
-int snapshotSamples[LAG_SAMPLES];
-int snapshotCount;
+  int frameSamples[LAG_SAMPLES];
+  int frameCount;
+  int snapshotFlags[LAG_SAMPLES];
+  int snapshotSamples[LAG_SAMPLES];
+  int snapshotCount;
 } lagometer_t;
 
 lagometer_t lagometer;
@@ -1385,20 +1389,18 @@ static void CG_DrawLagometer(void) {
     return;
   }
 
-  //
-  // draw the graph
-  //
-  x = 640 - 48;
-  y = 480 - 48;
+  x = cg_lagometerX.integer;
+  y = cg_lagometerY.integer;
+  aw = 64;
+  ah = 64;
 
   trap_R_SetColor(NULL);
-  CG_DrawPic(x, y, 48, 48, cgs.media.lagometerShader);
+  CG_DrawPic(x, y, ah, aw, cgs.media.lagometerShader);
 
   ax = x;
   ay = y;
-  aw = 48;
-  ah = 48;
   CG_AdjustFrom640(&ax, &ay, &aw, &ah);
+
 
   color = -1;
   range = ah / 3;
@@ -1494,7 +1496,7 @@ static void CG_DrawLagometer(void) {
 void CG_CenterPrint(const char *str, int y, int charWidth) {
   char *s;
 
-  Q_strncpyz(cg.centerPrint, str, sizeof(cg.centerPrint));
+  Q_strncpyz(cg.centerPrint, str, sizeof (cg.centerPrint));
 
   cg.centerPrintTime = cg.time;
   cg.centerPrintY = y;
@@ -1552,7 +1554,7 @@ static void CG_DrawCenterString(void) {
     x = (SCREEN_WIDTH - w) / 2;
 
     CG_DrawStringExt(x, y, linebuffer, color, qfalse, qtrue, cg.centerPrintCharWidth, (int) (cg.centerPrintCharWidth
-        * 1.5), 0);
+                     * 1.5), 0);
 
     y += cg.centerPrintCharWidth * 1.5;
     while (*start && (*start != '\n')) {
@@ -1642,7 +1644,7 @@ static void CG_DrawCrosshair(void) {
   hShader = cgs.media.crosshairShader[ca % NUM_CROSSHAIRS];
 
   trap_R_DrawStretchPic(x + cg.refdef.x + 0.5 * (cg.refdef.width - w), y
-      + cg.refdef.y + 0.5 * (cg.refdef.height - h), w, h, 0, 0, 1, 1, hShader);
+                        + cg.refdef.y + 0.5 * (cg.refdef.height - h), w, h, 0, 0, 1, 1, hShader);
 }
 
 /*
@@ -1709,9 +1711,9 @@ static void CG_DrawCrosshair3D(void) {
   // We are going to trace to the next shootable object and place the crosshair in front of it.
 
   // first get all the important renderer information
-  trap_Cvar_VariableStringBuffer("r_zProj", rendererinfos, sizeof(rendererinfos));
+  trap_Cvar_VariableStringBuffer("r_zProj", rendererinfos, sizeof (rendererinfos));
   zProj = atof(rendererinfos);
-  trap_Cvar_VariableStringBuffer("r_stereoSeparation", rendererinfos, sizeof(rendererinfos));
+  trap_Cvar_VariableStringBuffer("r_stereoSeparation", rendererinfos, sizeof (rendererinfos));
   stereoSep = zProj / atof(rendererinfos);
 
   xmax = zProj * tan(cg.refdef.fov_x * M_PI / 360.0f);
@@ -1721,7 +1723,7 @@ static void CG_DrawCrosshair3D(void) {
   VectorMA(cg.refdef.vieworg, maxdist, cg.refdef.viewaxis[0], endpos);
   CG_Trace(&trace, cg.refdef.vieworg, NULL, NULL, endpos, 0, MASK_SHOT);
 
-  memset(&ent, 0, sizeof(ent));
+  memset(&ent, 0, sizeof (ent));
   ent.reType = RT_SPRITE;
   ent.renderfx = RF_DEPTHHACK | RF_CROSSHAIR;
 
@@ -1757,7 +1759,7 @@ static void CG_ScanForCrosshairEntity(void) {
   VectorMA(start, range, cg.refdef.viewaxis[0], end);
 
   CG_Trace(&trace, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, CONTENTS_SOLID
-      | CONTENTS_BODY);
+           | CONTENTS_BODY);
   if (trace.entityNum >= MAX_CLIENTS) {
     return;
   }
@@ -1960,18 +1962,10 @@ static qboolean CG_DrawScoreboard(void) {
  =================
  */
 static void CG_DrawIntermission(void) {
-  //	int key;
-#ifdef MISSIONPACK
-  //if (cg_singlePlayer.integer) {
-  //	CG_DrawCenterString();
-  //	return;
-  //}
-#else
   if (cgs.gametype == GT_SINGLE_PLAYER) {
     CG_DrawCenterString();
     return;
   }
-#endif
   cg.scoreFadeTime = cg.time;
   cg.scoreBoardShowing = CG_DrawScoreboard();
 }
@@ -2060,10 +2054,16 @@ static void CG_DrawWarmup(void) {
     s = "Free For All";
   } else if (cgs.gametype == GT_TEAMSURVIVOR) {
     s = "Team Survivor";
+  } else if (cgs.gametype == GT_TEAMDEATHMATCH) {
+    s = "Team Deathmatch";
   } else if (cgs.gametype == GT_ASSASSINS) {
     s = "Assassins";
   } else if (cgs.gametype == GT_SINGLE_PLAYER) {
     s = "Mission";
+  } else if (cgs.gametype == GT_FREEZETAG) {
+    s = "Freeze Tag";
+  } else if (cgs.gametype == GT_ZONEFIGHT) {
+    s = "Zone Fight";
   } else {
     s = "wtf?";
   }
@@ -2074,7 +2074,7 @@ static void CG_DrawWarmup(void) {
     cw = GIANT_WIDTH;
   }
   CG_DrawStringExt(320 - w * cw / 2, 25, s, colorWhite, qfalse, qtrue, cw, (int) (cw
-      * 1.1f), 0);
+                   * 1.1f), 0);
 
   sec = (sec - cg.time) / 1000;
   if (sec < 0) {
@@ -2120,7 +2120,7 @@ static void CG_DrawWarmup(void) {
 
   w = CG_DrawStrlen(s);
   CG_DrawStringExt(320 - w * cw / 2, 70, s, colorWhite, qfalse, qtrue, cw, (int) (cw
-      * 1.5), 0);
+                   * 1.5), 0);
 }
 
 //==================================================================================

@@ -180,40 +180,119 @@ vmCvar_t cg_pistol;
 vmCvar_t cg_grenade;
 vmCvar_t cg_misc;
 
+vmCvar_t cg_lagometerX;
+vmCvar_t cg_lagometerY;
+
 typedef struct {
-vmCvar_t *vmCvar;
-char *cvarName;
-char *defaultString;
-int cvarFlags;
+  vmCvar_t *vmCvar;
+  char *cvarName;
+  char *defaultString;
+  int cvarFlags;
 } cvarTable_t;
 
 static cvarTable_t
-    cvarTable[] = { { &cg_ignore, "cg_ignore", "0", 0 }, // used for debugging
-    { &cg_autoswitch, "cg_autoswitch", "0", CVAR_ARCHIVE }, { &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE }, { &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE
-        | CVAR_CHEAT }, { &cg_fov, "cg_fov", "100", CVAR_ARCHIVE | CVAR_CHEAT }, { &cg_viewsize, "cg_viewsize", "100", CVAR_ARCHIVE }, { &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE }, { &cg_gibs, "cg_gibs", "1", CVAR_ARCHIVE }, { &cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE }, { &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE }, { &cg_drawTimer, "cg_drawTimer", "0", CVAR_ARCHIVE }, { &cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE }, { &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE }, { &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE }, { &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE }, { &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE }, { &cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE }, { &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE }, { &cg_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE }, { &cg_drawRewards, "cg_drawRewards", "1", CVAR_ARCHIVE }, { &cg_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE }, { &cg_crosshairHealth, "cg_crosshairHealth", "1", CVAR_ARCHIVE }, { &cg_crosshairX, "cg_crosshairX", "0", CVAR_ARCHIVE }, { &cg_crosshairY, "cg_crosshairY", "0", CVAR_ARCHIVE }, { &cg_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE
-        | CVAR_CHEAT }, { &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE
-        | CVAR_CHEAT }, { &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE
-        | CVAR_CHEAT }, { &cg_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE }, { &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE }, { &cg_gun_x, "cg_gunX", "0", CVAR_CHEAT }, { &cg_gun_y, "cg_gunY", "0", CVAR_CHEAT }, { &cg_gun_z, "cg_gunZ", "0", CVAR_CHEAT }, { &cg_centertime, "cg_centertime", "3", CVAR_CHEAT }, { &cg_runpitch, "cg_runpitch", "0.002", CVAR_ARCHIVE }, { &cg_runroll, "cg_runroll", "0.005", CVAR_ARCHIVE }, { &cg_bobup, "cg_bobup", "0.0", CVAR_CHEAT }, { &cg_bobpitch, "cg_bobpitch", "0.0", CVAR_CHEAT }, { &cg_bobroll, "cg_bobroll", "0.002", CVAR_CHEAT }, { &cg_swingSpeed, "cg_swingSpeed", "0.3", CVAR_CHEAT }, { &cg_animSpeed, "cg_animspeed", "1", CVAR_CHEAT }, { &cg_debugAnim, "cg_debuganim", "0", CVAR_CHEAT }, { &cg_debugPosition, "cg_debugposition", "0", CVAR_CHEAT }, { &cg_debugEvents, "cg_debugevents", "0", CVAR_CHEAT }, { &cg_errorDecay, "cg_errordecay", "100", 0 }, { &cg_nopredict, "cg_nopredict", "0", 0 }, { &cg_noPlayerAnims, "cg_noplayeranims", "0", CVAR_CHEAT }, { &cg_showmiss, "cg_showmiss", "0", 0 }, { &cg_footsteps, "cg_footsteps", "1", CVAR_CHEAT }, { &cg_tracerChance, "cg_tracerchance", "0.4", CVAR_CHEAT }, { &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT }, { &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT }, { &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT }, { &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT }, { &cg_thirdPerson, "cg_thirdPerson", "0", 0 }, { &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE }, { &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE }, { &cg_forceModel, "cg_forceModel", "0", CVAR_ARCHIVE
-        | CVAR_CHEAT }, { &cg_predictItems, "cg_predictItems", "1", CVAR_ARCHIVE }, { &cg_deferPlayers, "cg_deferPlayers", "1", CVAR_ARCHIVE }, { &cg_drawTeamOverlay, "cg_drawTeamOverlay", "0", CVAR_ARCHIVE }, { &cg_teamOverlayUserinfo, "teamoverlay", "0", CVAR_ROM
-        | CVAR_USERINFO }, { &cg_stats, "cg_stats", "0", 0 }, { &cg_drawFriend, "cg_drawFriend", "1", CVAR_ARCHIVE }, { &cg_teamChatsOnly, "cg_teamChatsOnly", "0", CVAR_ARCHIVE }, { &cg_noVoiceChats, "cg_noVoiceChats", "0", CVAR_ARCHIVE }, { &cg_noVoiceText, "cg_noVoiceText", "0", CVAR_ARCHIVE },
-    // the following variables are created in other parts of the system,
-    // but we also reference them here
-    { &cg_buildScript, "com_buildScript", "0", 0 }, // force loading of all possible data amd error on failures
-    { &cg_paused, "cl_paused", "0", CVAR_ROM }, { &cg_blood, "com_blood", "1", CVAR_CHEAT }, { &cg_synchronousClients, "g_synchronousClients", "0", 0 }, // communicated by systeminfo
-    { &cg_cameraOrbit, "cg_cameraOrbit", "0", CVAR_CHEAT }, { &cg_cameraOrbitDelay, "cg_cameraOrbitDelay", "50", CVAR_ARCHIVE }, { &cg_timescaleFadeEnd, "cg_timescaleFadeEnd", "1", 0 }, { &cg_timescaleFadeSpeed, "cg_timescaleFadeSpeed", "0", 0 }, { &cg_timescale, "timescale", "1", 0 }, { &cg_scorePlum, "cg_scorePlums", "1", CVAR_USERINFO
-        | CVAR_ARCHIVE }, { &cg_smoothClients, "cg_smoothClients", "0", CVAR_USERINFO
-        | CVAR_ARCHIVE }, { &cg_cameraMode, "com_cameraMode", "0", CVAR_CHEAT },
+cvarTable[] = {
+  {&cg_ignore, "cg_ignore", "0", 0}, // used for debugging
+  {&cg_autoswitch, "cg_autoswitch", "0", CVAR_ARCHIVE},
+  {&cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE},
+  {&cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE | CVAR_CHEAT},
+  {&cg_fov, "cg_fov", "100", CVAR_ARCHIVE | CVAR_CHEAT},
+  {&cg_viewsize, "cg_viewsize", "100", CVAR_ARCHIVE},
+  {&cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE},
+  {&cg_gibs, "cg_gibs", "1", CVAR_ARCHIVE},
+  {&cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE},
+  {&cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE},
+  {&cg_drawTimer, "cg_drawTimer", "0", CVAR_ARCHIVE},
+  {&cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE},
+  {&cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE},
+  {&cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE},
+  {&cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE},
+  {&cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE},
+  {&cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE},
+  {&cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE},
+  {&cg_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE},
+  {&cg_drawRewards, "cg_drawRewards", "1", CVAR_ARCHIVE},
+  {&cg_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE},
+  {&cg_crosshairHealth, "cg_crosshairHealth", "1", CVAR_ARCHIVE},
+  {&cg_crosshairX, "cg_crosshairX", "0", CVAR_ARCHIVE},
+  {&cg_crosshairY, "cg_crosshairY", "0", CVAR_ARCHIVE},
+  {&cg_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE | CVAR_CHEAT},
+  {&cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE | CVAR_CHEAT},
+  {&cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE | CVAR_CHEAT},
+  {&cg_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE},
+  {&cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE},
+  {&cg_gun_x, "cg_gunX", "0", CVAR_CHEAT},
+  {&cg_gun_y, "cg_gunY", "0", CVAR_CHEAT},
+  {&cg_gun_z, "cg_gunZ", "0", CVAR_CHEAT},
+  {&cg_centertime, "cg_centertime", "3", CVAR_CHEAT},
+  {&cg_runpitch, "cg_runpitch", "0.002", CVAR_ARCHIVE},
+  {&cg_runroll, "cg_runroll", "0.005", CVAR_ARCHIVE},
+  {&cg_bobup, "cg_bobup", "0.0", CVAR_CHEAT},
+  {&cg_bobpitch, "cg_bobpitch", "0.0", CVAR_CHEAT},
+  {&cg_bobroll, "cg_bobroll", "0.002", CVAR_CHEAT},
+  {&cg_swingSpeed, "cg_swingSpeed", "0.3", CVAR_CHEAT},
+  {&cg_animSpeed, "cg_animspeed", "1", CVAR_CHEAT},
+  {&cg_debugAnim, "cg_debuganim", "0", CVAR_CHEAT},
+  {&cg_debugPosition, "cg_debugposition", "0", CVAR_CHEAT},
+  {&cg_debugEvents, "cg_debugevents", "0", CVAR_CHEAT},
+  {&cg_errorDecay, "cg_errordecay", "100", 0},
+  {&cg_nopredict, "cg_nopredict", "0", 0},
+  {&cg_noPlayerAnims, "cg_noplayeranims", "0", CVAR_CHEAT},
+  {&cg_showmiss, "cg_showmiss", "0", 0},
+  {&cg_footsteps, "cg_footsteps", "1", CVAR_CHEAT},
+  {&cg_tracerChance, "cg_tracerchance", "0.4", CVAR_CHEAT},
+  {&cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT},
+  {&cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT},
+  {&cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT},
+  {&cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT},
+  {&cg_thirdPerson, "cg_thirdPerson", "0", 0},
+  {&cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE},
+  {&cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE},
+  {&cg_forceModel, "cg_forceModel", "0", CVAR_ARCHIVE | CVAR_CHEAT},
+  {&cg_predictItems, "cg_predictItems", "1", CVAR_ARCHIVE},
+  {&cg_deferPlayers, "cg_deferPlayers", "1", CVAR_ARCHIVE},
+  {&cg_drawTeamOverlay, "cg_drawTeamOverlay", "0", CVAR_ARCHIVE},
+  {&cg_teamOverlayUserinfo, "teamoverlay", "0", CVAR_ROM | CVAR_USERINFO},
+  {&cg_stats, "cg_stats", "0", 0},
+  {&cg_drawFriend, "cg_drawFriend", "1", CVAR_ARCHIVE},
+  {&cg_teamChatsOnly, "cg_teamChatsOnly", "0", CVAR_ARCHIVE},
+  {&cg_noVoiceChats, "cg_noVoiceChats", "0", CVAR_ARCHIVE},
+  {&cg_noVoiceText, "cg_noVoiceText", "0", CVAR_ARCHIVE},
+  // the following variables are created in other parts of the system,
+  // but we also reference them here
+  {&cg_buildScript, "com_buildScript", "0", 0}, // force loading of all possible data amd error on failures
+  {&cg_paused, "cl_paused", "0", CVAR_ROM},
+  {&cg_blood, "com_blood", "1", CVAR_CHEAT},
+  {&cg_synchronousClients, "g_synchronousClients", "0", 0}, // communicated by systeminfo
+  {&cg_cameraOrbit, "cg_cameraOrbit", "0", CVAR_CHEAT},
+  {&cg_cameraOrbitDelay, "cg_cameraOrbitDelay", "50", CVAR_ARCHIVE},
+  {&cg_timescaleFadeEnd, "cg_timescaleFadeEnd", "1", 0},
+  {&cg_timescaleFadeSpeed, "cg_timescaleFadeSpeed", "0", 0},
+  {&cg_timescale, "timescale", "1", 0},
+  {&cg_scorePlum, "cg_scorePlums", "1", CVAR_USERINFO | CVAR_ARCHIVE},
+  {&cg_smoothClients, "cg_smoothClients", "0", CVAR_USERINFO | CVAR_ARCHIVE},
+  {&cg_cameraMode, "com_cameraMode", "0", CVAR_CHEAT},
 
-    { &pmove_fixed, "pmove_fixed", "0", 0 }, { &pmove_msec, "pmove_msec", "8", 0 }, { &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE }, { &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE }, { &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE }, { &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE }, { &cg_oldRail, "cg_oldRail", "1", CVAR_ARCHIVE }, { &cg_oldRocket, "cg_oldRocket", "1", CVAR_ARCHIVE }, { &cg_oldPlasma, "cg_oldPlasma", "1", CVAR_ARCHIVE }, { &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE },
-    //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE },
-    { &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE
-        | CVAR_CHEAT },
+  {&pmove_fixed, "pmove_fixed", "0", 0},
+  {&pmove_msec, "pmove_msec", "8", 0},
+  {&cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE},
+  {&cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE},
+  {&cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
+  {&cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
+  {&cg_oldRail, "cg_oldRail", "1", CVAR_ARCHIVE},
+  {&cg_oldRocket, "cg_oldRocket", "1", CVAR_ARCHIVE},
+  {&cg_oldPlasma, "cg_oldPlasma", "1", CVAR_ARCHIVE},
+  {&cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE},
+  //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE },
+  {&cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE | CVAR_CHEAT},
 
-    { &cg_primary, "cg_primary", "-1", CVAR_USERINFO | CVAR_ARCHIVE },
+  {&cg_primary, "cg_primary", "-1", CVAR_USERINFO | CVAR_ARCHIVE},
+  {&cg_lagometerX, "cg_lagometerX", "560", CVAR_ARCHIVE},
+  {&cg_lagometerY, "cg_lagometerY", "240", CVAR_ARCHIVE},
 
-    };
+};
 
-static int cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
+static int cvarTableSize = sizeof (cvarTable) / sizeof (cvarTable[0]);
 
 /*
  =================
@@ -230,18 +309,18 @@ void CG_RegisterCvars(void) {
   }
 
   // see if we are also running the server on this machine
-  trap_Cvar_VariableStringBuffer("sv_running", var, sizeof(var));
+  trap_Cvar_VariableStringBuffer("sv_running", var, sizeof (var));
   cgs.localServer = atoi(var);
 
   forceModelModificationCount = cg_forceModel.modificationCount;
 
   trap_Cvar_Register(NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE);
   trap_Cvar_Register(NULL, "headmodel", DEFAULT_MODEL, CVAR_USERINFO
-      | CVAR_ARCHIVE);
+                     | CVAR_ARCHIVE);
   trap_Cvar_Register(NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO
-      | CVAR_ARCHIVE);
+                     | CVAR_ARCHIVE);
   trap_Cvar_Register(NULL, "team_headmodel", DEFAULT_TEAM_HEAD, CVAR_USERINFO
-      | CVAR_ARCHIVE);
+                     | CVAR_ARCHIVE);
 
   trap_Cvar_Register(NULL, "cg_primary", "6", CVAR_USERINFO | CVAR_ARCHIVE);
 }
@@ -318,7 +397,7 @@ void QDECL CG_Printf(const char *msg, ...) {
   char text[1024];
 
   va_start(argptr, msg);
-  Q_vsnprintf(text, sizeof(text), msg, argptr);
+  Q_vsnprintf(text, sizeof (text), msg, argptr);
   va_end(argptr);
 
   trap_Print(text);
@@ -329,7 +408,7 @@ void QDECL CG_Error(const char *msg, ...) {
   char text[1024];
 
   va_start(argptr, msg);
-  Q_vsnprintf(text, sizeof(text), msg, argptr);
+  Q_vsnprintf(text, sizeof (text), msg, argptr);
   va_end(argptr);
 
   trap_Error(text);
@@ -340,7 +419,7 @@ void QDECL Com_Error(int level, const char *error, ...) {
   char text[1024];
 
   va_start(argptr, error);
-  Q_vsnprintf(text, sizeof(text), error, argptr);
+  Q_vsnprintf(text, sizeof (text), error, argptr);
   va_end(argptr);
 
   CG_Error("%s", text);
@@ -351,7 +430,7 @@ void QDECL Com_Printf(const char *msg, ...) {
   char text[1024];
 
   va_start(argptr, msg);
-  Q_vsnprintf(text, sizeof(text), msg, argptr);
+  Q_vsnprintf(text, sizeof (text), msg, argptr);
   va_end(argptr);
 
   CG_Printf("%s", text);
@@ -365,7 +444,7 @@ void QDECL Com_Printf(const char *msg, ...) {
 const char *CG_Argv(int arg) {
   static char buffer[MAX_STRING_CHARS];
 
-  trap_Argv(arg, buffer, sizeof(buffer));
+  trap_Argv(arg, buffer, sizeof (buffer));
 
   return buffer;
 }
@@ -530,35 +609,35 @@ static void CG_RegisterSounds(void) {
       = trap_S_RegisterSound("sound/world/jumppad.wav", qfalse);
 
   for (i = 0; i < 4; i++) {
-    Com_sprintf(name, sizeof(name), "sound/player/footsteps/step%i.wav", i + 1);
+    Com_sprintf(name, sizeof (name), "sound/player/footsteps/step%i.wav", i + 1);
     cgs.media.footsteps[FOOTSTEP_NORMAL][i]
         = trap_S_RegisterSound(name, qfalse);
 
-    Com_sprintf(name, sizeof(name), "sound/player/footsteps/boot%i.wav", i + 1);
+    Com_sprintf(name, sizeof (name), "sound/player/footsteps/boot%i.wav", i + 1);
     cgs.media.footsteps[FOOTSTEP_BOOT][i] = trap_S_RegisterSound(name, qfalse);
 
-    Com_sprintf(name, sizeof(name), "sound/player/footsteps/flesh%i.wav", i + 1);
+    Com_sprintf(name, sizeof (name), "sound/player/footsteps/flesh%i.wav", i + 1);
     cgs.media.footsteps[FOOTSTEP_FLESH][i] = trap_S_RegisterSound(name, qfalse);
 
-    Com_sprintf(name, sizeof(name), "sound/player/footsteps/mech%i.wav", i + 1);
+    Com_sprintf(name, sizeof (name), "sound/player/footsteps/mech%i.wav", i + 1);
     cgs.media.footsteps[FOOTSTEP_MECH][i] = trap_S_RegisterSound(name, qfalse);
 
-    Com_sprintf(name, sizeof(name), "sound/player/footsteps/energy%i.wav", i
-        + 1);
+    Com_sprintf(name, sizeof (name), "sound/player/footsteps/energy%i.wav", i
+                + 1);
     cgs.media.footsteps[FOOTSTEP_ENERGY][i]
         = trap_S_RegisterSound(name, qfalse);
 
-    Com_sprintf(name, sizeof(name), "sound/player/footsteps/splash%i.wav", i
-        + 1);
+    Com_sprintf(name, sizeof (name), "sound/player/footsteps/splash%i.wav", i
+                + 1);
     cgs.media.footsteps[FOOTSTEP_SPLASH][i]
         = trap_S_RegisterSound(name, qfalse);
 
-    Com_sprintf(name, sizeof(name), "sound/player/footsteps/clank%i.wav", i + 1);
+    Com_sprintf(name, sizeof (name), "sound/player/footsteps/clank%i.wav", i + 1);
     cgs.media.footsteps[FOOTSTEP_METAL][i] = trap_S_RegisterSound(name, qfalse);
   }
 
   // only register the items that the server says we need
-  Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
+  Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof (items));
 
   for (i = 1; i < bg_numItems; i++) {
     //		if ( items[ i ] == '1' || cg_buildScript.integer ) {
@@ -624,10 +703,10 @@ static void CG_RegisterGraphics(void) {
   int i;
   char items[MAX_ITEMS + 1];
   static char
-      *sb_nums[11] = { "gfx/2d/numbers/zero_32b", "gfx/2d/numbers/one_32b", "gfx/2d/numbers/two_32b", "gfx/2d/numbers/three_32b", "gfx/2d/numbers/four_32b", "gfx/2d/numbers/five_32b", "gfx/2d/numbers/six_32b", "gfx/2d/numbers/seven_32b", "gfx/2d/numbers/eight_32b", "gfx/2d/numbers/nine_32b", "gfx/2d/numbers/minus_32b", };
+  *sb_nums[11] = {"gfx/2d/numbers/zero_32b", "gfx/2d/numbers/one_32b", "gfx/2d/numbers/two_32b", "gfx/2d/numbers/three_32b", "gfx/2d/numbers/four_32b", "gfx/2d/numbers/five_32b", "gfx/2d/numbers/six_32b", "gfx/2d/numbers/seven_32b", "gfx/2d/numbers/eight_32b", "gfx/2d/numbers/nine_32b", "gfx/2d/numbers/minus_32b",};
 
   // clear any references to old media
-  memset(&cg.refdef, 0, sizeof(cg.refdef));
+  memset(&cg.refdef, 0, sizeof (cg.refdef));
   trap_R_ClearScene();
 
   CG_LoadingString(cgs.mapname);
@@ -744,11 +823,11 @@ static void CG_RegisterGraphics(void) {
   cgs.media.medalAssist = trap_R_RegisterShaderNoMip("medal_assist");
   cgs.media.medalCapture = trap_R_RegisterShaderNoMip("medal_capture");
 
-  memset(cg_items, 0, sizeof(cg_items));
-  memset(cg_weapons, 0, sizeof(cg_weapons));
+  memset(cg_items, 0, sizeof (cg_items));
+  memset(cg_weapons, 0, sizeof (cg_weapons));
 
   // only register the items that the server says we need
-  Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
+  Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof (items));
 
   for (i = 1; i < bg_numItems; i++) {
     if (items[i] == '1' || cg_buildScript.integer) {
@@ -770,11 +849,11 @@ static void CG_RegisterGraphics(void) {
   cgs.media.shadowMarkShader = trap_R_RegisterShader("markShadow");
   cgs.media.wakeMarkShader = trap_R_RegisterShader("wake");
   cgs.media.bloodMarkShader = trap_R_RegisterShader("bloodMark");
-  
+
   // bullet shells
-    cgs.media.mod_sniperShell = trap_R_RegisterModel("models/ammo/shell_sniper.md3");
-    cgs.media.mod_autoShell = trap_R_RegisterModel("models/ammo/shell_auto.md3");
-    cgs.media.mod_pistolShell = trap_R_RegisterModel("models/ammo/shell_pistol.md3");
+  cgs.media.mod_sniperShell = trap_R_RegisterModel("models/ammo/shell_sniper.md3");
+  cgs.media.mod_autoShell = trap_R_RegisterModel("models/ammo/shell_auto.md3");
+  cgs.media.mod_pistolShell = trap_R_RegisterModel("models/ammo/shell_pistol.md3");
 
   // explosion sparks
   cgs.media.sha_spark = trap_R_RegisterShader("spark");
@@ -794,7 +873,7 @@ static void CG_RegisterGraphics(void) {
     vec3_t mins, maxs;
     int j;
 
-    Com_sprintf(name, sizeof(name), "*%i", i);
+    Com_sprintf(name, sizeof (name), "*%i", i);
     cgs.inlineDrawModel[i] = trap_R_RegisterModel(name);
     trap_R_ModelBounds(cgs.inlineDrawModel[i], mins, maxs);
     for (j = 0; j < 3; j++) {
@@ -838,7 +917,7 @@ void CG_BuildSpectatorString(void) {
   cg.spectatorList[0] = 0;
   for (i = 0; i < MAX_CLIENTS; i++) {
     if (cgs.clientinfo[i].infoValid && cgs.clientinfo[i].team == TEAM_SPECTATOR) {
-      Q_strcat(cg.spectatorList, sizeof(cg.spectatorList), va("%s     ", cgs.clientinfo[i].name));
+      Q_strcat(cg.spectatorList, sizeof (cg.spectatorList), va("%s     ", cgs.clientinfo[i].name));
     }
   }
   i = strlen(cg.spectatorList);
@@ -904,8 +983,8 @@ void CG_StartMusic(void) {
 
   // start the background music
   s = (char *) CG_ConfigString(CS_MUSIC);
-  Q_strncpyz(parm1, COM_Parse(&s), sizeof(parm1));
-  Q_strncpyz(parm2, COM_Parse(&s), sizeof(parm2));
+  Q_strncpyz(parm1, COM_Parse(&s), sizeof (parm1));
+  Q_strncpyz(parm2, COM_Parse(&s), sizeof (parm2));
 
   trap_S_StartBackgroundTrack(parm1, parm2);
 }
@@ -922,11 +1001,11 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum) {
   const char *s;
 
   // clear everything
-  memset(&cgs, 0, sizeof(cgs));
-  memset(&cg, 0, sizeof(cg));
-  memset(cg_entities, 0, sizeof(cg_entities));
-  memset(cg_weapons, 0, sizeof(cg_weapons));
-  memset(cg_items, 0, sizeof(cg_items));
+  memset(&cgs, 0, sizeof (cgs));
+  memset(&cg, 0, sizeof (cg));
+  memset(cg_entities, 0, sizeof (cg_entities));
+  memset(cg_weapons, 0, sizeof (cg_weapons));
+  memset(cg_items, 0, sizeof (cg_items));
 
   cg.clientNum = clientNum;
 

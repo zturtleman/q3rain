@@ -283,7 +283,7 @@ static float PM_CmdScale(usercmd_t *cmd) {
   }
 
   total = sqrt(cmd->forwardmove * cmd->forwardmove + cmd->rightmove
-      * cmd->rightmove + cmd->upmove * cmd->upmove);
+               * cmd->rightmove + cmd->upmove * cmd->upmove);
   scale = (float) pm->ps->speed * max / (127.0 * total);
 
   return scale;
@@ -334,14 +334,14 @@ static void PM_LadderMove(void) {
   vec3_t wishdir;
   float scale;
   float vel;
-  
+
   if (pm->ps->pm_flags & PMF_DUCKED) {
     pml.ladder = qfalse;
     return;
   }
 
   PM_Friction();
-  
+
   scale = PM_CmdScale(&pm->cmd);
   // user intentions
   if (!scale) {
@@ -360,7 +360,7 @@ static void PM_LadderMove(void) {
 
   VectorCopy(wishvel, wishdir);
   wishspeed = VectorNormalize(wishdir);
-  
+
   if (wishspeed > pm->ps->speed * pm_ladderScale) {
     wishspeed = pm->ps->speed * pm_ladderScale;
   }
@@ -670,7 +670,7 @@ static void PM_WaterMove(void) {
   } else {
     for (i = 0; i < 3; i++)
       wishvel[i] = scale * pml.forward[i] * pm->cmd.forwardmove + scale
-          * pml.right[i] * pm->cmd.rightmove;
+        * pml.right[i] * pm->cmd.rightmove;
 
     wishvel[2] += scale * pm->cmd.upmove;
   }
@@ -1886,7 +1886,7 @@ static void PM_Footsteps(void) {
   // all cyclic walking effects
   //
   pm->xyspeed = sqrt(pm->ps->velocity[0] * pm->ps->velocity[0]
-      + pm->ps->velocity[1] * pm->ps->velocity[1]);
+                     + pm->ps->velocity[1] * pm->ps->velocity[1]);
 
   if (pm->ps->groundEntityNum == ENTITYNUM_NONE) {
     // airborne leaves position in cycle intact, but doesn't advance
@@ -2124,7 +2124,7 @@ static void PM_Weapon(void) {
     if (!(pm->ps->pm_flags & PMF_USE_ITEM_HELD)) {
       pm->ps->pm_flags |= PMF_USE_ITEM_HELD;
       PM_AddEvent(EV_USE_ITEM0
-          + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag);
+                  + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag);
       pm->ps->stats[STAT_HOLDABLE_ITEM] = 0;
       return;
     }
@@ -2466,7 +2466,7 @@ void PmoveSingle(pmove_t * pmove) {
   }
 
   // clear all pmove local vars
-  memset(&pml, 0, sizeof(pml));
+  memset(&pml, 0, sizeof (pml));
 
   // determine the time
   pml.msec = pmove->cmd.serverTime - pm->ps->commandTime;

@@ -1113,6 +1113,9 @@ extern vmCvar_t cg_trueLightning;
 extern vmCvar_t cg_atmosphericEffects;
 extern vmCvar_t cg_lowEffects;
 
+extern vmCvar_t cg_lagometerX;
+extern vmCvar_t cg_lagometerY;
+
 //
 // cg_main.c
 //

@@ -439,8 +439,7 @@ void G_InitGame(int levelTime, int randomSeed, int restart) {
   level.num_entities = MAX_CLIENTS;
 
   // let the server system know where the entites are
-  trap_LocateGameData(level.gentities, level.num_entities, sizeof ( gentity_t),
-                      &level.clients[0].ps, sizeof ( level.clients[0]));
+  trap_LocateGameData(level.gentities, level.num_entities, sizeof ( gentity_t), &level.clients[0].ps, sizeof ( level.clients[0]));
 
   // reserve some spots for dead player bodies
   InitBodyQue();
@@ -1650,6 +1649,12 @@ void G_RunFrame(int levelTime) {
     return;
   }
 
+  if (level.nextState >= 0 && level.nextStateTime <= level.time) {
+    Com_Printf("Changing roundState from %i to %i\n", level.roundState, level.nextState);
+    level.roundState = level.nextState;
+    level.nextState = -1;
+  }
+
   if (g_gametype.integer == GT_TEAMSURVIVOR) {
     if (level.roundState == ROUND_WARMUP && level.numPlayingClients >= 2) {
       if (level.nextStateTime <= level.time && level.nextState < 0) {
@@ -1662,12 +1667,6 @@ void G_RunFrame(int levelTime) {
         trap_SendServerCommand(-1, "cp \"Game starts in 1\n\"");
       }
     }
-  }
-
-  if (level.nextState >= 0 && level.nextStateTime <= level.time) {
-    Com_Printf("Changing roundState from %i to %i\n", level.roundState, level.nextState);
-    level.roundState = level.nextState;
-    level.nextState = -1;
   }
 
   level.framenum++;

@@ -53,9 +53,15 @@ void G_BounceProjectile(vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout) 
  G_PushBack
  ===============
  */
-void G_PushBack(gentity_t *ent, int knockback) {
+void G_PushBack(gentity_t *ent, int knockback, qboolean allowCancel) {
   vec3_t kvel;
   vec3_t dir;
+
+  if (ent->client && allowCancel) {
+    if (ent->client->ps.pm_flags & PMF_DUCKED) {
+      return;
+    }
+  }
 
   VectorCopy(forward, dir);
   dir[0] *= -1;
@@ -398,7 +404,7 @@ void Weapon_Knife_Fire(gentity_t *ent) {
   if (tr.surfaceFlags & SURF_NOIMPACT) {
     return;
   } else if (tr.contents & CONTENTS_SOLID) {
-    G_PushBack(ent, KNIFE_KNOCKBACK);
+    G_PushBack(ent, KNIFE_KNOCKBACK, qtrue);
   }
 
   traceEnt = &g_entities[tr.entityNum];
@@ -487,7 +493,7 @@ void Weapon_Hands_Fire(gentity_t *ent) {
   if (tr.surfaceFlags & SURF_NOIMPACT) {
     return;
   } else if (tr.contents & CONTENTS_SOLID) {
-    G_PushBack(ent, HANDS_KNOCKBACK);
+    G_PushBack(ent, HANDS_KNOCKBACK, qtrue);
   }
 
   traceEnt = &g_entities[tr.entityNum];
@@ -1135,7 +1141,7 @@ void FireWeapon(gentity_t *ent) {
       break;
     case WP_HE:
       Weapon_HE_Fire(ent, ent->client->ps.grenadetime
-          - ent->client->ps.levelTime);
+                     - ent->client->ps.levelTime);
       if (ent->client->clipammo[WP_HE] == 0) {
         ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_HE);
         ent->client->ps.weapon = WP_HANDS;

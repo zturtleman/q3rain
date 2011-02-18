@@ -108,6 +108,7 @@ typedef enum {
     GT_TEAMDEATHMATCH, //deathmatch
     GT_TEAMSURVIVOR, //deathmatch, roundbased
     GT_FREEZETAG,
+    GT_ZONEFIGHT,
     GT_MAX_GAME_TYPE
 } gametype_t;
 
