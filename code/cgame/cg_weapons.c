@@ -1358,7 +1358,7 @@ void CG_AddViewWeapon(playerState_t *ps) {
         z = 3;
     }
     if (cg_drawGun.integer == 2) {
-        y *= -1;
+        //x *= -1;
     }
     VectorMA(hand.origin, x, cg.refdef.viewaxis[0], hand.origin);
     VectorMA(hand.origin, y, cg.refdef.viewaxis[1], hand.origin);

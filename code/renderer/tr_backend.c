@@ -24,7 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 backEndData_t	*backEndData[SMP_FRAMES];
 backEndState_t	backEnd;
 
-int	EndSurfaceCount=0;
 
 static float	s_flipMatrix[16] = {
 	// convert from our coordinate system (looking down X)
@@ -41,30 +40,6 @@ static float	s_flipMatrix[16] = {
 */
 void GL_Bind( image_t *image ) {
 	int texnum;
-	image_t *img;
-
-	if ( !image ) {
-		ri.Printf( PRINT_WARNING, "GL_Bind: NULL image\n" );
-		img = tr.defaultImage;
-	} else {
-		img = image;
-	}
-	texnum = img->texnum;
-
-	if ( r_nobind->integer && tr.dlightImage ) {		// performance evaluation option
-		texnum = tr.dlightImage->texnum;
-	}
-
-	if ( glState.currenttextures[glState.currenttmu] != texnum ) {
-		img->frameUsed = tr.frameCount;
-		glState.currenttextures[glState.currenttmu] = texnum;
-		qglBindTexture (GL_TEXTURE_2D, texnum);
-	}
-}
-
-void GL_BindCube( image_t *image ) 
-{
-	int texnum;
 
 	if ( !image ) {
 		ri.Printf( PRINT_WARNING, "GL_Bind: NULL image\n" );
@@ -78,35 +53,11 @@ void GL_BindCube( image_t *image )
 	}
 
 	if ( glState.currenttextures[glState.currenttmu] != texnum ) {
-
 		image->frameUsed = tr.frameCount;
-		glState.currenttextures[glState.currenttmu] = texnum;
-		qglBindTexture (GL_TEXTURE_CUBE_MAP, texnum);
-	}
-}
-
-
-void GL_BindCubeTexnum( int texnum ) 
-{
-
-	if ( glState.currenttextures[glState.currenttmu] != texnum ) 
-	{
-		glState.currenttextures[glState.currenttmu] = texnum;
-		qglBindTexture (GL_TEXTURE_CUBE_MAP, texnum);
-	}
-}
-
-
-void GL_BindTexnum( int texnum ) 
-{
-
-	if ( glState.currenttextures[glState.currenttmu] != texnum ) 
-	{
 		glState.currenttextures[glState.currenttmu] = texnum;
 		qglBindTexture (GL_TEXTURE_2D, texnum);
 	}
 }
-
 
 /*
 ** GL_SelectTexture
@@ -131,85 +82,7 @@ void GL_SelectTexture( int unit )
 		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE1_ARB )\n" );
 		qglClientActiveTextureARB( GL_TEXTURE1_ARB );
 		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE1_ARB )\n" );
-	}
-	else if ( unit == 2 )
-	{
-		qglActiveTextureARB( GL_TEXTURE2_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE2_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE2_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE2_ARB )\n" );
-	} 
-	else if ( unit == 3 )
-	{
-		qglActiveTextureARB( GL_TEXTURE3_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE3_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE3_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE3_ARB )\n" );
-	} 
-	else if ( unit == 4 )
-	{
-		qglActiveTextureARB( GL_TEXTURE4_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE4_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE4_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE4_ARB )\n" );
-	} 
-	else if ( unit == 5 )
-	{
-		qglActiveTextureARB( GL_TEXTURE5_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE5_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE5_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE5_ARB )\n" );
-	} 
-	else if ( unit == 6 )
-	{
-		qglActiveTextureARB( GL_TEXTURE6_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE6_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE6_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE6_ARB )\n" );
-	} 
-	else if ( unit == 7 )
-	{
-		qglActiveTextureARB( GL_TEXTURE7_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE7_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE7_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE7_ARB )\n" );
-	} 
-	else if ( unit == 8 )
-	{
-		qglActiveTextureARB( GL_TEXTURE8_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE8_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE8_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE8_ARB )\n" );
-	} 
-	else if ( unit == 9 )
-	{
-		qglActiveTextureARB( GL_TEXTURE9_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE9_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE9_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE9_ARB )\n" );
-	} 
-	else if ( unit == 10)
-	{
-		qglActiveTextureARB( GL_TEXTURE10_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE10_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE10_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE10_ARB )\n" );
-	} 
-	else if ( unit == 11 )
-	{
-		qglActiveTextureARB( GL_TEXTURE11_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE11_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE11_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE11_ARB )\n" );
-	} 
-	else if ( unit == 12 )
-	{
-		qglActiveTextureARB( GL_TEXTURE12_ARB );
-		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE12_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE12_ARB );
-		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE12_ARB )\n" );
-	} 
-	else {
+	} else {
 		ri.Error( ERR_DROP, "GL_SelectTexture: unit = %i", unit );
 	}
 
@@ -243,171 +116,6 @@ void GL_BindMultitexture( image_t *image0, GLuint env0, image_t *image1, GLuint 
 		qglBindTexture( GL_TEXTURE_2D, texnum0 );
 	}
 }
-
-
-
-void RB_SetupFragment( fragShader_t* frag, shader_t* shader )
-{
-	int uniform_location;
-	vec3_t forward;
-	int j = 0;
-
-	if (glState.currentFragShader==frag)
-		return;
-	
-	// We're going back to standard rendering now
-	qglUseProgramObjectARB( 0 );
-	GL_UnBindVBO( );
-	
-	//turn off all texture units
-	for (j=1;j<13;j++)
-	{
-		GL_SelectTexture(j);
-		qglDisable( GL_TEXTURE_2D );
-		qglDisable( GL_TEXTURE_CUBE_MAP );
-		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	}
-	GL_SelectTexture( 0 );	
-
-	glState.currentFragShader=frag;
-
-	if (frag==NULL ) return;
-
-	glState.currentFragShader=frag;
-	
-	// ENABLE A FRAGSHADER
-	GL_BindVBO(frag->vertexType);
-	qglUseProgramObjectARB(frag->program);
-
-	if (backEnd.viewParms.isMirror==qfalse)
-	{
-		uniform_location = qglGetUniformLocationARB(frag->program, "IN_eye_pos");
-		qglUniform3fARB(uniform_location, backEnd.refdef.vieworg[0],backEnd.refdef.vieworg[1],backEnd.refdef.vieworg[2]);
-		uniform_location = qglGetUniformLocationARB(frag->program, "IN_eye_vec");
-		VectorCopy( backEnd.refdef.viewaxis[0], forward );
-		qglUniform3fARB(uniform_location, forward[0],forward[1],forward[2]);
-	}
-	else
-	{
-		uniform_location = qglGetUniformLocationARB(frag->program, "IN_eye_pos");
-		qglUniform3fARB(uniform_location, backEnd.refdef.vieworg[0],backEnd.refdef.vieworg[1],backEnd.refdef.vieworg[2]);
-		uniform_location = qglGetUniformLocationARB(frag->program, "IN_eye_vec");
-		VectorCopy( backEnd.or.axis[0], forward );
-		qglUniform3fARB(uniform_location, forward[0],forward[1],forward[2]);
-	}
-	
-
-	//set the time for the animation
-	uniform_location = qglGetUniformLocationARB(frag->program, "time");
-	if (uniform_location>-1) qglUniform1fARB(uniform_location, backEnd.refdef.floatTime);
-	
-	//turn all the deforms off
-	uniform_location = qglGetUniformLocationARB(frag->program, "IN_deformtype");
-	if (uniform_location>-1) qglUniform1fARB(uniform_location, 0);
-
-
-
-	if (shader!=NULL)
-	{
-		//set the tiling
-		uniform_location = qglGetUniformLocationARB(frag->program, "scale");
-		if (uniform_location>-1) qglUniform1fARB(uniform_location,shader->scale );
-	
-		//set the refraction tint
-		uniform_location = qglGetUniformLocationARB(frag->program, "undertint");
-		if (uniform_location>-1) qglUniform3fARB(uniform_location,1,1,1);
-			
-		//overtint
-		uniform_location = qglGetUniformLocationARB(frag->program, "tint");
-		if (uniform_location>-1) qglUniform3fARB(uniform_location,shader->tint[0],shader->tint[1],shader->tint[2]);
-	}
-
-
-	if (backEnd.viewParms.isUnderwater)
-	{
-		//set the flip 		
-		uniform_location = qglGetUniformLocationARB(frag->program, "flip");		
-		if (uniform_location>-1) qglUniform1fARB(uniform_location,-1 );
-	}
-	else
-	{
-		uniform_location = qglGetUniformLocationARB(frag->program, "flip");		
-		if (uniform_location>-1) qglUniform1fARB(uniform_location,1 );
-
-	}
-
-	
-}
-
-void GL_BindVBO(int VBOMode)
-{
-	int oldMode=glState.VBOBound;
-
-	fragShader_t* frag=glState.currentFragShader;
-
-	//Unbind the vbo
-	if (glState.VBOBound!=VBOMode)
-	{
-		qglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-		qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-		
-		if (glState.VBOBound==1)
-		{
-			//disable static vertexes		
-			qglDisableVertexAttribArrayARB(glState.currentFragShader->position_i);
-			qglDisableVertexAttribArrayARB(glState.currentFragShader->uv_i);
-			qglDisableVertexAttribArrayARB(glState.currentFragShader->light_uv_i);
-			qglDisableVertexAttribArrayARB(glState.currentFragShader->normal_i);
-			qglDisableVertexAttribArrayARB(glState.currentFragShader->stv_i);
-			qglDisableVertexAttribArrayARB(glState.currentFragShader->ttv_i);
-			qglDisableVertexAttribArrayARB(glState.currentFragShader->rgba_i);
-		}
-
-		glState.VBOBound=0;
-		if (VBOMode==0) return;
-	}
-
-	//bind the new vbo
-	glState.VBOBound=VBOMode;
-
-	if (glState.VBOBound==1) //Static vbo mode
-	{
-		qglBindBufferARB(GL_ARRAY_BUFFER_ARB, tr.VBO_vertexBuffer);
-		qglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, tr.VBO_indexBuffer);
-
-		qglVertexPointer(3,GL_FLOAT,sizeof(staticVert_t),GEOMETRY_VERTEX_OFFSET(0, staticVert_t, position ));
-		qglTexCoordPointer(2,GL_FLOAT,sizeof(staticVert_t),GEOMETRY_VERTEX_OFFSET(0, staticVert_t, uv ));
-		qglTexCoordPointer(2,GL_FLOAT,sizeof(staticVert_t),GEOMETRY_VERTEX_OFFSET(0, staticVert_t, light_uv ));
-	
-		qglEnableVertexAttribArrayARB(frag->position_i);
-		qglEnableVertexAttribArrayARB(frag->uv_i);
-		qglEnableVertexAttribArrayARB(frag->light_uv_i);
-		qglEnableVertexAttribArrayARB(frag->normal_i);
-		qglEnableVertexAttribArrayARB(frag->stv_i);
-		qglEnableVertexAttribArrayARB(frag->ttv_i);
-		qglEnableVertexAttribArrayARB(frag->rgba_i);
-
-		qglVertexAttribPointerARB(frag->position_i, 3, GL_FLOAT, GL_FALSE, sizeof(staticVert_t), GEOMETRY_VERTEX_OFFSET(0, staticVert_t, position ));
-		qglVertexAttribPointerARB(frag->uv_i, 2, GL_FLOAT, GL_FALSE, sizeof(staticVert_t), GEOMETRY_VERTEX_OFFSET(0, staticVert_t, uv ));		
-		qglVertexAttribPointerARB(frag->light_uv_i, 2, GL_FLOAT, GL_FALSE, sizeof(staticVert_t), GEOMETRY_VERTEX_OFFSET(0, staticVert_t, light_uv ));
-		qglVertexAttribPointerARB(frag->normal_i, 3, GL_FLOAT, GL_FALSE, sizeof(staticVert_t), GEOMETRY_VERTEX_OFFSET(0, staticVert_t, normal ));
-		qglVertexAttribPointerARB(frag->stv_i, 3, GL_FLOAT, GL_FALSE, sizeof(staticVert_t), GEOMETRY_VERTEX_OFFSET(0, staticVert_t, stv ));
-		qglVertexAttribPointerARB(frag->ttv_i, 3, GL_FLOAT, GL_FALSE, sizeof(staticVert_t), GEOMETRY_VERTEX_OFFSET(0, staticVert_t, ttv ));
-		qglVertexAttribPointerARB(frag->rgba_i, 4, GL_FLOAT, GL_FALSE, sizeof(staticVert_t), GEOMETRY_VERTEX_OFFSET(0, staticVert_t, rgba ));
-
-		qglEnableClientState(GL_VERTEX_ARRAY);
-		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-		qglDisableClientState(GL_COLOR_ARRAY);
-	}
-	// other model formats go here, like hardware accelerated md5...
-}
-
-void GL_UnBindVBO()
-{
-	GL_BindVBO(0);
-}
-
-
 
 
 /*
@@ -701,7 +409,7 @@ static void RB_Hyperspace( void ) {
 }
 
 
-void SetViewportAndScissor( void ) {
+static void SetViewportAndScissor( void ) {
 	qglMatrixMode(GL_PROJECTION);
 	qglLoadMatrixf( backEnd.viewParms.projectionMatrix );
 	qglMatrixMode(GL_MODELVIEW);
@@ -760,27 +468,6 @@ void RB_BeginDrawingView (void) {
 		qglClearColor( 0.0f, 0.0f, 0.0f, 1.0f );	// FIXME: get color of sky
 #endif
 	}
-		
-	
-	if (r_ext_vertex_buffer_object->integer && backEnd.viewParms.doWater )
-	{
-		clearBits |= GL_COLOR_BUFFER_BIT;
-		qglClearColor( 0, 0, 0, 1.0f );
-	}
-
-	//clear the backbuffer each target render
-	if (backEnd.refdef.pixelTarget!=NULL)
-	{
-		clearBits |= GL_COLOR_BUFFER_BIT;	
-		qglClearColor( 0.0f, 0.0f, 0.0f, 1.0f );	// FIXME: get color of sky
-	}
-
-
-	if (backEnd.refdef.rdflags & RDF_NOCLEAR)
-	{
-		clearBits=GL_COLOR_BUFFER_BIT;
-	}
-
 	qglClear( clearBits );
 
 	if ( ( backEnd.refdef.rdflags & RDF_HYPERSPACE ) )
@@ -819,63 +506,6 @@ void RB_BeginDrawingView (void) {
 	} else {
 		qglDisable (GL_CLIP_PLANE0);
 	}
-
-
-	// clip to the plane of the water, only show whats underneath
-	if ( backEnd.viewParms.isWater==1 || backEnd.viewParms.isWater==2 ) 
-	{
-		vec4_t plane;
-		float bias=8.0f;
-	
-		plane[0]=backEnd.viewParms.waterPlane.normal[0];
-		plane[1]=backEnd.viewParms.waterPlane.normal[1];
-		plane[2]=backEnd.viewParms.waterPlane.normal[2];
-		plane[3]=backEnd.viewParms.waterPlane.dist; //fudge it 1 unit to clean up the edge cuts
-
-		//we're underwater  so flip
-		if (backEnd.viewParms.isUnderwater) 
-		{
-			plane[0]=-plane[0];
-			plane[1]=-plane[1];
-			plane[2]=-plane[2];
-			plane[3]=-plane[3];
-		}
-
-		if (backEnd.viewParms.isWater==1)
-		{
-			double f[4];
-			f[0]=plane[0];
-			f[1]=plane[1];
-			f[2]=plane[2];
-			f[3]=plane[3]+bias;
-
-			qglLoadMatrixf(backEnd.viewParms.world.modelMatrix );
-			qglClipPlane (GL_CLIP_PLANE1, f);
-			qglEnable (GL_CLIP_PLANE1);
-		}
-
-		if (backEnd.viewParms.isWater==2)
-		{
-			double f[4];
-			f[0]=-plane[0];
-			f[1]=-plane[1];
-			f[2]=-plane[2];
-			f[3]=-plane[3]+bias;
-
-			qglLoadMatrixf(backEnd.viewParms.world.modelMatrix );
-			qglClipPlane (GL_CLIP_PLANE1, f);
-			qglEnable (GL_CLIP_PLANE1);
-		}
-	}
-	else
-	{
-		qglDisable(GL_CLIP_PLANE1);
-		
-	}
-	
-	GL_Cull( CT_FRONT_SIDED );
-	
-	
 }
 
 
@@ -894,7 +524,6 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	qboolean		depthRange, oldDepthRange, isCrosshair, wasCrosshair;
 	int				i;
 	drawSurf_t		*drawSurf;
-	int			oldSurf;
 	int				oldSort;
 	float			originalTime;
 
@@ -913,17 +542,12 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	wasCrosshair = qfalse;
 	oldDlighted = qfalse;
 	oldSort = -1;
-	oldSurf = -1;
-	
 	depthRange = qfalse;
 
 	backEnd.pc.c_surfaces += numDrawSurfs;
 
-	for (i = 0, drawSurf = drawSurfs ; i < numDrawSurfs ; i++, drawSurf++)
-	{
-
-		if (drawSurf->sort == oldSort )  
-		{
+	for (i = 0, drawSurf = drawSurfs ; i < numDrawSurfs ; i++, drawSurf++) {
+		if ( drawSurf->sort == oldSort ) {
 			// fast path, same as previous sort
 			rb_surfaceTable[ *drawSurf->surface ]( drawSurf->surface );
 			continue;
@@ -936,8 +560,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		// a "entityMergable" shader is a shader that can have surfaces from seperate
 		// entities merged into a single batch, like smoke and blood puff sprites
 		if (shader != oldShader || fogNum != oldFogNum || dlighted != oldDlighted 
-			|| ( entityNum != oldEntityNum && !shader->entityMergable ) ) 
-		{
+			|| ( entityNum != oldEntityNum && !shader->entityMergable ) ) {
 			if (oldShader != NULL) {
 				RB_EndSurface();
 			}
@@ -945,7 +568,6 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 			oldShader = shader;
 			oldFogNum = fogNum;
 			oldDlighted = dlighted;
-			oldSurf   = *drawSurf->surface;
 		}
 
 		//
@@ -969,7 +591,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 					R_TransformDlights( backEnd.refdef.num_dlights, backEnd.refdef.dlights, &backEnd.or );
 				}
 
-				if ( backEnd.currentEntity->e.renderfx & RF_DEPTHHACK )
+				if(backEnd.currentEntity->e.renderfx & RF_DEPTHHACK)
 				{
 					// hack the depth range to prevent view model from poking into walls
 					depthRange = qtrue;
@@ -993,15 +615,15 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 			// change depthrange. Also change projection matrix so first person weapon does not look like coming
 			// out of the screen.
 			//
-			if ( oldDepthRange != depthRange || wasCrosshair != isCrosshair )
+			if (oldDepthRange != depthRange || wasCrosshair != isCrosshair)
 			{
-				if ( depthRange )
+				if (depthRange)
 				{
-					if ( backEnd.viewParms.stereoFrame != STEREO_CENTER )
+					if(backEnd.viewParms.stereoFrame != STEREO_CENTER)
 					{
-						if ( isCrosshair )
+						if(isCrosshair)
 						{
-							if ( oldDepthRange )
+							if(oldDepthRange)
 							{
 								// was not a crosshair but now is, change back proj matrix
 								qglMatrixMode(GL_PROJECTION);
@@ -1026,7 +648,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 				}
 				else
 				{
-					if ( !wasCrosshair && backEnd.viewParms.stereoFrame != STEREO_CENTER )
+					if(!wasCrosshair && backEnd.viewParms.stereoFrame != STEREO_CENTER)
 					{
 						qglMatrixMode(GL_PROJECTION);
 						qglLoadMatrixf(backEnd.viewParms.projectionMatrix);
@@ -1050,13 +672,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	backEnd.refdef.floatTime = originalTime;
 
 	// draw the contents of the last shader batch
-	if (oldShader != NULL) 
-	{
-		EndSurfaceCount++;	
-		if (EndSurfaceCount==2)
-		{
-			EndSurfaceCount = 2;
-		}
+	if (oldShader != NULL) {
 		RB_EndSurface();
 	}
 
@@ -1074,42 +690,6 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 
 	// add light flares on lights that aren't obscured
 	RB_RenderFlares();
-
-	// post process for dof, bloom 
-	RB_PostProcess();
-
-	// copy the underwater view if we have one
-	if (backEnd.viewParms.isWater==1)
-	{
-		//Copy scene
-		GL_SelectTexture(0);
-		GL_BindTexnum(tr.underwaterTexnum);
-		qglCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0,0,0, WATER_RES_X, WATER_RES_Y ); 
-	}
-	// copy the reflected view if we have one
-	if (backEnd.viewParms.isWater==2)
-	{
-		//Copy scene
-		GL_SelectTexture(0);
-		GL_BindTexnum(tr.reflectionTexnum);
-		qglCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0,0,0, WATER_RES_X,WATER_RES_Y ); 
-	}
-
-	// make a copy if we want one
-	if (tr.refdef.pixelTarget)
-	{
-		int i;
-		
-		// Bugfix: drivers absolutely hate running in high res and using qglReadPixels near the top or bottom edge.
-		// soo.. lets do it in the middle.
-		qglReadPixels( glConfig.vidWidth / 2,glConfig.vidHeight / 2,tr.refdef.pixelTargetX, tr.refdef.pixelTargetY, GL_RGBA, GL_UNSIGNED_BYTE, tr.refdef.pixelTarget);
-		
-		for (i=0;i<tr.refdef.pixelTargetX*tr.refdef.pixelTargetY;i++)
-		{
-			tr.refdef.pixelTarget[(i*4)+3]=255; //set the alpha pure white
-		}
-	}
-
 }
 
 
@@ -1134,10 +714,10 @@ void	RB_SetGL2D (void) {
 	qglViewport( 0, 0, glConfig.vidWidth, glConfig.vidHeight );
 	qglScissor( 0, 0, glConfig.vidWidth, glConfig.vidHeight );
 	qglMatrixMode(GL_PROJECTION);
-	qglLoadIdentity ();
+    qglLoadIdentity ();
 	qglOrtho (0, glConfig.vidWidth, glConfig.vidHeight, 0, 0, 1);
 	qglMatrixMode(GL_MODELVIEW);
-	qglLoadIdentity ();
+    qglLoadIdentity ();
 
 	GL_State( GLS_DEPTHTEST_DISABLE |
 			  GLS_SRCBLEND_SRC_ALPHA |
@@ -1145,7 +725,6 @@ void	RB_SetGL2D (void) {
 
 	qglDisable( GL_CULL_FACE );
 	qglDisable( GL_CLIP_PLANE0 );
-	qglDisable( GL_CLIP_PLANE1 );
 
 	// set time for 2D shaders
 	backEnd.refdef.time = ri.Milliseconds();
@@ -1219,7 +798,7 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 	qglBegin (GL_QUADS);
 	qglTexCoord2f ( 0.5f / cols,  0.5f / rows );
 	qglVertex2f (x, y);
-	qglTexCoord2f ( ( cols - 0.5f ) / cols,  0.5f / rows );
+	qglTexCoord2f ( ( cols - 0.5f ) / cols ,  0.5f / rows );
 	qglVertex2f (x+w, y);
 	qglTexCoord2f ( ( cols - 0.5f ) / cols, ( rows - 0.5f ) / rows );
 	qglVertex2f (x+w, y+h);
@@ -1287,9 +866,6 @@ const void *RB_StretchPic ( const void *data ) {
 	}
 
 	shader = cmd->shader;
-	if ( !shader )
-		return (const void *)(cmd + 1);
-
 	if ( shader != tess.shader ) {
 		if ( tess.numIndexes ) {
 			RB_EndSurface();
@@ -1368,8 +944,6 @@ const void	*RB_DrawSurfs( const void *data ) {
 	backEnd.refdef = cmd->refdef;
 	backEnd.viewParms = cmd->viewParms;
 
-	//TODO Maybe check for rdf_noworld stuff but q3mme has full 3d ui
-	backEnd.doneSurfaces = qtrue;
 	RB_RenderDrawSurfList( cmd->drawSurfs, cmd->numDrawSurfs );
 
 	return (const void *)(cmd + 1);
@@ -1454,7 +1028,7 @@ void RB_ShowImages( void ) {
 	qglFinish();
 
 	end = ri.Milliseconds();
-	ri.Printf( PRINT_DEVELOPER, "%i msec to draw all images\n", end - start );
+	ri.Printf( PRINT_ALL, "%i msec to draw all images\n", end - start );
 
 }
 
@@ -1545,9 +1119,6 @@ const void	*RB_SwapBuffers( const void *data ) {
 
 	backEnd.projection2D = qfalse;
 
-	backEnd.doneBloom = qfalse;
-	backEnd.doneSurfaces = qfalse;
-	
 	return (const void *)(cmd + 1);
 }
 
@@ -1635,5 +1206,4 @@ void RB_RenderThread( void ) {
 		renderThreadActive = qfalse;
 	}
 }
-
 

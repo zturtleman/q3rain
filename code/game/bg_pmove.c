@@ -283,7 +283,7 @@ static float PM_CmdScale(usercmd_t *cmd) {
   }
 
   total = sqrt(cmd->forwardmove * cmd->forwardmove + cmd->rightmove
-               * cmd->rightmove + cmd->upmove * cmd->upmove);
+      * cmd->rightmove + cmd->upmove * cmd->upmove);
   scale = (float) pm->ps->speed * max / (127.0 * total);
 
   return scale;
@@ -670,7 +670,7 @@ static void PM_WaterMove(void) {
   } else {
     for (i = 0; i < 3; i++)
       wishvel[i] = scale * pml.forward[i] * pm->cmd.forwardmove + scale
-        * pml.right[i] * pm->cmd.rightmove;
+          * pml.right[i] * pm->cmd.rightmove;
 
     wishvel[2] += scale * pm->cmd.upmove;
   }
@@ -847,6 +847,7 @@ static void PM_WallJump(void) {
     boost /= 2;
   }
 
+  // FIXME …really needed?
   flatforward[0] = pml.forward[0];
   flatforward[1] = pml.forward[1];
   flatforward[2] = 0;
@@ -1037,19 +1038,18 @@ static void PM_GrappleMove(void) {
 
   if (vlen <= 100)
     VectorScale(vel, 10 * vlen, vel);
-  else
-    VectorScale(vel, 800, vel);
+else    VectorScale(vel, 800, vel);
 
-  VectorCopy(vel, pm->ps->velocity);
+    VectorCopy(vel, pm->ps->velocity);
 
-  pml.groundPlane = qfalse;
-}
+    pml.groundPlane = qfalse;
+  }
 
-/*
- ===================
- PM_SnowMove
- ===================
- */
+  /*
+   ===================
+   PM_SnowMove
+   ===================
+   */
 
 static void PM_SnowMove(pmove_t * pmove) {
   int i;
@@ -1886,7 +1886,7 @@ static void PM_Footsteps(void) {
   // all cyclic walking effects
   //
   pm->xyspeed = sqrt(pm->ps->velocity[0] * pm->ps->velocity[0]
-                     + pm->ps->velocity[1] * pm->ps->velocity[1]);
+      + pm->ps->velocity[1] * pm->ps->velocity[1]);
 
   if (pm->ps->groundEntityNum == ENTITYNUM_NONE) {
     // airborne leaves position in cycle intact, but doesn't advance
@@ -2124,7 +2124,7 @@ static void PM_Weapon(void) {
     if (!(pm->ps->pm_flags & PMF_USE_ITEM_HELD)) {
       pm->ps->pm_flags |= PMF_USE_ITEM_HELD;
       PM_AddEvent(EV_USE_ITEM0
-                  + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag);
+          + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag);
       pm->ps->stats[STAT_HOLDABLE_ITEM] = 0;
       return;
     }
@@ -2167,8 +2167,8 @@ static void PM_Weapon(void) {
       pm->ps->cooldown -= pml.msec;
     }
     if (pm->ps->weapon == WP_WALTHER
-        && (pm->ps->weaponstate != WEAPON_DROPPING)
-        && (pm->ps->weaponstate != WEAPON_RELOADING)) {
+        && (pm->ps->weaponstate != WEAPON_DROPPING) && (pm->ps->weaponstate
+        != WEAPON_RELOADING)) {
       pm->ps->weaponTime = SEMI_DELAY;
       pm->ps->weaponstate = WEAPON_READY;
       return;
@@ -2410,8 +2410,7 @@ void PmoveSingle(pmove_t * pmove) {
   if (pm->cmd.buttons & BUTTON_SPRINT && pm->ps->stats[STAT_HEALTH] > 60
       && !(pm->cmd.buttons & BUTTON_WALKING) && pm->ps->stamina > 0
       && (abs(pm->cmd.forwardmove) != 0 || abs(pm->cmd.rightmove) != 0)
-      && pml.groundPlane
-      && !(pm->ps->pm_flags & PMF_DUCKED)) {
+      && pml.groundPlane && !(pm->ps->pm_flags & PMF_DUCKED)) {
     pm->ps->sprintAdd += pml.msec / 5;
     if (pm->ps->sprintAdd > 270) {
       pm->ps->sprintAdd = 270;
@@ -2466,7 +2465,7 @@ void PmoveSingle(pmove_t * pmove) {
   }
 
   // clear all pmove local vars
-  memset(&pml, 0, sizeof (pml));
+  memset(&pml, 0, sizeof(pml));
 
   // determine the time
   pml.msec = pmove->cmd.serverTime - pm->ps->commandTime;

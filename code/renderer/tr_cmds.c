@@ -144,7 +144,7 @@ void R_IssueRenderCommands( qboolean runPerformanceCounters ) {
 	}
 
 	// at this point, the back end thread is idle, so it is ok
-	// to look at it's performance counters
+	// to look at its performance counters
 	if ( runPerformanceCounters ) {
 		R_PerformanceCounters();
 	}
@@ -514,14 +514,11 @@ void RE_EndFrame( int *frontEndMsec, int *backEndMsec ) {
 	if ( !tr.registered ) {
 		return;
 	}
-
-	if ( !(tr.refdef.rdflags & RDF_NODISPLAY) && !tr.viewParms.isWater ) {
-		cmd = R_GetCommandBuffer( sizeof( *cmd ) );
-		if ( !cmd ) {
-			return;
-		}
-		cmd->commandId = RC_SWAP_BUFFERS;
+	cmd = R_GetCommandBuffer( sizeof( *cmd ) );
+	if ( !cmd ) {
+		return;
 	}
+	cmd->commandId = RC_SWAP_BUFFERS;
 
 	R_IssueRenderCommands( qtrue );
 
