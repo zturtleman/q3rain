@@ -111,8 +111,7 @@ static void PM_StartTorsoAnim(int anim) {
   if (pm->ps->pm_type >= PM_DEAD) {
     return;
   }
-  pm->ps->torsoAnim = ((pm->ps->torsoAnim & ANIM_TOGGLEBIT) ^ ANIM_TOGGLEBIT)
-      | anim;
+  pm->ps->torsoAnim = ((pm->ps->torsoAnim & ANIM_TOGGLEBIT) ^ ANIM_TOGGLEBIT) | anim;
 }
 
 static void PM_StartLegsAnim(int anim) {
@@ -122,8 +121,7 @@ static void PM_StartLegsAnim(int anim) {
   if (pm->ps->legsTimer > 0) {
     return; // a high priority animation is running
   }
-  pm->ps->legsAnim = ((pm->ps->legsAnim & ANIM_TOGGLEBIT) ^ ANIM_TOGGLEBIT)
-      | anim;
+  pm->ps->legsAnim = ((pm->ps->legsAnim & ANIM_TOGGLEBIT) ^ ANIM_TOGGLEBIT) | anim;
 }
 
 static void PM_ContinueLegsAnim(int anim) {
@@ -282,8 +280,7 @@ static float PM_CmdScale(usercmd_t *cmd) {
     return 0;
   }
 
-  total = sqrt(cmd->forwardmove * cmd->forwardmove + cmd->rightmove
-      * cmd->rightmove + cmd->upmove * cmd->upmove);
+  total = sqrt(cmd->forwardmove * cmd->forwardmove + cmd->rightmove * cmd->rightmove + cmd->upmove * cmd->upmove);
   scale = (float) pm->ps->speed * max / (127.0 * total);
 
   return scale;
@@ -368,8 +365,7 @@ static void PM_LadderMove(void) {
   PM_Accelerate(wishdir, wishspeed, pm_ladderaccelerate);
 
   // This SHOULD help us with sloped ladders, but it remains untested.
-  if (pml.groundPlane
-      && DotProduct(pm->ps->velocity, pml.groundTrace.plane.normal) < 0) {
+  if (pml.groundPlane && DotProduct(pm->ps->velocity, pml.groundTrace.plane.normal) < 0) {
     vel = VectorLength(pm->ps->velocity);
     // slide along the ground plane [the ladder section under our feet]
     PM_ClipVelocity(pm->ps->velocity, pml.groundTrace.plane.normal, pm->ps->velocity, OVERCLIP);
@@ -669,8 +665,7 @@ static void PM_WaterMove(void) {
     wishvel[2] = -60; // sink towards bottom
   } else {
     for (i = 0; i < 3; i++)
-      wishvel[i] = scale * pml.forward[i] * pm->cmd.forwardmove + scale
-          * pml.right[i] * pm->cmd.rightmove;
+      wishvel[i] = scale * pml.forward[i] * pm->cmd.forwardmove + scale * pml.right[i] * pm->cmd.rightmove;
 
     wishvel[2] += scale * pm->cmd.upmove;
   }
@@ -685,8 +680,7 @@ static void PM_WaterMove(void) {
   PM_Accelerate(wishdir, wishspeed, pm_wateraccelerate);
 
   // make sure we can go up slopes easily under water
-  if (pml.groundPlane
-      && DotProduct(pm->ps->velocity, pml.groundTrace.plane.normal) < 0) {
+  if (pml.groundPlane && DotProduct(pm->ps->velocity, pml.groundTrace.plane.normal) < 0) {
     vel = VectorLength(pm->ps->velocity);
     // slide along the ground plane
     PM_ClipVelocity(pm->ps->velocity, pml.groundTrace.plane.normal, pm->ps->velocity, OVERCLIP);
@@ -725,6 +719,10 @@ static qboolean PM_CheckWallClimb(void) {
 
   if (pm->ps->pm_flags & PMF_JUMP_HELD) {
     pm->cmd.upmove = 0;
+    return qfalse;
+  }
+
+  if (pm->ps->velocity[2] <= -200) {
     return qfalse;
   }
 
@@ -860,8 +858,7 @@ static void PM_WallJump(void) {
 #define MINIMUM 10
 
   // 1
-  if (pm->ps->velocity[0] < 0 && pm->ps->velocity[0] > -MINIMUM
-      && pm->ps->velocity[1] < -MINIMUM) {
+  if (pm->ps->velocity[0] < 0 && pm->ps->velocity[0] > -MINIMUM && pm->ps->velocity[1] < -MINIMUM) {
     pm->ps->velocity[0] += boost;
     //Com_Printf("1\n");
     jumped = qtrue;
@@ -876,8 +873,7 @@ static void PM_WallJump(void) {
   }
 
   // 3
-  if (pm->ps->velocity[0] > MINIMUM && pm->ps->velocity[1] > 0
-      && pm->ps->velocity[1] < MINIMUM) {
+  if (pm->ps->velocity[0] > MINIMUM && pm->ps->velocity[1] > 0 && pm->ps->velocity[1] < MINIMUM) {
     pm->ps->velocity[1] += boost;
     pm->ps->velocity[1] *= -1;
     //Com_Printf("3\n");
@@ -885,8 +881,7 @@ static void PM_WallJump(void) {
   }
 
   // 4
-  if (pm->ps->velocity[0] < -MINIMUM && pm->ps->velocity[1] > 0
-      && pm->ps->velocity[1] < MINIMUM) {
+  if (pm->ps->velocity[0] < -MINIMUM && pm->ps->velocity[1] > 0 && pm->ps->velocity[1] < MINIMUM) {
     pm->ps->velocity[1] += boost;
     pm->ps->velocity[1] *= -1;
     //Com_Printf("4\n");
@@ -894,8 +889,7 @@ static void PM_WallJump(void) {
   }
 
   // 5
-  if (pm->ps->velocity[0] < -MINIMUM && pm->ps->velocity[1] < 0
-      && pm->ps->velocity[1] > -MINIMUM) {
+  if (pm->ps->velocity[0] < -MINIMUM && pm->ps->velocity[1] < 0 && pm->ps->velocity[1] > -MINIMUM) {
     pm->ps->velocity[1] -= boost;
     pm->ps->velocity[1] *= -1;
     //Com_Printf("5\n");
@@ -903,8 +897,7 @@ static void PM_WallJump(void) {
   }
 
   // 6
-  if (pm->ps->velocity[0] > MINIMUM && pm->ps->velocity[1] < 0
-      && pm->ps->velocity[1] > -MINIMUM) {
+  if (pm->ps->velocity[0] > MINIMUM && pm->ps->velocity[1] < 0 && pm->ps->velocity[1] > -MINIMUM) {
     pm->ps->velocity[1] -= boost;
     pm->ps->velocity[1] *= -1;
     //Com_Printf("6\n");
@@ -912,8 +905,7 @@ static void PM_WallJump(void) {
   }
 
   // 7
-  if (pm->ps->velocity[0] > 0 && pm->ps->velocity[0] < MINIMUM
-      && pm->ps->velocity[1] < -MINIMUM) {
+  if (pm->ps->velocity[0] > 0 && pm->ps->velocity[0] < MINIMUM && pm->ps->velocity[1] < -MINIMUM) {
     pm->ps->velocity[0] += boost;
     pm->ps->velocity[0] *= -1;
     //Com_Printf("7\n");
@@ -921,8 +913,7 @@ static void PM_WallJump(void) {
   }
 
   // 8
-  if (pm->ps->velocity[0] > 0 && pm->ps->velocity[0] < MINIMUM
-      && pm->ps->velocity[1] > MINIMUM) {
+  if (pm->ps->velocity[0] > 0 && pm->ps->velocity[0] < MINIMUM && pm->ps->velocity[1] > MINIMUM) {
     pm->ps->velocity[0] += boost;
     pm->ps->velocity[0] *= -1;
     //Com_Printf("8\n");
@@ -1066,8 +1057,7 @@ static void PM_SnowMove(pmove_t * pmove) {
   pmove->ps->wallclimbs = MAX_WALLCLIMBS;
   pmove->ps->walljumps = MAX_WALLJUMPS;
 
-  if (pm->waterlevel > 2
-      && DotProduct(pml.forward, pml.groundTrace.plane.normal) > 0) {
+  if (pm->waterlevel > 2 && DotProduct(pml.forward, pml.groundTrace.plane.normal) > 0) {
     PM_WaterMove();
     return;
   }
@@ -1140,8 +1130,7 @@ static void PM_SnowMove(pmove_t * pmove) {
 
   // when a player gets hit, they temporarily lose
   // full control, which allows them to be moved a bit
-  if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags
-      & PMF_TIME_KNOCKBACK) {
+  if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
     accelerate = pm_airaccelerate;
   } else {
     accelerate = pm_snowaccelerate;
@@ -1152,8 +1141,7 @@ static void PM_SnowMove(pmove_t * pmove) {
   //Com_Printf("velocity = %1.1f %1.1f %1.1f\n", pm->ps->velocity[0], pm->ps->velocity[1], pm->ps->velocity[2]);
   //Com_Printf("velocity1 = %1.1f\n", VectorLength(pm->ps->velocity));
 
-  if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags
-      & PMF_TIME_KNOCKBACK || snowboarding) {
+  if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK || snowboarding) {
     if (snowboarding) {
       pm->ps->velocity[2] -= (pm->ps->gravity / 6) * pml.frametime;
     } else {
@@ -1203,8 +1191,7 @@ static void PM_WalkMove(pmove_t *pmove) {
     pm->cmd.forwardmove = pm->cmd.rightmove = pm->cmd.upmove = 0;
   }
 
-  if (pm->waterlevel > 2
-      && DotProduct(pml.forward, pml.groundTrace.plane.normal) > 0) {
+  if (pm->waterlevel > 2 && DotProduct(pml.forward, pml.groundTrace.plane.normal) > 0) {
     // begin swimming
     PM_WaterMove();
     return;
@@ -1288,8 +1275,7 @@ static void PM_WalkMove(pmove_t *pmove) {
 
   // when a player gets hit, they temporarily lose
   // full control, which allows them to be moved a bit
-  if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags
-      & PMF_TIME_KNOCKBACK) {
+  if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
     accelerate = pm_airaccelerate;
   } else {
     accelerate = pm_accelerate;
@@ -1300,8 +1286,7 @@ static void PM_WalkMove(pmove_t *pmove) {
   //Com_Printf("velocity = %1.1f %1.1f %1.1f\n", pm->ps->velocity[0], pm->ps->velocity[1], pm->ps->velocity[2]);
   //Com_Printf("velocity1 = %1.1f\n", VectorLength(pm->ps->velocity));
 
-  if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags
-      & PMF_TIME_KNOCKBACK) {
+  if ((pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK) {
     pm->ps->velocity[2] -= pm->ps->gravity * pml.frametime;
   }
 
@@ -1366,8 +1351,7 @@ static void PM_FlyMove(void) {
     wishvel[2] = 0;
   } else {
     for (i = 0; i < 3; i++) {
-      wishvel[i] = scale * pml.forward[i] * pm->cmd.forwardmove + scale
-          * pml.right[i] * pm->cmd.rightmove;
+      wishvel[i] = scale * pml.forward[i] * pm->cmd.forwardmove + scale * pml.right[i] * pm->cmd.rightmove;
     }
 
     wishvel[2] += scale * pm->cmd.upmove;
@@ -1716,8 +1700,7 @@ static void PM_GroundTrace(void) {
   }
 
   // check if getting thrown off the ground
-  if (pm->ps->velocity[2] > 0
-      && DotProduct(pm->ps->velocity, trace.plane.normal) > 10) {
+  if (pm->ps->velocity[2] > 0 && DotProduct(pm->ps->velocity, trace.plane.normal) > 10) {
     if (pm->debugLevel) {
       Com_Printf("%i:kickoff\n", c_pmove);
     }
@@ -1885,8 +1868,7 @@ static void PM_Footsteps(void) {
   // calculate speed and cycle to be used for
   // all cyclic walking effects
   //
-  pm->xyspeed = sqrt(pm->ps->velocity[0] * pm->ps->velocity[0]
-      + pm->ps->velocity[1] * pm->ps->velocity[1]);
+  pm->xyspeed = sqrt(pm->ps->velocity[0] * pm->ps->velocity[0] + pm->ps->velocity[1] * pm->ps->velocity[1]);
 
   if (pm->ps->groundEntityNum == ENTITYNUM_NONE) {
     // airborne leaves position in cycle intact, but doesn't advance
@@ -2123,8 +2105,7 @@ static void PM_Weapon(void) {
   if (pm->cmd.buttons & BUTTON_USE_HOLDABLE) {
     if (!(pm->ps->pm_flags & PMF_USE_ITEM_HELD)) {
       pm->ps->pm_flags |= PMF_USE_ITEM_HELD;
-      PM_AddEvent(EV_USE_ITEM0
-          + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag);
+      PM_AddEvent(EV_USE_ITEM0 + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag);
       pm->ps->stats[STAT_HOLDABLE_ITEM] = 0;
       return;
     }
@@ -2166,9 +2147,7 @@ static void PM_Weapon(void) {
     } else if (pm->ps->cooldown > 0) {
       pm->ps->cooldown -= pml.msec;
     }
-    if (pm->ps->weapon == WP_WALTHER
-        && (pm->ps->weaponstate != WEAPON_DROPPING) && (pm->ps->weaponstate
-        != WEAPON_RELOADING)) {
+    if (pm->ps->weapon == WP_WALTHER && (pm->ps->weaponstate != WEAPON_DROPPING) && (pm->ps->weaponstate != WEAPON_RELOADING)) {
       pm->ps->weaponTime = SEMI_DELAY;
       pm->ps->weaponstate = WEAPON_READY;
       return;
@@ -2229,8 +2208,7 @@ static void PM_Weapon(void) {
 
   // check for out of ammo
   // modified for changing ammo from ps->ammo to client->clipammo updated to ps->stats[STAT_AMMO]
-  if (!pm->ps->stats[STAT_AMMO] && pm->ps->weapon != WP_KNIFE && pm->ps->weapon
-      != WP_HANDS) {
+  if (!pm->ps->stats[STAT_AMMO] && pm->ps->weapon != WP_KNIFE && pm->ps->weapon != WP_HANDS) {
     PM_AddEvent(EV_NOAMMO);
     pm->ps->weaponTime += 200;
     return;
@@ -2407,10 +2385,8 @@ void PmoveSingle(pmove_t * pmove) {
     pm->ps->eFlags &= ~EF_TALK;
   }
 
-  if (pm->cmd.buttons & BUTTON_SPRINT && pm->ps->stats[STAT_HEALTH] > 60
-      && !(pm->cmd.buttons & BUTTON_WALKING) && pm->ps->stamina > 0
-      && (abs(pm->cmd.forwardmove) != 0 || abs(pm->cmd.rightmove) != 0)
-      && pml.groundPlane && !(pm->ps->pm_flags & PMF_DUCKED)) {
+  if (pm->cmd.buttons & BUTTON_SPRINT && pm->ps->stats[STAT_HEALTH] > 60 && !(pm->cmd.buttons & BUTTON_WALKING) && pm->ps->stamina > 0
+      && (abs(pm->cmd.forwardmove) != 0 || abs(pm->cmd.rightmove) != 0) && pml.groundPlane && !(pm->ps->pm_flags & PMF_DUCKED)) {
     pm->ps->sprintAdd += pml.msec / 5;
     if (pm->ps->sprintAdd > 270) {
       pm->ps->sprintAdd = 270;
@@ -2425,23 +2401,19 @@ void PmoveSingle(pmove_t * pmove) {
   }
 
   // probably hit a wall
-  if (pm->ps->velocity[0] < 30 && pm->ps->velocity[0] > -30
-      && pm->ps->velocity[1] < 30 && pm->ps->velocity[1] > -30
-      && pm->ps->sprintAdd > 100) {
+  if (pm->ps->velocity[0] < 30 && pm->ps->velocity[0] > -30 && pm->ps->velocity[1] < 30 && pm->ps->velocity[1] > -30 && pm->ps->sprintAdd > 100) {
     pm->ps->sprintAdd = 0;
   }
 
   // set the firing flag for continuous beam weapons
-  if (!(pm->ps->pm_flags & PMF_RESPAWNED) && pm->ps->pm_type != PM_INTERMISSION
-      && (pm->cmd.buttons & BUTTON_ATTACK) && pm->ps->ammo[pm->ps->weapon]) {
+  if (!(pm->ps->pm_flags & PMF_RESPAWNED) && pm->ps->pm_type != PM_INTERMISSION && (pm->cmd.buttons & BUTTON_ATTACK) && pm->ps->ammo[pm->ps->weapon]) {
     pm->ps->eFlags |= EF_FIRING;
   } else {
     pm->ps->eFlags &= ~EF_FIRING;
   }
 
   // clear the respawned flag if attack and use are cleared
-  if (pm->ps->stats[STAT_HEALTH] > 0 && !(pm->cmd.buttons & (BUTTON_ATTACK
-      | BUTTON_USE_HOLDABLE))) {
+  if (pm->ps->stats[STAT_HEALTH] > 0 && !(pm->cmd.buttons & (BUTTON_ATTACK | BUTTON_USE_HOLDABLE))) {
     pm->ps->pm_flags &= ~PMF_RESPAWNED;
   }
 
@@ -2457,8 +2429,7 @@ void PmoveSingle(pmove_t * pmove) {
     pmove->cmd.upmove = 0;
   }
 
-  if (pm->cmd.buttons & BUTTON_WALKING && (abs(pm->cmd.forwardmove) != 0
-      || abs(pm->cmd.rightmove) != 0 || abs(pm->cmd.upmove) != 0)) {
+  if (pm->cmd.buttons & BUTTON_WALKING && (abs(pm->cmd.forwardmove) != 0 || abs(pm->cmd.rightmove) != 0 || abs(pm->cmd.upmove) != 0)) {
     regain *= 1.5f;
   } else if (abs(pm->cmd.forwardmove) == 0 && abs(pm->cmd.rightmove) == 0) {
     regain *= 2.5;
@@ -2497,8 +2468,7 @@ void PmoveSingle(pmove_t * pmove) {
   // decide if backpedaling animations should be used
   if (pm->cmd.forwardmove < 0) {
     pm->ps->pm_flags |= PMF_BACKWARDS_RUN;
-  } else if (pm->cmd.forwardmove > 0 || (pm->cmd.forwardmove == 0
-      && pm->cmd.rightmove)) {
+  } else if (pm->cmd.forwardmove > 0 || (pm->cmd.forwardmove == 0 && pm->cmd.rightmove)) {
     pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
   }
 
@@ -2525,8 +2495,7 @@ void PmoveSingle(pmove_t * pmove) {
     return; // no movement at all
   }
 
-  if (pm->ps->pm_type == PM_INTERMISSION || pm->ps->pm_type
-      == PM_SPINTERMISSION) {
+  if (pm->ps->pm_type == PM_INTERMISSION || pm->ps->pm_type == PM_SPINTERMISSION) {
     return; // no movement at all
   }
 
@@ -2623,8 +2592,7 @@ void Pmove(pmove_t * pmove) {
     pmove->ps->commandTime = finalTime - 1000;
   }
 
-  pmove->ps->pmove_framecount = (pmove->ps->pmove_framecount + 1) & ((1
-      << PS_PMOVEFRAMECOUNTBITS) - 1);
+  pmove->ps->pmove_framecount = (pmove->ps->pmove_framecount + 1) & ((1 << PS_PMOVEFRAMECOUNTBITS) - 1);
 
   // chop the move up if it is too long, to prevent framerate
   // dependent behavior
@@ -2646,8 +2614,7 @@ void Pmove(pmove_t * pmove) {
     PmoveSingle(pmove);
 
     if (pmove->ps->pm_flags & PMF_JUMP_HELD) {
-      if (pmove->ps->jumpCooldown < pmove->ps->levelTime && pmove->ps->stamina
-          >= 1000) {
+      if (pmove->ps->jumpCooldown < pmove->ps->levelTime && pmove->ps->stamina >= 1000) {
         pmove->cmd.upmove = 20;
       }
     }
