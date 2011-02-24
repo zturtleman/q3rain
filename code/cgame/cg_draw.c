@@ -826,27 +826,145 @@ static float CG_DrawTeamOverlay(float y, qboolean right, qboolean upper) {
 
 /*
  =================
+ CG_CleanKillfeed
+ =================
+ */
+void CG_CleanKillfeed(void) {
+  int i;
+  for (i = 0; i < KILLFEED_LENGTH; i++) {
+    if (killfeed.times[i] + (cg_killfeedTime.value * 1000) < cg.time) {
+      killfeed.attackers[i][0] = 0;
+      killfeed.targets[i][0] = 0;
+      killfeed.mods[i] = -1;
+      killfeed.times[i] = 0;
+    }
+  }
+  CG_KillfeedSort();
+}
+
+int CG_WeaponFromMod(int mod) {
+  switch (mod) {
+    case MOD_ACR:
+      return WP_ACR;
+    case MOD_BARRETT:
+      return WP_BARRETT;
+    case MOD_INTERVENTION:
+      return WP_INTERVENTION;
+    case MOD_HE:
+    case MOD_HE_SPLASH:
+      return WP_HE;
+    case MOD_WALTHER:
+      return WP_WALTHER;
+    case MOD_CROSSBOW:
+      return WP_CROSSBOW;
+    case MOD_KNIFE:
+      return WP_KNIFE;
+    case MOD_HANDS:
+      return WP_HANDS;
+    case MOD_BOMB:
+      return WP_BOMB;
+    case MOD_SNOWBOARD:
+      return WP_SNOWBOARD;
+    default:
+      return -1;
+  }
+}
+
+char *CG_NameForMod(int mod) {
+  if (BG_NameForWeapon(CG_WeaponFromMod(mod)) != NULL) {
+    return BG_NameForWeapon(CG_WeaponFromMod(mod));
+  } else {
+    switch (mod) {
+      case MOD_ADMIN:
+        return "Admin";
+      case MOD_BLEED:
+        return "Bleed";
+      case MOD_CRUSH:
+        return "Crush";
+      case MOD_FALLING:
+        return "Cratered";
+      case MOD_LAVA:
+        return "Lava";
+      case MOD_MOOR:
+        return "Moor";
+      case MOD_NADELOVE:
+        return "Exploded";
+      case MOD_NUKE:
+        return "Nuke";
+      case MOD_SHRAPNEL:
+        return "Shrapnel";
+      case MOD_SLIME:
+        return "Slime";
+      case MOD_SUICIDE:
+        return "Suicide";
+      case MOD_TARGET_LASER:
+        return "Laser";
+      case MOD_TELEFRAG:
+        return "Telefrag";
+      case MOD_TRIGGER_HURT:
+        return "Trigger";
+      case MOD_UNKNOWN:
+        return "Unknown";
+      case MOD_WATER:
+        return "Drowned";
+      case MOD_WINDOW:
+        return "Glass";
+    }
+  }
+  return "";
+}
+
+/*
+ =================
  CG_DrawKillfeed
  =================
  */
 void CG_DrawKillfeed(void) {
-  int i, attackerLength, mod;
-  int lineHeight = 48;
+  int i, mod;
+  int x, y, w, h;
+  int lineHeight = 24;
+  float *color;
   if (!cg_killfeed.integer) {
     return;
   }
+  x = 16;
+  w = 6;
+  h = 12;
   for (i = 0; i < KILLFEED_LENGTH; i++) {
-    attackerLength = strlen(killfeed.attackers[i]) * 8;
-    if (!attackerLength) {
+    if (!killfeed.attackers[i][0]) {
+      continue;
+    }
+    color = CG_FadeColorTime(killfeed.times[i], cg_killfeedTime.value * 1000, (cg_killfeedTime.value * 1000) / 2);
+    if (color[3] <= 0) {
       continue;
     }
     mod = killfeed.mods[i];
-    CG_DrawSmallString(32, 39 + (i * lineHeight), killfeed.attackers[i], 1.0);
-    CG_DrawPic(48 + attackerLength, 32 + (i * lineHeight), 96, 32, cgs.media.sha_mods[mod]);
-    if (mod != MOD_FALLING && killfeed.targets[i][0]) {
-      CG_DrawSmallString(160 + attackerLength, 39 + (i * lineHeight), killfeed.targets[i], 1.0);
+    y = 39 + (i * lineHeight);
+    if (cg_killfeed.integer == 1) {
+      CG_DrawStringExtAlpha(x, y, killfeed.attackers[i], qfalse, w, h, 0, color[3]);
+    } else if (cg_killfeed.integer == 2) {
+      if (killfeed.targets[i][0]) {
+        CG_DrawStringExtAlpha(x, y, killfeed.attackers[i], qfalse, w, h, 0, color[3]);
+      } else {
+        CG_DrawStringExtAlpha(x, y, va("%s ^1X", killfeed.attackers[i]), qfalse, w, h, 0, color[3]);
+      }
+    } else if (cg_killfeed.integer >= 3) {
+      CG_DrawStringExtAlpha(x, y, killfeed.attackers[i], qfalse, w, h, 0, color[3]);
+    }
+    if (cg_killfeed.integer == 1) {
+      CG_DrawPic(144, y - 1, 48, 16, cgs.media.sha_mods[mod]);
+    }
+    if (killfeed.targets[i][0]) {
+      if (cg_killfeed.integer == 1) {
+        CG_DrawStringExtAlpha(x + 192, y, killfeed.targets[i], qfalse, w, h, 0, color[3]);
+      } else if (cg_killfeed.integer == 2) {
+        CG_DrawStringExtAlpha(x + (Q_PrintStrlen(killfeed.attackers[i]) * w), y, va(" --> %s", killfeed.targets[i]), qfalse, w, h, 0, color[3]);
+      } else if (cg_killfeed.integer >= 3) {
+        CG_DrawStringExtAlpha(x + (Q_PrintStrlen(killfeed.attackers[i]) * w), y, va(" [%s] %s", CG_NameForMod(mod), killfeed.targets[i]), qfalse, w, h, 0, color[3]);
+      }
     }
   }
+  CG_CleanKillfeed();
 }
 
 /*

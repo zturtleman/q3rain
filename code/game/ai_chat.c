@@ -294,30 +294,6 @@ char *BotMapTitle(void) {
 
 char *BotWeaponNameForMeansOfDeath(int mod) {
   switch (mod) {
-    case MOD_SHOTGUN:
-      return "Shotgun";
-    case MOD_GAUNTLET:
-      return "Gauntlet";
-    case MOD_MACHINEGUN:
-      return "Machinegun";
-    case MOD_GRENADE:
-    case MOD_GRENADE_SPLASH:
-      return "Grenade Launcher";
-    case MOD_ROCKET:
-    case MOD_ROCKET_SPLASH:
-      return "Rocket Launcher";
-    case MOD_PLASMA:
-    case MOD_PLASMA_SPLASH:
-      return "Plasmagun";
-    case MOD_RAILGUN:
-      return "Railgun";
-    case MOD_LIGHTNING:
-      return "Lightning Gun";
-    case MOD_BFG:
-    case MOD_BFG_SPLASH:
-      return "BFG10K";
-    case MOD_GRAPPLE:
-      return "Grapple";
     case MOD_KNIFE:
       return "Knife";
     case MOD_HE:
@@ -670,9 +646,7 @@ int BotChat_Death(bot_state_t *bs) {
     else if (bs->botdeathtype == MOD_TELEFRAG)
       BotAI_BotInitialChat(bs, "death_telefrag", name, NULL);
     else {
-      if ((bs->botdeathtype == MOD_KNIFE || bs->botdeathtype == MOD_RAILGUN || bs->botdeathtype == MOD_BFG || bs->botdeathtype == MOD_BFG_SPLASH) && random()
-          < 0.5) {
-
+      if ((bs->botdeathtype == MOD_KNIFE) && random() < 0.5) {
         if (bs->botdeathtype == MOD_KNIFE)
           BotAI_BotInitialChat(bs, "death_gauntlet", name, // 0
           BotWeaponNameForMeansOfDeath(bs->botdeathtype), // 1

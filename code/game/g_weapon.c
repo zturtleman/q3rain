@@ -20,7 +20,7 @@
  ===========================================================================
  */
 //
-// g_weapon.c 
+// g_weapon.c
 // perform the server side effects of a weapon firing
 
 #include "g_local.h"
@@ -89,52 +89,6 @@ void G_PushBack(gentity_t *ent, int knockback, qboolean allowCancel) {
     ent->client->ps.pm_time = t;
     ent->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
   }
-}
-
-/*
- ===============
- CheckGauntletAttack
- ===============
- */
-qboolean CheckGauntletAttack(gentity_t *ent) {
-  trace_t tr;
-  vec3_t end;
-  gentity_t *tent;
-  gentity_t *traceEnt;
-  int damage;
-
-  // set aiming directions
-  AngleVectors(ent->client->ps.viewangles, forward, right, up);
-
-  CalcMuzzlePoint(ent, forward, right, up, muzzle);
-
-  VectorMA(muzzle, 32, forward, end);
-
-  trap_Trace(&tr, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
-  if (tr.surfaceFlags & SURF_NOIMPACT) {
-    return qfalse;
-  }
-
-  traceEnt = &g_entities[tr.entityNum];
-
-  // send blood impact
-  if (traceEnt->takedamage && traceEnt->client) {
-    tent = G_TempEntity(tr.endpos, EV_MISSILE_HIT);
-    tent->s.otherEntityNum = traceEnt->s.number;
-    tent->s.eventParm = DirToByte(tr.plane.normal);
-    tent->s.weapon = ent->s.weapon;
-  }
-
-  if (!traceEnt->takedamage) {
-    return qfalse;
-  }
-
-  s_quadFactor = 1;
-
-  damage = 50;
-  G_Damage(traceEnt, ent, ent, forward, tr.endpos, damage, 0, MOD_GAUNTLET);
-
-  return qtrue;
 }
 
 /*
@@ -216,7 +170,7 @@ void Bullet_Fire(gentity_t *ent, float spread, int damage) {
     tent->s.otherEntityNum = ent->s.number;
 
     if (traceEnt->takedamage) {
-      G_Damage(traceEnt, ent, ent, forward, tr.endpos, damage, 0, MOD_MACHINEGUN);
+      G_Damage(traceEnt, ent, ent, forward, tr.endpos, damage, 0, MOD_ACR);
     }
     break;
   }
@@ -352,8 +306,7 @@ qboolean LogAccuracyHit(gentity_t *target, gentity_t *attacker) {
  set muzzle location relative to pivoting eye
  ===============
  */
-void CalcMuzzlePoint(gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up,
-                     vec3_t muzzlePoint) {
+void CalcMuzzlePoint(gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint) {
   VectorCopy(ent->s.pos.trBase, muzzlePoint);
   muzzlePoint[2] += ent->client->ps.viewheight;
   VectorMA(muzzlePoint, 14, forward, muzzlePoint);
@@ -368,8 +321,7 @@ void CalcMuzzlePoint(gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up,
  set muzzle location relative to pivoting eye
  ===============
  */
-void CalcMuzzlePointOrigin(gentity_t *ent, vec3_t origin, vec3_t forward,
-                           vec3_t right, vec3_t up, vec3_t muzzlePoint) {
+void CalcMuzzlePointOrigin(gentity_t *ent, vec3_t origin, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint) {
   VectorCopy(ent->s.pos.trBase, muzzlePoint);
   muzzlePoint[2] += ent->client->ps.viewheight;
   VectorMA(muzzlePoint, 14, forward, muzzlePoint);
@@ -583,8 +535,7 @@ void Weapon_ACR_Fire(gentity_t *ent) {
 
   if (ent->client != NULL) {
     ent->client->ps.spammed++;
-    ent->client->ps.spread = ACR_MINSPREAD + (ACR_SPREADADD
-        * (ent->client->ps.spammed - 1));
+    ent->client->ps.spread = ACR_MINSPREAD + (ACR_SPREADADD * (ent->client->ps.spammed - 1));
     ent->client->ps.spread += ent->client->ps.sprintAdd / 4;
     if (ent->client->ps.spread > ACR_MAXSPREAD) {
       ent->client->ps.spread = ACR_MAXSPREAD;
@@ -1001,8 +952,7 @@ void Weapon_Walther_Fire(gentity_t *ent) {
 
   if (ent->client != NULL) {
     ent->client->ps.spammed++;
-    ent->client->ps.spread = WALTHER_MINSPREAD + (WALTHER_SPREADADD
-        * (ent->client->ps.spammed - 1));
+    ent->client->ps.spread = WALTHER_MINSPREAD + (WALTHER_SPREADADD * (ent->client->ps.spammed - 1));
     ent->client->ps.spread += ent->client->ps.sprintAdd / 4;
     if (ent->client->ps.spread > WALTHER_MAXSPREAD) {
       ent->client->ps.spread = WALTHER_MAXSPREAD;
@@ -1140,8 +1090,7 @@ void FireWeapon(gentity_t *ent) {
       Weapon_Knife_Fire(ent);
       break;
     case WP_HE:
-      Weapon_HE_Fire(ent, ent->client->ps.grenadetime
-                     - ent->client->ps.levelTime);
+      Weapon_HE_Fire(ent, ent->client->ps.grenadetime - ent->client->ps.levelTime);
       if (ent->client->clipammo[WP_HE] == 0) {
         ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_HE);
         ent->client->ps.weapon = WP_HANDS;
@@ -1149,11 +1098,15 @@ void FireWeapon(gentity_t *ent) {
       break;
     case WP_BARRETT:
       Weapon_Barrett_Fire(ent, 0);
-      ent->client->ps.zoomFov = 0;
+      if (g_zoomreset.integer) {
+        ent->client->ps.zoomFov = 0;
+      }
       break;
     case WP_INTERVENTION:
       Weapon_Intervention_Fire(ent, 0);
-      ent->client->ps.zoomFov = 0;
+      if (g_zoomreset.integer) {
+        ent->client->ps.zoomFov = 0;
+      }
       break;
     case WP_CROSSBOW:
       Weapon_Crossbow_Fire(ent);

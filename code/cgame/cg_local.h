@@ -1111,6 +1111,7 @@ extern vmCvar_t cg_lagometerX;
 extern vmCvar_t cg_lagometerY;
 
 extern vmCvar_t cg_killfeed;
+extern vmCvar_t cg_killfeedTime;
 
 //
 // cg_main.c
@@ -1202,6 +1203,7 @@ typedef struct {
   int mods[KILLFEED_LENGTH];
   char attackers[KILLFEED_LENGTH][32];
   char targets[KILLFEED_LENGTH][32];
+  int times[KILLFEED_LENGTH];
 } killfeed_t;
 
 extern killfeed_t killfeed;
@@ -1264,6 +1266,8 @@ void CG_CheckEvents(centity_t *cent);
 const char *CG_PlaceString(int rank);
 void CG_EntityEvent(centity_t *cent, vec3_t position);
 void CG_PainEvent(centity_t *cent, int health);
+void CG_KillfeedShift(char attacker[32], char target[32], int mod);
+void CG_KillfeedSort(void);
 
 //
 // cg_ents.c

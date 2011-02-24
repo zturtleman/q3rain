@@ -2228,10 +2228,10 @@ static void PM_Weapon(void) {
       addTime = 500;
       break;
     case WP_BARRETT:
-      addTime = 4000;
+      addTime = 800;
       break;
     case WP_INTERVENTION:
-      addTime = 3000;
+      addTime = 800;
       break;
     case WP_CROSSBOW:
       addTime = 400;

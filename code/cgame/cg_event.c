@@ -70,26 +70,67 @@ const char *CG_PlaceString(int rank) {
   return str;
 }
 
+static void CG_KillfeedAppend(char attacker[32], char target[32], int mod);
+
+/*
+ =============
+ CG_KillfeedShift
+ =============
+ */
+void CG_KillfeedShift(char attacker[32], char target[32], int mod) {
+  int i;
+  for (i = 1; i < KILLFEED_LENGTH; i++) {
+    Q_strncpyz(killfeed.attackers[i - 1], killfeed.attackers[i], 32);
+    Q_strncpyz(killfeed.targets[i - 1], killfeed.targets[i], 32);
+    killfeed.mods[i - 1] = killfeed.mods[i];
+    killfeed.times[i - 1] = killfeed.times[i];
+  }
+  if (attacker != NULL && target != NULL && mod >= 0) {
+    Q_strncpyz(killfeed.attackers[KILLFEED_LENGTH - 1], attacker, 32);
+    Q_strncpyz(killfeed.targets[KILLFEED_LENGTH - 1], target, 32);
+    killfeed.mods[KILLFEED_LENGTH - 1] = mod;
+    killfeed.times[i] = cg.time;
+  }
+}
+
+/*
+ =============
+ CG_KillfeedSort
+ =============
+ */
+void CG_KillfeedSort(void) {
+  int i;
+  for (i = 1; i < KILLFEED_LENGTH; i++) {
+    if (!killfeed.attackers[i - 1][0]) {
+      Q_strncpyz(killfeed.attackers[i - 1], killfeed.attackers[i], 32);
+      Q_strncpyz(killfeed.targets[i - 1], killfeed.targets[i], 32);
+      killfeed.mods[i - 1] = killfeed.mods[i];
+      killfeed.times[i - 1] = killfeed.times[i];
+      killfeed.attackers[i][0] = 0;
+      killfeed.targets[i][0] = 0;
+      killfeed.mods[i] = -1;
+      killfeed.times[i] = 0;
+    }
+  }
+}
+
 /*
  =============
  CG_KillfeedAppend
  =============
  */
 static void CG_KillfeedAppend(char attacker[32], char target[32], int mod) {
-  int i, attackerLength, j;
+  int i;
   for (i = 0; i < KILLFEED_LENGTH; i++) {
-    attackerLength = strlen(killfeed.attackers[i]);
-    if (!attackerLength) {
-      if (killfeed.attackers[i] != NULL) {
-        Q_strncpyz(killfeed.attackers[i], attacker, sizeof(killfeed.attackers[i]));
-      }
-      if (killfeed.targets[i] != NULL) {
-        Q_strncpyz(killfeed.targets[i], target, sizeof(killfeed.targets[i]));
-      }
+    if (!killfeed.attackers[i][0]) {
+      Q_strncpyz(killfeed.attackers[i], attacker, sizeof(killfeed.attackers[i]));
+      Q_strncpyz(killfeed.targets[i], target, sizeof(killfeed.targets[i]));
       killfeed.mods[i] = mod;
-      break;
+      killfeed.times[i] = cg.time;
+      return;
     }
   }
+  CG_KillfeedShift(attacker, target, mod);
 }
 
 /*
@@ -103,19 +144,19 @@ static void CG_Killfeed(int mod, int attacker, int target, char attackerName[32]
   if (attackerName == NULL || !attackerName) {
     attackerName = "";
   } else if (attacker == ENTITYNUM_WORLD) {
-    attackerName = targetName;
-    targetName = "<world>";
+    Q_strncpyz(attackerName, targetName, 32);
+    targetName[0] = 0;
   }
   if (targetName == NULL || !targetName) {
     targetName = "";
   }
   if (attacker == target) {
-    CG_Printf("%i (%s) killed himself by %i\n", attacker, attackerName, mod);
+    //CG_Printf("%i (%s) killed himself by %i\n", attacker, attackerName, mod);
     targetName = "";
   } else if (mod <= -1 || attacker <= -1) {
-    CG_Printf("%i (%s) died for unknown reason\n", target, targetName);
+    //CG_Printf("%i (%s) died for unknown reason\n", target, targetName);
   } else {
-    CG_Printf("%i (%s) was killed by %i (%s) using %i\n", target, targetName, attacker, attackerName, mod);
+    //CG_Printf("%i (%s) was killed by %i (%s) using %i\n", target, targetName, attacker, attackerName, mod);
   }
   CG_KillfeedAppend(attackerName, targetName, mod);
 }

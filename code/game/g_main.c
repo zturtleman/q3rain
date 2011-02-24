@@ -91,6 +91,8 @@ vmCvar_t g_pistol;
 vmCvar_t g_grenade;
 vmCvar_t g_misc;
 
+vmCvar_t g_zoomreset;
+
 static cvarTable_t gameCvarTable[] = {
 // don't override the cheat state set by the system
     { &g_cheats, "sv_cheats", "", 0, 0, qfalse },
@@ -167,6 +169,7 @@ static cvarTable_t gameCvarTable[] = {
     { &g_grenade, "g_grenade", "-1", CVAR_SERVERINFO, 0, qfalse },
     { &g_misc, "g_misc", "-1", CVAR_SERVERINFO, 0, qfalse },
 
+    { &g_zoomreset, "cg_zoomreset", "1", CVAR_ARCHIVE, 0, qfalse },
 };
 
 static int gameCvarTableSize = sizeof(gameCvarTable) / sizeof(gameCvarTable[0]);

@@ -182,6 +182,7 @@ vmCvar_t cg_lagometerX;
 vmCvar_t cg_lagometerY;
 
 vmCvar_t cg_killfeed;
+vmCvar_t cg_killfeedTime;
 
 typedef struct {
 vmCvar_t *vmCvar;
@@ -288,7 +289,7 @@ static cvarTable_t cvarTable[] = { { &cg_ignore, "cg_ignore", "0", 0 }, // used 
     { &cg_lagometerX, "cg_lagometerX", "560", CVAR_ARCHIVE },
     { &cg_lagometerY, "cg_lagometerY", "240", CVAR_ARCHIVE },
     { &cg_killfeed, "cg_killfeed", "1", CVAR_ARCHIVE },
-};
+    { &cg_killfeedTime, "cg_killfeedTime", "5", CVAR_ARCHIVE }, };
 
 static int cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
 

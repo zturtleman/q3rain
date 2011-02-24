@@ -577,22 +577,6 @@ typedef enum {
 // means of death
 
 typedef enum {
-    // TODO remove
-    MOD_SHOTGUN,
-    MOD_GAUNTLET,
-    MOD_MACHINEGUN,
-    MOD_GRENADE,
-    MOD_GRENADE_SPLASH,
-    MOD_ROCKET,
-    MOD_ROCKET_SPLASH,
-    MOD_PLASMA,
-    MOD_PLASMA_SPLASH,
-    MOD_RAILGUN,
-    MOD_LIGHTNING,
-    MOD_BFG,
-    MOD_BFG_SPLASH,
-    MOD_GRAPPLE,
-
     MOD_UNKNOWN,
     // weapons
     MOD_HANDS,
@@ -675,6 +659,8 @@ gitem_t *BG_FindItemForWeapon(weapon_t weapon);
 gitem_t *BG_FindItemForPowerup(powerup_t pw);
 gitem_t *BG_FindItemForHoldable(holdable_t pw);
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
+
+char *BG_NameForWeapon(int weap);
 
 qboolean BG_CanItemBeGrabbed(int gametype, const entityState_t *ent, const playerState_t *ps);
 

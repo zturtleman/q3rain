@@ -827,6 +827,8 @@ extern vmCvar_t g_pistol;
 extern vmCvar_t g_grenade;
 extern vmCvar_t g_misc;
 
+extern vmCvar_t g_zoomreset;
+
 void trap_Printf(const char *fmt);
 void trap_Error(const char *fmt);
 int trap_Milliseconds(void);
