@@ -90,7 +90,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CS_SOUNDS			(CS_MODELS+MAX_MODELS)
 #define	CS_PLAYERS			(CS_SOUNDS+MAX_SOUNDS)
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
-#define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS) 
+#define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS)
 
 #define CS_MAX				(CS_PARTICLES+MAX_LOCATIONS)
 
@@ -624,6 +624,8 @@ typedef enum {
     MOD_SHRAPNEL,
     MOD_BLEED,
     MOD_SNOWBOARD,
+
+    NUM_MODS,
 } meansOfDeath_t;
 
 

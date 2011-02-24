@@ -69,8 +69,7 @@ void P_DamageFeedback(gentity_t *player) {
   }
 
   // play an apropriate pain sound
-  if ((level.time > player->pain_debounce_time)
-      && !(player->flags & FL_GODMODE) && client->lasthurt_mod != MOD_BLEED) {
+  if ((level.time > player->pain_debounce_time) && !(player->flags & FL_GODMODE) && client->lasthurt_mod != MOD_BLEED) {
     player->pain_debounce_time = level.time + 700;
     G_AddEvent(player, EV_PAIN, player->health);
     client->ps.damageEvent++;
@@ -271,8 +270,7 @@ void G_TouchTriggers(gentity_t *ent) {
 
     // ignore most entities if a spectator
     if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
-      if (hit->s.eType != ET_TELEPORT_TRIGGER && hit->touch
-          != Touch_DoorTrigger) {
+      if (hit->s.eType != ET_TELEPORT_TRIGGER && hit->touch != Touch_DoorTrigger) {
         continue;
       }
     }
@@ -354,8 +352,7 @@ void SpectatorThink(gentity_t *ent, usercmd_t *ucmd) {
   client->buttons = ucmd->buttons;
 
   // attack button cycles through spectators
-  if ((client->buttons & BUTTON_ATTACK)
-      && !(client->oldbuttons & BUTTON_ATTACK)) {
+  if ((client->buttons & BUTTON_ATTACK) && !(client->oldbuttons & BUTTON_ATTACK)) {
     Cmd_FollowCycle_f(ent, 1);
   }
 }
@@ -373,8 +370,7 @@ qboolean ClientInactivityTimer(gclient_t *client) {
     // gameplay, everyone isn't kicked
     client->inactivityTime = level.time + 60 * 1000;
     client->inactivityWarning = qfalse;
-  } else if (client->pers.cmd.forwardmove || client->pers.cmd.rightmove
-      || client->pers.cmd.upmove || (client->pers.cmd.buttons & BUTTON_ATTACK)) {
+  } else if (client->pers.cmd.forwardmove || client->pers.cmd.rightmove || client->pers.cmd.upmove || (client->pers.cmd.buttons & BUTTON_ATTACK)) {
     client->inactivityTime = level.time + g_inactivity.integer * 1000;
     client->inactivityWarning = qfalse;
   } else if (!client->pers.localClient) {
@@ -382,8 +378,7 @@ qboolean ClientInactivityTimer(gclient_t *client) {
       trap_DropClient(client - level.clients, "Dropped due to inactivity");
       return qfalse;
     }
-    if (level.time > client->inactivityTime - 10000
-        && !client->inactivityWarning) {
+    if (level.time > client->inactivityTime - 10000 && !client->inactivityWarning) {
       client->inactivityWarning = qtrue;
       trap_SendServerCommand(client - level.clients, "cp \"^1Ten seconds until inactivity drop!\n\"");
     }
@@ -430,8 +425,7 @@ void ClientIntermissionThink(gclient_t *client) {
   // swap and latch button actions
   client->oldbuttons = client->buttons;
   client->buttons = client->pers.cmd.buttons;
-  if (client->buttons & (BUTTON_ATTACK | BUTTON_USE_HOLDABLE)
-      & (client->oldbuttons ^ client->buttons)) {
+  if (client->buttons & (BUTTON_ATTACK | BUTTON_USE_HOLDABLE) & (client->oldbuttons ^ client->buttons)) {
     // this used to be an ^1 but once a player says ready, it should stick
     client->readyToExit = 1;
   }
@@ -494,8 +488,7 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
         if (ent->client->ps.powerups[PW_ADRENALINE] > 0) {
           factor /= 2;
         }
-        ent->client->ps.jumpCooldown = ent->client->ps.levelTime + (damage
-            * factor);
+        ent->client->ps.jumpCooldown = ent->client->ps.levelTime + (damage * factor);
         break;
 
       case EV_FIRE_WEAPON:
@@ -556,8 +549,7 @@ void ThrowWeapon(gentity_t *ent) {
     return;
   }
 
-  if (client->ps.weapon == WP_KNIFE || client->ps.weapon == WP_NONE
-      || client->ps.weapon == WP_HANDS || (ucmd->buttons & BUTTON_ATTACK)) {
+  if (client->ps.weapon == WP_KNIFE || client->ps.weapon == WP_NONE || client->ps.weapon == WP_HANDS || (ucmd->buttons & BUTTON_ATTACK)) {
     return;
   }
 
@@ -695,8 +687,7 @@ void ClientThink_real(gentity_t *ent) {
   }
 
   if (pmove_fixed.integer || client->pers.pmoveFixed) {
-    ucmd->serverTime = ((ucmd->serverTime + pmove_msec.integer - 1)
-        / pmove_msec.integer) * pmove_msec.integer;
+    ucmd->serverTime = ((ucmd->serverTime + pmove_msec.integer - 1) / pmove_msec.integer) * pmove_msec.integer;
     //if (ucmd->serverTime - client->ps.commandTime <= 0)
     //	return;
   }
@@ -725,8 +716,7 @@ void ClientThink_real(gentity_t *ent) {
 
   // clear the rewards if time
   if (level.time > client->rewardTime) {
-    client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT
-        | EF_AWARD_GAUNTLET);
+    client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET);
   }
 
   if (client->noclip) {
@@ -753,18 +743,15 @@ void ClientThink_real(gentity_t *ent) {
   if (adrenaline) {
     client->ps.speed = client->ps.maxspeed * 1.3;
   } else {
-    client->ps.speed = (int) ((float) client->ps.maxspeed
-        / ((float) client->ps.legsfactor / 10));
+    client->ps.speed = (int) ((float) client->ps.maxspeed / ((float) client->ps.legsfactor / 10));
   }
 
   client->ps.speed += client->ps.sprintAdd;
 
   bleed = client->ps.powerups[PW_BLEED];
   if (client->ps.wounds > 0 && bleed <= level.time) {
-    G_Damage(ent, NULL, NULL, NULL, NULL, 1, DAMAGE_NO_KNOCKBACK
-        | DAMAGE_NO_ARMOR, MOD_BLEED);
-    client->ps.powerups[PW_BLEED] = level.time
-        + (BLEEDTIME / client->ps.wounds);
+    G_Damage(ent, NULL, NULL, NULL, NULL, 1, DAMAGE_NO_KNOCKBACK | DAMAGE_NO_ARMOR, MOD_BLEED);
+    client->ps.powerups[PW_BLEED] = level.time + (BLEEDTIME / client->ps.wounds);
   }
 
   ent->client->ps.levelTime = level.time;
@@ -872,25 +859,32 @@ void ClientThink_real(gentity_t *ent) {
   client->buttons = ucmd->buttons;
   client->latched_buttons |= client->buttons & ~client->oldbuttons;
 
+  // FIXME
   /*if (client->ps.stats[STAT_HEALTH] > 0 && client->ps.stats[STAT_HEALTH] <= 20 && (level.time % 53 == 0) && (client->ps.powerups[PW_ADRENALINE] == 0)) {
    P_KickBack(ent, (int) crandom()*10, (int) crandom()*10, 3);
    }*/
 
+  if (level.roundState == ROUND_SPAWNING && level.numSpawnedClients < level.numPlayingClients) {
+//    if (client->ps.stats[STAT_HEALTH] > 0) {
+//      Com_Printf("killing client\n");
+//      G_Damage(ent, NULL, NULL, NULL, NULL, 10000, DAMAGE_NO_PROTECTION, MOD_SUICIDE);
+//    }
+    Com_Printf("respawning client, stat is %i/%i\n", level.numSpawnedClients, level.numPlayingClients);
+    respawn(ent);
+    return;
+  }
+
   // check for respawning
   if (client->ps.stats[STAT_HEALTH] <= 0) {
     // wait for the attack button to be pressed
-    if (level.time > client->respawnTime && g_gametype.integer != GT_FREEZETAG
-        && g_gametype.integer != GT_ASSASSINS) {
+    if (level.time > client->respawnTime && g_gametype.integer != GT_FREEZETAG && g_gametype.integer != GT_ASSASSINS) {
       if (g_gametype.integer == GT_TEAMSURVIVOR) {
-        if (level.roundState != ROUND_SPAWNING || level.roundState
-            != ROUND_WARMUP) {
+        if (level.roundState != ROUND_SPAWNING || level.roundState != ROUND_WARMUP) {
           return;
         }
       }
       // forcerespawn is to prevent users from waiting out powerups
-      if (g_forcerespawn.integer > 0 && (level.time - client->respawnTime)
-          > g_forcerespawn.integer * 1000 || g_gametype.integer
-          == GT_TEAMSURVIVOR) {
+      if (g_forcerespawn.integer > 0 && (level.time - client->respawnTime) > g_forcerespawn.integer * 1000) {
         respawn(ent);
         return;
       }
@@ -901,8 +895,7 @@ void ClientThink_real(gentity_t *ent) {
       }
     }
     return;
-  } else if (g_gametype.integer == GT_TEAMSURVIVOR && level.roundState
-      == ROUND_SPAWNING) {
+  } else if (g_gametype.integer == GT_TEAMSURVIVOR && level.roundState == ROUND_SPAWNING) {
     respawn(ent);
     return;
   }
@@ -964,10 +957,8 @@ void SpectatorClientEndFrame(gentity_t *ent) {
     }
     if (clientNum >= 0) {
       cl = &level.clients[clientNum];
-      if (cl->pers.connected == CON_CONNECTED && cl->sess.sessionTeam
-          != TEAM_SPECTATOR) {
-        flags = (cl->ps.eFlags & ~(EF_VOTED | EF_TEAMVOTED))
-            | (ent->client->ps.eFlags & (EF_VOTED | EF_TEAMVOTED));
+      if (cl->pers.connected == CON_CONNECTED && cl->sess.sessionTeam != TEAM_SPECTATOR) {
+        flags = (cl->ps.eFlags & ~(EF_VOTED | EF_TEAMVOTED)) | (ent->client->ps.eFlags & (EF_VOTED | EF_TEAMVOTED));
         ent->client->ps = cl->ps;
         ent->client->ps.pm_flags |= PMF_FOLLOW;
         ent->client->ps.eFlags = flags;
@@ -1052,8 +1043,7 @@ void ClientEndFrame(gentity_t *ent) {
   }
 
   //Update the Ammo Amount in weapon RELOADING
-  ent->client->ps.stats[STAT_AMMO]
-      = ent->client->clipammo[ent->client->ps.weapon];
+  ent->client->ps.stats[STAT_AMMO] = ent->client->clipammo[ent->client->ps.weapon];
 
   ent->client->ps.stats[STAT_HEALTH] = ent->health; // FIXME: get rid of ent->health...
 

@@ -392,7 +392,7 @@ void G_InitGame(int levelTime, int randomSeed, int restart) {
   level.time = levelTime;
   level.startTime = levelTime;
 
-  level.snd_fry = G_SoundIndex("sound/player/fry.wav"); // FIXME standing in lava / slime
+  level.snd_fry = G_SoundIndex("sound/player/fry.wav"); // standing in lava / slime
 
   if (g_gametype.integer != GT_SINGLE_PLAYER && g_logfile.string[0]) {
     if (g_logfileSync.integer) {
@@ -1221,6 +1221,7 @@ void RoundEnd(void) {
   level.roundState = ROUND_END;
   level.nextStateTime = level.time + 3000;
   level.nextState = ROUND_SPAWNING;
+  Com_Printf("round ended, starting next in 3s\n");
 }
 
 /*
@@ -1243,10 +1244,6 @@ void CheckExitRules(void) {
     return;
   }
 
-  if (level.roundState != ROUND_PROGRESS && g_gametype.integer == GT_TEAMSURVIVOR) {
-    return;
-  }
-
   if (level.intermissionQueued) {
     if (level.time - level.intermissionQueued >= INTERMISSION_DELAY_TIME) {
       level.intermissionQueued = 0;
@@ -1261,6 +1258,10 @@ void CheckExitRules(void) {
    * return;
    * }*/
 
+  if (level.numPlayingClients < 2) {
+    return;
+  }
+
   if (g_timelimit.integer && !level.warmupTime && level.roundState == ROUND_END) {
     if (level.time - level.startTime >= g_timelimit.integer * 60000) {
       trap_SendServerCommand(-1, "print \"Timelimit hit.\n\"");
@@ -1269,11 +1270,7 @@ void CheckExitRules(void) {
     }
   }
 
-  if (level.numPlayingClients < 2) {
-    return;
-  }
-
-  if (g_gametype.integer == GT_TEAMSURVIVOR) {
+  if (g_gametype.integer == GT_TEAMSURVIVOR && level.roundState == ROUND_PROGRESS) {
     if (MembersAlive(TEAM_BLUE) <= 0) {
       trap_SendServerCommand(-1, "cp \"^1Red ^7wins the round\n\"");
       Com_Printf("red wins the round\n");
@@ -1640,6 +1637,9 @@ void G_RunFrame(int levelTime) {
   }
 
   if (g_gametype.integer == GT_TEAMSURVIVOR) {
+    if (level.roundState == ROUND_SPAWNING) {
+      Com_Printf("^3SPAWNING\n");
+    }
     if (level.roundState == ROUND_WARMUP && level.numPlayingClients >= 2) {
       if (level.nextStateTime <= level.time && level.nextState < 0) {
         trap_SendServerCommand(-1, "cp \"Game starts in 3\n\"");
@@ -1650,6 +1650,12 @@ void G_RunFrame(int levelTime) {
       } else if (level.nextStateTime <= level.time + 1000) {
         trap_SendServerCommand(-1, "cp \"Game starts in 1\n\"");
       }
+    }
+    if (level.roundState == ROUND_SPAWNING && level.numSpawnedClients >= level.numPlayingClients) {
+      Com_Printf("%i/%i clients spawned, starting round\n", level.numSpawnedClients, level.numConnectedClients);
+      level.roundState = ROUND_PROGRESS;
+      level.nextState = -1;
+      level.numSpawnedClients = 0;
     }
   }
 
