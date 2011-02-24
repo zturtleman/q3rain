@@ -1112,6 +1112,8 @@ extern vmCvar_t cg_lagometerY;
 
 extern vmCvar_t cg_killfeed;
 extern vmCvar_t cg_killfeedTime;
+extern vmCvar_t cg_killfeedHeight;
+extern vmCvar_t cg_killfeedTeam;
 
 //
 // cg_main.c
@@ -1198,7 +1200,7 @@ extern char systemChat[256];
 extern char teamChat1[256];
 extern char teamChat2[256];
 
-#define KILLFEED_LENGTH 8
+#define KILLFEED_LENGTH 16
 typedef struct {
   int mods[KILLFEED_LENGTH];
   char attackers[KILLFEED_LENGTH][32];

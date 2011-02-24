@@ -183,6 +183,8 @@ vmCvar_t cg_lagometerY;
 
 vmCvar_t cg_killfeed;
 vmCvar_t cg_killfeedTime;
+vmCvar_t cg_killfeedHeight;
+vmCvar_t cg_killfeedTeam;
 
 typedef struct {
 vmCvar_t *vmCvar;
@@ -286,10 +288,16 @@ static cvarTable_t cvarTable[] = { { &cg_ignore, "cg_ignore", "0", 0 }, // used 
     { &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE | CVAR_CHEAT },
 
     { &cg_primary, "cg_primary", "-1", CVAR_USERINFO | CVAR_ARCHIVE },
+
     { &cg_lagometerX, "cg_lagometerX", "560", CVAR_ARCHIVE },
     { &cg_lagometerY, "cg_lagometerY", "240", CVAR_ARCHIVE },
+
     { &cg_killfeed, "cg_killfeed", "1", CVAR_ARCHIVE },
-    { &cg_killfeedTime, "cg_killfeedTime", "5", CVAR_ARCHIVE }, };
+    { &cg_killfeedTime, "cg_killfeedTime", "5", CVAR_ARCHIVE },
+    { &cg_killfeedHeight, "cg_killfeedHeight", "8", CVAR_ARCHIVE | CVAR_LATCH },
+    { &cg_killfeedTeam, "cg_killfeedTeam", "1", CVAR_ARCHIVE },
+
+};
 
 static int cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
 
@@ -317,8 +325,6 @@ void CG_RegisterCvars(void) {
   trap_Cvar_Register(NULL, "headmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE);
   trap_Cvar_Register(NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE);
   trap_Cvar_Register(NULL, "team_headmodel", DEFAULT_TEAM_HEAD, CVAR_USERINFO | CVAR_ARCHIVE);
-
-  trap_Cvar_Register(NULL, "cg_primary", "6", CVAR_USERINFO | CVAR_ARCHIVE);
 }
 
 /*
@@ -351,6 +357,14 @@ void CG_UpdateCvars(void) {
 
   for (i = 0, cv = cvarTable; i < cvarTableSize; i++, cv++) {
     trap_Cvar_Update(cv->vmCvar);
+  }
+
+  if (cg_killfeedHeight.integer > KILLFEED_LENGTH) {
+    trap_Cvar_Set("cg_killfeedHeight", va("%i", KILLFEED_LENGTH));
+    CG_Printf("^3WARNING: cg_killfeedHeight out of range (1-%i). Set to %i\n", KILLFEED_LENGTH, KILLFEED_LENGTH);
+  } else if (cg_killfeedHeight.integer < 1) {
+    trap_Cvar_Set("cg_killfeedHeight", "1");
+    CG_Printf("^3WARNING: cg_killfeedHeight out of range (1-%i). Set to 1\n", KILLFEED_LENGTH);
   }
 
   // check for modications here

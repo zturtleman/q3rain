@@ -79,16 +79,16 @@ static void CG_KillfeedAppend(char attacker[32], char target[32], int mod);
  */
 void CG_KillfeedShift(char attacker[32], char target[32], int mod) {
   int i;
-  for (i = 1; i < KILLFEED_LENGTH; i++) {
+  for (i = 1; i < cg_killfeedHeight.integer; i++) {
     Q_strncpyz(killfeed.attackers[i - 1], killfeed.attackers[i], 32);
     Q_strncpyz(killfeed.targets[i - 1], killfeed.targets[i], 32);
     killfeed.mods[i - 1] = killfeed.mods[i];
     killfeed.times[i - 1] = killfeed.times[i];
   }
   if (attacker != NULL && target != NULL && mod >= 0) {
-    Q_strncpyz(killfeed.attackers[KILLFEED_LENGTH - 1], attacker, 32);
-    Q_strncpyz(killfeed.targets[KILLFEED_LENGTH - 1], target, 32);
-    killfeed.mods[KILLFEED_LENGTH - 1] = mod;
+    Q_strncpyz(killfeed.attackers[cg_killfeedHeight.integer - 1], attacker, 32);
+    Q_strncpyz(killfeed.targets[cg_killfeedHeight.integer - 1], target, 32);
+    killfeed.mods[cg_killfeedHeight.integer - 1] = mod;
     killfeed.times[i] = cg.time;
   }
 }
@@ -100,7 +100,7 @@ void CG_KillfeedShift(char attacker[32], char target[32], int mod) {
  */
 void CG_KillfeedSort(void) {
   int i;
-  for (i = 1; i < KILLFEED_LENGTH; i++) {
+  for (i = 1; i < cg_killfeedHeight.integer; i++) {
     if (!killfeed.attackers[i - 1][0]) {
       Q_strncpyz(killfeed.attackers[i - 1], killfeed.attackers[i], 32);
       Q_strncpyz(killfeed.targets[i - 1], killfeed.targets[i], 32);
@@ -121,7 +121,7 @@ void CG_KillfeedSort(void) {
  */
 static void CG_KillfeedAppend(char attacker[32], char target[32], int mod) {
   int i;
-  for (i = 0; i < KILLFEED_LENGTH; i++) {
+  for (i = 0; i < cg_killfeedHeight.integer; i++) {
     if (!killfeed.attackers[i][0]) {
       Q_strncpyz(killfeed.attackers[i], attacker, sizeof(killfeed.attackers[i]));
       Q_strncpyz(killfeed.targets[i], target, sizeof(killfeed.targets[i]));

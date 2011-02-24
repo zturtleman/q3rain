@@ -60,6 +60,10 @@ void trap_Cvar_Update(vmCvar_t *vmCvar) {
     syscall(CG_CVAR_UPDATE, vmCvar);
 }
 
+/*void trap_Cvar_CheckRange(vmCvar_t *cvar, float min, float max, qboolean integral) {
+    syscall(CG_CVAR_CHECKRANGE, cvar);
+}*/
+
 void trap_Cvar_Set(const char *var_name, const char *value) {
     syscall(CG_CVAR_SET, var_name, value);
 }
