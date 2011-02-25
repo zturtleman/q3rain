@@ -25,8 +25,6 @@
 
 #include "cg_local.h"
 
-#undef MISSIONPACK
-
 int drawTeamOverlayModificationCount = -1;
 
 int sortedTeamPlayers[TEAM_MAXOVERLAY];

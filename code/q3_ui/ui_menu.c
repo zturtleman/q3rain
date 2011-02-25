@@ -218,30 +218,29 @@ static void Main_MenuDraw(void) {
 
     x = 16;
     y = 16;
-    UI_DrawProportionalString(x, y, "Hazewood", UI_LEFT, color_green);
-
+    UI_DrawString(x, y, "Hazewood", UI_LEFT, color_green);
 
     x = 196;
     y = 28;
     if (connected) {
-        UI_DrawProportionalString(x, y, va("%s", s_main.motd), UI_LEFT | UI_TINYFONT, color_white);
+      UI_DrawString(x, y, va("%s", s_main.motd), UI_LEFT | UI_SMALLERFONT, color_white);
     } else {
-        UI_DrawProportionalString(x, y, va("%s", s_main.motd), UI_LEFT | UI_TINYFONT, color_red);
+      UI_DrawString(x, y, va("%s", s_main.motd), UI_LEFT | UI_SMALLERFONT, color_red);
     }
 
     x = 640 - 196 + 48;
     y = 12;
     if (s_main.servers > 0) {
-        UI_DrawProportionalString(x, y, va("%i Servers", s_main.servers), UI_LEFT | UI_SMALLERFONT, color_blue);
+        UI_DrawString(x, y, va("%i Servers", s_main.servers), UI_LEFT | UI_SMALLFONT, color_blue);
     } else {
-        UI_DrawProportionalString(x, y, va("%i Servers", s_main.servers), UI_LEFT | UI_SMALLERFONT, color_red);
+        UI_DrawString(x, y, va("%i Servers", s_main.servers), UI_LEFT | UI_SMALLFONT, color_red);
     }
 
     y = 36;
     if (s_main.players > 0) {
-        UI_DrawProportionalString(x, y, va("%i Players", s_main.players), UI_LEFT | UI_SMALLERFONT, color_blue);
+        UI_DrawString(x, y, va("%i Players", s_main.players), UI_LEFT | UI_SMALLFONT, color_blue);
     } else {
-        UI_DrawProportionalString(x, y, va("%i Players", s_main.players), UI_LEFT | UI_SMALLERFONT, color_red);
+        UI_DrawString(x, y, va("%i Players", s_main.players), UI_LEFT | UI_SMALLFONT, color_red);
     }
 
     x = 0;
@@ -309,7 +308,7 @@ and that local cinematics are killed
  */
 void UI_MainMenu(void) {
     int x, y;
-    int style = UI_LEFT | UI_DROPSHADOW | UI_SMALLERFONT;
+    int style = UI_LEFT | UI_DROPSHADOW | UI_SMALLFONT;
 
     trap_Cvar_Set("sv_killserver", "1");
 

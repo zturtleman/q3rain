@@ -161,7 +161,8 @@ static void BText_Draw(menutext_s *t) {
     else
         color = t->color;
 
-    UI_DrawBannerString(x, y, t->string, t->style, color);
+    UI_DrawString(x, y, t->string, t->style, color);
+    //UI_DrawBannerString(x, y, t->string, t->style, color);
 }
 
 /*
@@ -223,7 +224,8 @@ static void PText_Draw(menutext_s *t) {
         }
     }
 
-    UI_DrawProportionalString(x, y, t->string, style, color);
+    UI_DrawString(x, y, t->string, t->style, color);
+    //UI_DrawProportionalString(x, y, t->string, style, color);
 }
 
 /*
