@@ -910,6 +910,8 @@ qhandle_t sha_viewScope;
 qhandle_t sha_fewBloodSpurts;
 
 qhandle_t sha_mods[NUM_MODS];
+
+qhandle_t sha_breathPuff;
 } cgMedia_t;
 
 // The client game static (cgs) structure hold everything
@@ -1001,6 +1003,9 @@ char acceptVoice[MAX_NAME_LENGTH];
 
 // media
 cgMedia_t media;
+
+// misc
+int temperature; // map temp in °C, set in worldspawn
 
 } cgs_t;
 
@@ -1170,7 +1175,7 @@ void CG_DrawPic(float x, float y, float width, float height, qhandle_t hShader);
 void CG_DrawString(float x, float y, const char *string, float charWidth, float charHeight, const float *modulate);
 
 void
-    CG_DrawStringExt(int x, int y, const char *string, const float *setColor, qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars);
+CG_DrawStringExt(int x, int y, const char *string, const float *setColor, qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars);
 void CG_DrawBigString(int x, int y, const char *s, float alpha);
 void CG_DrawBigStringColor(int x, int y, const char *s, vec4_t color);
 void CG_DrawSmallString(int x, int y, const char *s, float alpha);
@@ -1202,10 +1207,10 @@ extern char teamChat2[256];
 
 #define KILLFEED_LENGTH 16
 typedef struct {
-  int mods[KILLFEED_LENGTH];
-  char attackers[KILLFEED_LENGTH][32];
-  char targets[KILLFEED_LENGTH][32];
-  int times[KILLFEED_LENGTH];
+int mods[KILLFEED_LENGTH];
+char attackers[KILLFEED_LENGTH][32];
+char targets[KILLFEED_LENGTH][32];
+int times[KILLFEED_LENGTH];
 } killfeed_t;
 
 extern killfeed_t killfeed;

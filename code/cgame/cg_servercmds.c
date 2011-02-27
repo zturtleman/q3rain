@@ -169,6 +169,9 @@ void CG_ParseServerinfo(void) {
     trap_Cvar_Set("g_redTeam", cgs.redTeam);
     Q_strncpyz(cgs.blueTeam, Info_ValueForKey(info, "g_blueTeam"), sizeof (cgs.blueTeam));
     trap_Cvar_Set("g_blueTeam", cgs.blueTeam);
+
+    cgs.temperature = atoi(CG_ConfigString(CS_TEMPERATURE));
+    CG_Printf("^2temperature = %i\n", cgs.temperature);
 }
 
 /*

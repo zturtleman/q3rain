@@ -816,6 +816,8 @@ static void CG_RegisterGraphics(void) {
 
   cgs.media.mod_nuke = trap_R_RegisterModel("models/nuke/nuke.md3");
 
+  cgs.media.sha_breathPuff = trap_R_RegisterShader("breathPuff");
+
   // register the inline models
   cgs.numInlineModels = trap_CM_NumInlineModels();
   for (i = 1; i < cgs.numInlineModels; i++) {

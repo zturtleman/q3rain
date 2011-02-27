@@ -702,6 +702,9 @@ void SP_worldspawn(void) {
         level.allDisallowed = qtrue;
     }
 
+    G_SpawnString("temperature", "20", &s);
+    trap_SetConfigstring(CS_TEMPERATURE, s);
+
     g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
     g_entities[ENTITYNUM_WORLD].classname = "worldspawn";
 
