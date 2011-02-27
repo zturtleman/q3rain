@@ -956,10 +956,10 @@ void CG_DrawKillfeed(void) {
       if (killfeed.targets[i][0]) {
         CG_DrawStringExtAlpha(x, y, killfeed.attackers[i], qfalse, w, h, 0, color[3]);
       } else {
-        CG_DrawStringExtAlpha(x, y, va("%s ^1X", killfeed.attackers[i]), qfalse, w, h, 0, color[3]);
+        CG_DrawStringExtAlpha(x, y, va("^7%s ^1X", killfeed.attackers[i]), qfalse, w, h, 0, color[3]);
       }
     } else if (cg_killfeed.integer >= 3) {
-      CG_DrawStringExtAlpha(x, y, va("%s^7 [%s]", killfeed.attackers[i], CG_NameForMod(mod)), qfalse, w, h, 0, color[3]);
+      CG_DrawStringExtAlpha(x, y, va("^7%s ^7[%s^7] %s", killfeed.attackers[i], CG_NameForMod(mod), killfeed.targets[i]), qfalse, w, h, 0, color[3]);
     }
     if (cg_killfeed.integer == 1) {
       CG_DrawPic(144, y - 1, 48, 16, cgs.media.sha_mods[mod]);
@@ -969,8 +969,6 @@ void CG_DrawKillfeed(void) {
         CG_DrawStringExtAlpha(x + 192, y, killfeed.targets[i], qfalse, w, h, 0, color[3]);
       } else if (cg_killfeed.integer == 2) {
         CG_DrawStringExtAlpha(x + (Q_PrintStrlen(killfeed.attackers[i]) * w), y, va("^7 --> %s", killfeed.targets[i]), qfalse, w, h, 0, color[3]);
-      } else if (cg_killfeed.integer >= 3) {
-        CG_DrawStringExtAlpha(x + (Q_PrintStrlen(killfeed.attackers[i]) * w), y, va("^7 [%s] %s", CG_NameForMod(mod), killfeed.targets[i]), qfalse, w, h, 0, color[3]);
       }
     }
     trap_R_SetColor(NULL);

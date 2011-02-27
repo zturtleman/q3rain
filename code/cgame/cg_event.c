@@ -294,10 +294,10 @@ static void CG_Obituary(entityState_t *ent) {
 
   if (message) {
     if (cg_killfeed.integer) {
-      if (mod == MOD_FALLING) {
-        CG_Killfeed(mod, attacker, target, "", targetName);
+      if (attacker == ENTITYNUM_WORLD) {
+        CG_Killfeed(mod, attacker, target, "<world>", targetName);
       } else {
-        CG_Killfeed(mod, attacker, target, targetName, targetName);
+        CG_Killfeed(mod, attacker, target, targetName, "");
       }
       return;
     }
