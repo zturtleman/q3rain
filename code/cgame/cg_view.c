@@ -35,7 +35,7 @@ enhanced into a single model testing facility.
 
 Model viewing can begin with either "testmodel <modelname>" or "testgun <modelname>".
 
-The names must be the full pathname after the basedir, like 
+The names must be the full pathname after the basedir, like
 "models/weapons/v_launch/tris.md3" or "players/male/tris.md3"
 
 Testmodel will create a fake entity 100 units in front of the current view
@@ -513,9 +513,7 @@ static int CG_CalcFov(void) {
             }
         } else {
             f = (cg.time - cg.zoomTime) / (float) ZOOM_TIME;
-            if (f > 1.0) {
-                fov_x = fov_x;
-            } else {
+            if (f <= 1.0) {
                 fov_x = zoomFov + f * (fov_x - zoomFov);
             }
         }
@@ -527,6 +525,13 @@ static int CG_CalcFov(void) {
     x = cg.refdef.width / tan(fov_x / 360 * M_PI);
     fov_y = atan2(cg.refdef.height, x);
     fov_y = fov_y * 360 / M_PI;
+
+    if (cg.snap->ps.stats[STAT_HEALTH] < 40 && !cg.snap->ps.zoomFov && cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR) {
+      phase = cg.time / 1000.0 * 0.03 * M_PI * 2;
+      v = 10 * sin(phase);
+      fov_x += v;
+      fov_y -= v;
+    }
 
     // warp if underwater
     contents = CG_PointContents(cg.refdef.vieworg, -1);
@@ -544,10 +549,10 @@ static int CG_CalcFov(void) {
     cg.refdef.fov_x = fov_x;
     cg.refdef.fov_y = fov_y;
 
-    if (!cg.zoomed) {
+    if (!cg.snap->ps.zoomFov) {
         cg.zoomSensitivity = 1;
     } else {
-        cg.zoomSensitivity = cg.refdef.fov_y / 75.0;
+        cg.zoomSensitivity = cg.refdef.fov_y / 60.0;
     }
 
     return inwater;
