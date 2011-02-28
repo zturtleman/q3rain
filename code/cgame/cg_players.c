@@ -1495,9 +1495,9 @@ static void CG_BreathPuffs(centity_t *cent, refEntity_t *head) {
   VectorSet(up, 0, 0, 8);
   VectorMA(head->origin, 8, head->axis[0], origin);
   VectorMA(origin, -4, head->axis[2], origin);
-  CG_SmokePuff(origin, up, 12, 1, 1, 1, 0.66f, 1500 + ((cgs.temperature * -1) * 100), cg.time, cg.time + 700, LEF_PUFF_DONT_SCALE, cgs.media.sha_breathPuff);
+  CG_SmokePuff(origin, up, 12, 1, 1, 1, 0.66f, 2000 + ((cgs.temperature * -1) * 100), cg.time, cg.time + 700, LEF_PUFF_DONT_SCALE, cgs.media.sha_breathPuff);
   next = cg.time + 500;
-  next += cg.snap->ps.stamina / 7;
+  next += cent->currentState.stamina / 7;
   ci->breathPuffTime = next;
 }
 
@@ -2184,6 +2184,11 @@ void CG_Player(centity_t *cent) {
   legs.shadowPlane = shadowPlane;
   legs.renderfx = renderfx;
   VectorCopy(legs.origin, legs.oldorigin); // don't positionally lerp at all
+
+  if (cg.snap->ps.persistant[PERS_TEAM] < TEAM_SPECTATOR && cent->currentState.clientNum == cg.clientNum && !cg.renderingThirdPerson) {
+    legs.renderfx &= ~RF_THIRD_PERSON;
+    VectorMA(legs.origin, -10, cg.refdef.viewaxis[2], legs.origin);
+  }
 
   CG_AddRefEntityWithPowerups(&legs, &cent->currentState, ci->team);
 
