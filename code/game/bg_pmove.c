@@ -2582,7 +2582,7 @@ void PmoveSingle(pmove_t * pmove) {
     pm->ps->stamina = 0;
   }
 
-  Com_Printf("stamina = %i regain = %i\n", pm->ps->stamina, regain);
+  //Com_Printf("stamina = %i regain = %i\n", pm->ps->stamina, regain);
 }
 
 /*
