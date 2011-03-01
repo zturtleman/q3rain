@@ -482,7 +482,7 @@ int RaySphereIntersections(vec3_t origin, float radius, vec3_t point, vec3_t dir
     return 0;
 }
 
-/* 
+/*
 ============
 G_LocationDamage
 LOCATIONS

@@ -1132,6 +1132,8 @@ void ClientSpawn(gentity_t *ent) {
   client->ps.stats[STAT_WEAPONS] |= (1 << WP_HANDS);
   client->ps.ammo[WP_HANDS] = -1;
 
+  client->ps.levelTemperature = level.temperature;
+
   if (!level.allDisallowed) {
     client->ps.stats[STAT_WEAPONS] |= (1 << WP_KNIFE);
     client->ps.ammo[WP_KNIFE] = -1;

@@ -704,6 +704,10 @@ void SP_worldspawn(void) {
 
     G_SpawnString("temperature", "20", &s);
     trap_SetConfigstring(CS_TEMPERATURE, s);
+    level.temperature = atoi(s);
+
+    G_SpawnString("weather", "", &s);
+    trap_SetConfigstring(CS_WEATHER, s);
 
     g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
     g_entities[ENTITYNUM_WORLD].classname = "worldspawn";

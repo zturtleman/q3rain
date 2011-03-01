@@ -80,8 +80,7 @@ void CG_LoadingItem(int itemNum) {
   item = &bg_itemlist[itemNum];
 
   if (item->icon && loadingItemIconCount < MAX_LOADING_ITEM_ICONS) {
-    loadingItemIcons[loadingItemIconCount++]
-        = trap_R_RegisterShaderNoMip(item->icon);
+    loadingItemIcons[loadingItemIconCount++] = trap_R_RegisterShaderNoMip(item->icon);
   }
 
   CG_LoadingString(item->pickup_name);
@@ -112,17 +111,14 @@ void CG_LoadingClient(int clientNum) {
 
     Com_sprintf(iconName, MAX_QPATH, "models/players/%s/icon_%s.tga", model, skin);
 
-    loadingPlayerIcons[loadingPlayerIconCount]
-        = trap_R_RegisterShaderNoMip(iconName);
+    loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip(iconName);
     if (!loadingPlayerIcons[loadingPlayerIconCount]) {
       Com_sprintf(iconName, MAX_QPATH, "models/players/characters/%s/icon_%s.tga", model, skin);
-      loadingPlayerIcons[loadingPlayerIconCount]
-          = trap_R_RegisterShaderNoMip(iconName);
+      loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip(iconName);
     }
     if (!loadingPlayerIcons[loadingPlayerIconCount]) {
       Com_sprintf(iconName, MAX_QPATH, "models/players/%s/icon_%s.tga", DEFAULT_MODEL, "default");
-      loadingPlayerIcons[loadingPlayerIconCount]
-          = trap_R_RegisterShaderNoMip(iconName);
+      loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip(iconName);
     }
     if (loadingPlayerIcons[loadingPlayerIconCount]) {
       loadingPlayerIconCount++;
@@ -151,7 +147,7 @@ void CG_DrawInformation(void) {
   const char *info;
   const char *sysInfo;
   const char *gt;
-  int y;
+  int y, i;
   int value;
   qhandle_t levelshot, overlay;
   char buf[1024];
@@ -176,11 +172,9 @@ void CG_DrawInformation(void) {
   // the first 150 rows are reserved for the client connection
   // screen to write into
   if (cg.infoScreenText[0]) {
-    CG_DrawStringExt(32, 96, va("Loading %s...", cg.infoScreenText), colorWhite, qfalse, qfalse, size, size
-        * 2, 512);
+    CG_DrawStringExt(32, 96, va("Loading %s...", cg.infoScreenText), colorWhite, qfalse, qfalse, size, size * 2, 512);
   } else {
-    CG_DrawStringExt(32, 96, "Awaiting snapshot...", colorWhite, qtrue, qfalse, size, size
-        * 2, 64);
+    CG_DrawStringExt(32, 96, "Awaiting snapshot...", colorWhite, qtrue, qfalse, size, size * 2, 64);
   }
 
   //CG_ParseMapData(s);
@@ -234,26 +228,42 @@ void CG_DrawInformation(void) {
     // server hostname
     Q_strncpyz(buf, Info_ValueForKey(info, "sv_hostname"), 1024);
     Q_CleanStr(buf);
-    CG_DrawStringExt(32, 32, va("%s (%s, %s)", buf, gt, s), colorWhite, qfalse, qfalse, size, size
-        * 2, 64);
+    CG_DrawStringExt(32, 32, va("%s (%s, %s)", buf, gt, s), colorWhite, qfalse, qfalse, size, size * 2, 64);
 
     // server-specific message of the day
     s = CG_ConfigString(CS_MOTD);
     if (s[0]) {
-      CG_DrawStringExt(32, 64, s, colorWhite, qfalse, qfalse, size, size
-          * 2, 1024);
+      CG_DrawStringExt(32, 64, s, colorWhite, qfalse, qfalse, size, size * 2, 512);
     }
   }
 
   // map-specific message (long map name)
   s = CG_ConfigString(CS_MESSAGE);
   if (s[0]) {
-    CG_DrawStringExt(32, 400, s, colorWhite, qfalse, qfalse, size, size * 2, 1024);
+    CG_DrawStringExt(32, 400, s, colorWhite, qfalse, qfalse, size, size * 2, 256);
   }
   s = CG_ConfigString(CS_LOCATION);
   if (s[0]) {
-    CG_DrawStringExt(32, 400 + size * 3, s, colorWhite, qfalse, qfalse, size, size
-        * 2, 1024);
+    CG_DrawStringExt(32, 400 + size * 3, s, colorWhite, qfalse, qfalse, size, size * 2, 256);
+  }
+
+  s = CG_ConfigString(CS_TEMPERATURE);
+  i = atoi(s);
+  // maps should set their temp in °C
+  // FIXME needs ° in charset
+  if (!Q_stricmp(cg_temperatureUnit.string, "F")) {
+    i = i * (9.0 / 5.0) + 32;
+    s = va("%i Degrees F", i);
+  } else if (!Q_stricmp(cg_temperatureUnit.string, "K")) {
+    s = va("%i Degrees K", i + 273);
+  } else {
+    s = va("%i Degrees C", i);
+  }
+  CG_DrawStringExt(448, 400, s, colorWhite, qfalse, qfalse, size, size * 2, 1024);
+
+  s = CG_ConfigString(CS_WEATHER);
+  if (s[0]) {
+    CG_DrawStringExt(448, 400 + size * 3, s, colorWhite, qfalse, qfalse, size, size * 2, 256);
   }
 }
 

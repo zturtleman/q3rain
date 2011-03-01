@@ -519,7 +519,7 @@ static int CG_CalcFov(void) {
 
   if (cg.snap->ps.stats[STAT_HEALTH] < 40 && !cg.snap->ps.zoomFov && cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR && !cg.renderingThirdPerson) {
     phase = cg.time / 1000.0 * 0.02 * M_PI * 2;
-    v = 10 * sin(phase);
+    v = 5 * sin(phase);
     fov_x += v;
     fov_y -= v;
   }

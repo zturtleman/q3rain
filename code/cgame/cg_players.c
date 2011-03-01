@@ -2185,7 +2185,8 @@ void CG_Player(centity_t *cent) {
   legs.renderfx = renderfx;
   VectorCopy(legs.origin, legs.oldorigin); // don't positionally lerp at all
 
-  if (cg.snap->ps.persistant[PERS_TEAM] < TEAM_SPECTATOR && cent->currentState.clientNum == cg.clientNum && !cg.renderingThirdPerson) {
+  if (cg.snap->ps.persistant[PERS_TEAM] < TEAM_SPECTATOR && cent->currentState.clientNum == cg.clientNum && !cg.renderingThirdPerson && cg_showLegs.integer) {
+    // FIXME own corpses are still affected
     legs.renderfx &= ~RF_THIRD_PERSON;
     VectorMA(legs.origin, -10, cg.refdef.viewaxis[2], legs.origin);
   }

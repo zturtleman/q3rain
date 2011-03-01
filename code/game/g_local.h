@@ -456,6 +456,8 @@ typedef struct {
     int roundState;
     int nextState;
     int nextStateTime;
+    // temp
+    int temperature;
 } level_locals_t;
 
 typedef enum {

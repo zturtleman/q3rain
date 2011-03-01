@@ -88,7 +88,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define CS_TEMPERATURE 30
 
-#define	CS_MODELS			32
+#define CS_WEATHER 31
+
+#define	CS_MODELS			64
 #define	CS_SOUNDS			(CS_MODELS+MAX_MODELS)
 #define	CS_PLAYERS			(CS_SOUNDS+MAX_SOUNDS)
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)

@@ -1029,18 +1029,19 @@ static void PM_GrappleMove(void) {
 
   if (vlen <= 100)
     VectorScale(vel, 10 * vlen, vel);
-else    VectorScale(vel, 800, vel);
+  else
+    VectorScale(vel, 800, vel);
 
-    VectorCopy(vel, pm->ps->velocity);
+  VectorCopy(vel, pm->ps->velocity);
 
-    pml.groundPlane = qfalse;
-  }
+  pml.groundPlane = qfalse;
+}
 
-  /*
-   ===================
-   PM_SnowMove
-   ===================
-   */
+/*
+ ===================
+ PM_SnowMove
+ ===================
+ */
 
 static void PM_SnowMove(pmove_t * pmove) {
   int i;
@@ -1105,7 +1106,6 @@ static void PM_SnowMove(pmove_t * pmove) {
   }
   // when going up or down slopes the wish velocity should Not be zero
   //  wishvel[2] = 0;
-
   VectorCopy(wishvel, wishdir);
   wishspeed = VectorNormalize(wishdir);
   wishspeed *= scale;
@@ -1247,7 +1247,6 @@ static void PM_WalkMove(pmove_t *pmove) {
   }
   // when going up or down slopes the wish velocity should Not be zero
   //  wishvel[2] = 0;
-
   VectorCopy(wishvel, wishdir);
   wishspeed = VectorNormalize(wishdir);
   wishspeed *= scale;
@@ -2562,6 +2561,20 @@ void PmoveSingle(pmove_t * pmove) {
     regain /= 1.5f;
   }
 
+  if (pm->ps->levelTemperature > 30) {
+    regain -= (pm->ps->levelTemperature - 30) / 3;
+    if (pm->ps->levelTemperature < 50 && regain < 0) {
+      regain = 0;
+    }
+  } else if (pm->ps->levelTemperature < -20) {
+    regain -= (pm->ps->levelTemperature + 20) / 3;
+    if (pm->ps->levelTemperature > -30 && regain < 0) {
+      regain = 0;
+    }
+  }
+
+  // FIXME im not too sure about stamina regain + fps
+
   pm->ps->stamina += regain;
   if (pm->ps->stamina > 10000) {
     pm->ps->stamina = 10000;
@@ -2569,7 +2582,7 @@ void PmoveSingle(pmove_t * pmove) {
     pm->ps->stamina = 0;
   }
 
-  //Com_Printf("stamina = %i regain = %i\n", pm->ps->stamina, regain);
+  Com_Printf("stamina = %i regain = %i\n", pm->ps->stamina, regain);
 }
 
 /*

@@ -186,6 +186,10 @@ vmCvar_t cg_killfeedTime;
 vmCvar_t cg_killfeedHeight;
 vmCvar_t cg_killfeedTeam;
 
+vmCvar_t cg_showLegs;
+
+vmCvar_t cg_temperatureUnit;
+
 typedef struct {
 vmCvar_t *vmCvar;
 char *cvarName;
@@ -296,6 +300,10 @@ static cvarTable_t cvarTable[] = { { &cg_ignore, "cg_ignore", "0", 0 }, // used 
     { &cg_killfeedTime, "cg_killfeedTime", "5", CVAR_ARCHIVE },
     { &cg_killfeedHeight, "cg_killfeedHeight", "8", CVAR_ARCHIVE | CVAR_LATCH },
     { &cg_killfeedTeam, "cg_killfeedTeam", "1", CVAR_ARCHIVE },
+
+    { &cg_showLegs, "cg_showLegs", "0", CVAR_ARCHIVE },
+
+    { &cg_temperatureUnit, "cg_temperatureUnit", "C", CVAR_ARCHIVE },
 
 };
 

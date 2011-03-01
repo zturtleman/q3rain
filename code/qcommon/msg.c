@@ -1196,6 +1196,7 @@ netField_t playerStateFields[] = {
     { PSF(stamina), 16},
     { PSF(wounds), 4},
     { PSF(cooldown), 8},
+    { PSF(levelTemperature), 4},
 };
 
 /*

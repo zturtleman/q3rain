@@ -1105,6 +1105,8 @@ int stamina;
 // combat
 int wounds;
 int cooldown;
+// weather
+int levelTemperature;
 } playerState_t;
 
 //====================================================================

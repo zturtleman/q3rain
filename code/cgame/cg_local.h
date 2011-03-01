@@ -1120,6 +1120,10 @@ extern vmCvar_t cg_killfeedTime;
 extern vmCvar_t cg_killfeedHeight;
 extern vmCvar_t cg_killfeedTeam;
 
+extern vmCvar_t cg_showLegs;
+
+extern vmCvar_t cg_temperatureUnit;
+
 //
 // cg_main.c
 //
