@@ -190,6 +190,8 @@ vmCvar_t cg_showLegs;
 
 vmCvar_t cg_temperatureUnit;
 
+vmCvar_t cg_scopeType;
+
 typedef struct {
 vmCvar_t *vmCvar;
 char *cvarName;
@@ -245,10 +247,10 @@ static cvarTable_t cvarTable[] = { { &cg_ignore, "cg_ignore", "0", 0 }, // used 
     { &cg_noPlayerAnims, "cg_noplayeranims", "0", CVAR_CHEAT },
     { &cg_showmiss, "cg_showmiss", "0", 0 },
     { &cg_footsteps, "cg_footsteps", "1", CVAR_CHEAT },
-    { &cg_tracerChance, "cg_tracerchance", "0.4", CVAR_CHEAT },
-    { &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT },
-    { &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
-    { &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT },
+    { &cg_tracerChance, "cg_tracerchance", "5", CVAR_CHEAT },
+    { &cg_tracerWidth, "cg_tracerwidth", "3", CVAR_CHEAT },
+    { &cg_tracerLength, "cg_tracerlength", "200", CVAR_CHEAT },
+    { &cg_thirdPersonRange, "cg_thirdPersonRange", "0", CVAR_CHEAT },
     { &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
     { &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
     { &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE },
@@ -274,14 +276,14 @@ static cvarTable_t cvarTable[] = { { &cg_ignore, "cg_ignore", "0", 0 }, // used 
     { &cg_timescaleFadeEnd, "cg_timescaleFadeEnd", "1", 0 },
     { &cg_timescaleFadeSpeed, "cg_timescaleFadeSpeed", "0", 0 },
     { &cg_timescale, "timescale", "1", 0 },
-    { &cg_scorePlum, "cg_scorePlums", "1", CVAR_USERINFO | CVAR_ARCHIVE },
+    { &cg_scorePlum, "cg_scorePlums", "0", CVAR_USERINFO | CVAR_ARCHIVE },
     { &cg_smoothClients, "cg_smoothClients", "0", CVAR_USERINFO | CVAR_ARCHIVE },
     { &cg_cameraMode, "com_cameraMode", "0", CVAR_CHEAT },
 
     { &pmove_fixed, "pmove_fixed", "0", 0 },
     { &pmove_msec, "pmove_msec", "8", 0 },
     { &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
-    { &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE },
+    { &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE | CVAR_CHEAT },
     { &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE },
     { &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE },
     { &cg_oldRail, "cg_oldRail", "1", CVAR_ARCHIVE },
@@ -304,6 +306,8 @@ static cvarTable_t cvarTable[] = { { &cg_ignore, "cg_ignore", "0", 0 }, // used 
     { &cg_showLegs, "cg_showLegs", "0", CVAR_ARCHIVE },
 
     { &cg_temperatureUnit, "cg_temperatureUnit", "C", CVAR_ARCHIVE },
+
+    { &cg_scopeType, "cg_scopeType", "0", CVAR_ARCHIVE },
 
 };
 

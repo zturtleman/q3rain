@@ -2435,6 +2435,14 @@ void CG_Player(centity_t *cent) {
 
   CG_BreathPuffs(cent, &head);
 
+  if (!(cent->currentState.eFlags & EF_DEAD) && cg.snap->ps.clientNum == cent->currentState.number) {
+    /*VectorCopy(cg.refdef.vieworg, cg.headOrigin);
+    VectorCopy(cg.refdefViewAngles, cg.headAngles);*/
+  } else if (cg.snap->ps.clientNum == cent->currentState.number) {
+    VectorCopy(head.origin, cg.headOrigin);
+     vectoangles(head.axis[0], cg.headAngles);
+  }
+
   //
   // add the gun / barrel / flash
   //

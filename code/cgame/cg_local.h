@@ -619,6 +619,13 @@ refEntity_t testModelEntity;
 char testModelName[MAX_QPATH];
 qboolean testGun;
 
+vec3_t headOrigin;
+vec3_t headAngles;
+
+refdef_t zoomRefdef;
+
+float baseFovX, baseFovY;
+
 } cg_t;
 
 // all of the model, shader, and sound references that are
@@ -1123,6 +1130,8 @@ extern vmCvar_t cg_killfeedTeam;
 extern vmCvar_t cg_showLegs;
 
 extern vmCvar_t cg_temperatureUnit;
+
+extern vmCvar_t cg_scopeType;
 
 //
 // cg_main.c

@@ -536,14 +536,24 @@ static int CG_CalcFov(void) {
     inwater = qfalse;
   }
 
-  // set it
-  cg.refdef.fov_x = fov_x;
-  cg.refdef.fov_y = fov_y;
-
-  if (!cg.snap->ps.zoomFov) {
+  if (cg.snap->ps.zoomFov <= 0) {
     cg.zoomSensitivity = 1;
+    cg.refdef.fov_x = fov_x;
+    cg.refdef.fov_y = fov_y;
+    cg.baseFovX = fov_x;
+    cg.baseFovY = fov_y;
   } else {
-    cg.zoomSensitivity = cg.refdef.fov_y / 60.0;
+    if (cg_scopeType.integer) {
+      cg.zoomRefdef.fov_x = fov_x;
+      cg.zoomRefdef.fov_y = fov_y;
+      cg.refdef.fov_x = cg.baseFovX;
+      cg.refdef.fov_y = cg.baseFovY;
+      cg.zoomSensitivity = cg.zoomRefdef.fov_y / 30.0;
+    } else {
+      cg.refdef.fov_x = fov_x;
+      cg.refdef.fov_y = fov_y;
+      cg.zoomSensitivity = cg.refdef.fov_y / 60.0;
+    }
   }
 
   return inwater;
@@ -597,6 +607,11 @@ static int CG_CalcViewValues(void) {
 
   VectorCopy(ps->origin, cg.refdef.vieworg);
   VectorCopy(ps->viewangles, cg.refdefViewAngles);
+
+  if (cg.snap->ps.stats[STAT_HEALTH] <= 0) {
+    VectorCopy(cg.headAngles, cg.refdefViewAngles);
+    VectorCopy(cg.headOrigin, cg.refdef.vieworg);
+  }
 
   if (cg_cameraOrbit.integer) {
     if (cg.time > cg.nextOrbitTime) {
@@ -800,6 +815,23 @@ void CG_DrawActiveFrame(int serverTime, stereoFrame_t stereoView, qboolean demoP
     if (cg_timescaleFadeSpeed.value) {
       trap_Cvar_Set("timescale", va("%f", cg_timescale.value));
     }
+  }
+
+  if (cg_scopeType.integer) {
+    cg.zoomRefdef.time = cg.time;
+    memcpy(cg.zoomRefdef.areamask, cg.snap->areamask, sizeof(cg.zoomRefdef.areamask));
+
+    cg.zoomRefdef.width = cgs.glconfig.vidWidth / 5;
+    cg.zoomRefdef.width &= ~1;
+
+    cg.zoomRefdef.height = cgs.glconfig.vidHeight / 5;
+    cg.zoomRefdef.height &= ~1;
+
+    cg.zoomRefdef.x = (cgs.glconfig.vidWidth - cg.zoomRefdef.width) / 2;
+    cg.zoomRefdef.y = (cgs.glconfig.vidHeight - cg.zoomRefdef.height) / 2;
+
+    VectorCopy(cg.snap->ps.origin, cg.zoomRefdef.vieworg);
+    AnglesToAxis(cg.snap->ps.viewangles, cg.zoomRefdef.viewaxis);
   }
 
   // actually issue the rendering calls

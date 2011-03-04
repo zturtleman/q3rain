@@ -166,24 +166,7 @@ void body_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int da
 
 // these are just for logging, the client prints its own messages
 char *modNames[] = {
-// TODO remove
-    "MOD_SHOTGUN",
-    "MOD_GAUNTLET",
-    "MOD_MACHINEGUN",
-    "MOD_GRENADE",
-    "MOD_GRENADE_SPLASH",
-    "MOD_ROCKET",
-    "MOD_ROCKET_SPLASH",
-    "MOD_PLASMA",
-    "MOD_PLASMA_SPLASH",
-    "MOD_RAILGUN",
-    "MOD_LIGHTNING",
-    "MOD_BFG",
-    "MOD_BFG_SPLASH",
-    "MOD_GRAPPLE",
-
     "MOD_UNKNOWN",
-    // weapons
     "MOD_HANDS",
     "MOD_KNIFE",
     "MOD_HE",
@@ -193,20 +176,18 @@ char *modNames[] = {
     "MOD_CROSSBOW",
     "MOD_ACR",
     "MOD_WALTHER",
-    // env
     "MOD_WATER",
     "MOD_SLIME",
     "MOD_LAVA",
     "MOD_CRUSH",
     "MOD_MOOR",
     "MOD_FALLING",
-    "MOD_TELEFRAG,"
-      "MOD_SUICIDE",
+    "MOD_TELEFRAG",
+    "MOD_SUICIDE",
     "MOD_TARGET_LASER",
     "MOD_TRIGGER_HURT",
     "MOD_WINDOW",
     "MOD_NADELOVE",
-    // misc
     "MOD_ADMIN",
     "MOD_BOMB",
     "MOD_NUKE", };
@@ -316,7 +297,6 @@ void player_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
   contents = trap_PointContents(self->r.currentOrigin, -1);
   if (!(contents & CONTENTS_NODROP)) {
     TossClientItems(self);
-  } else {
   }
 
   Cmd_Score_f(self); // show scores
@@ -360,13 +340,11 @@ void player_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
   // remove powerups
   memset(self->client->ps.powerups, 0, sizeof(self->client->ps.powerups));
 
-  // never gib in a nodrop
   if (self->health <= GIB_HEALTH || meansOfDeath == MOD_ADMIN) {
     GibEntity(self, killer);
   } else {
     // normal death
     static int i;
-
     switch (i) {
       case 0:
         anim = BOTH_DEATH1;
@@ -385,11 +363,10 @@ void player_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
 
     G_AddEvent(self, EV_DEATH1 + i, killer);
 
-    self->die = NULL;
+    self->die = 0;
 
     // globally cycle through the different death animations
     i = (i + 1) % 3;
-
   }
 
   trap_LinkEntity(self);

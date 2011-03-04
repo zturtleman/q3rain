@@ -391,7 +391,7 @@ static void CG_DrawDamagePic(void) {
       }
     }
 
-    if (ps->zoomFov > 0) {
+    if (ps->zoomFov > 0 && !cg_scopeType.integer) {
       trap_R_DrawStretchPic(x, y, w, h, 1, 1, 0, 0, cgs.media.sha_viewScope);
     }
 
@@ -2355,6 +2355,10 @@ void CG_DrawActive(stereoFrame_t stereoView) {
 
   // draw 3D view
   trap_R_RenderScene(&cg.refdef);
+
+  if (cg.snap->ps.zoomFov > 0 && cg_scopeType.integer) {
+    trap_R_RenderScene(&cg.zoomRefdef);
+  }
 
   // draw status bar and other floating elements
   CG_Draw2D(stereoView);
