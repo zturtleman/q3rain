@@ -540,17 +540,21 @@ void ThrowWeapon(gentity_t *ent) {
   gitem_t *xr_item;
   gentity_t *xr_drop;
   byte i;
+  qboolean dead;
   int ammo, clipammo;
 
   client = ent->client;
   ucmd = &ent->client->pers.cmd;
 
-  if (client->ps.weaponstate != WEAPON_READY) {
-    return;
-  }
+  dead = client->ps.stats[STAT_HEALTH] > 0;
 
-  if (client->ps.weapon == WP_KNIFE || client->ps.weapon == WP_NONE || client->ps.weapon == WP_HANDS || (ucmd->buttons & BUTTON_ATTACK)) {
-    return;
+  if (!dead) {
+    if (client->ps.weaponstate != WEAPON_READY) {
+      return;
+    }
+    if (client->ps.weapon == WP_KNIFE || client->ps.weapon == WP_NONE || client->ps.weapon == WP_HANDS || (ucmd->buttons & BUTTON_ATTACK)) {
+      return;
+    }
   }
 
   xr_item = BG_FindItemForWeapon(client->ps.weapon);
@@ -865,10 +869,10 @@ void ClientThink_real(gentity_t *ent) {
    }*/
 
   if (level.roundState == ROUND_SPAWNING && level.numSpawnedClients < level.numPlayingClients) {
-//    if (client->ps.stats[STAT_HEALTH] > 0) {
-//      Com_Printf("killing client\n");
-//      G_Damage(ent, NULL, NULL, NULL, NULL, 10000, DAMAGE_NO_PROTECTION, MOD_SUICIDE);
-//    }
+    //    if (client->ps.stats[STAT_HEALTH] > 0) {
+    //      Com_Printf("killing client\n");
+    //      G_Damage(ent, NULL, NULL, NULL, NULL, 10000, DAMAGE_NO_PROTECTION, MOD_SUICIDE);
+    //    }
     Com_Printf("respawning client, stat is %i/%i\n", level.numSpawnedClients, level.numPlayingClients);
     respawn(ent);
     return;

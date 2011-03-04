@@ -75,34 +75,20 @@ void AddScore(gentity_t *ent, vec3_t origin, int score) {
  */
 void TossClientItems(gentity_t *self) {
   gitem_t *item;
-  int weapon;
   float angle;
   int i;
   gentity_t *drop;
 
-  // drop the weapon if not a gauntlet or machinegun
-  weapon = self->s.weapon;
   for (i = 0; i < MAX_WEAPONS; i++) {
-    /*if (self->client->ps.weaponstate == WEAPON_DROPPING) {
-     weapon = self->client->pers.cmd.weapon;
-     }*/
-    weapon = i;
-    if (!(self->client->ps.stats[STAT_WEAPONS] & (1 << weapon))) {
-      weapon = WP_NONE;
+    if (!(self->client->ps.stats[STAT_WEAPONS] & (1 << i)) || i == WP_NONE || i == WP_HANDS || i == WP_KNIFE) {
+      continue;
     }
-
-    if (weapon != WP_HANDS && weapon != WP_KNIFE && weapon != WP_NONE/* && self->client->ps.ammo[weapon]*/) {
-      // find the item type for this weapon
-      item = BG_FindItemForWeapon(weapon);
-
-      // spawn the item
-      // FIXME add ammo
-      // FIXME add variation to position/angle
-      Drop_Item(self, item, 0);
-    }
+    self->client->ps.weapon = i;
+    ThrowWeapon(self);
   }
 
   // drop all the powerups if not in teamplay
+  // FIXME remove?
   if (g_gametype.integer != GT_TEAMSURVIVOR) {
     angle = 45;
     for (i = 1; i < PW_NUM_POWERUPS; i++) {
