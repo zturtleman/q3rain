@@ -709,6 +709,9 @@ void SP_worldspawn(void) {
     G_SpawnString("weather", "", &s);
     trap_SetConfigstring(CS_WEATHER, s);
 
+    G_SpawnString("effect", "", &s);
+    trap_SetConfigstring(CS_ATMOSEFFECT, s);
+
     g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
     g_entities[ENTITYNUM_WORLD].classname = "worldspawn";
 

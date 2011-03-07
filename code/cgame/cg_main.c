@@ -291,7 +291,9 @@ static cvarTable_t cvarTable[] = { { &cg_ignore, "cg_ignore", "0", 0 }, // used 
     { &cg_oldPlasma, "cg_oldPlasma", "1", CVAR_ARCHIVE },
     { &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE },
     //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE },
+
     { &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE | CVAR_CHEAT },
+    { &cg_lowEffects, "cg_lowEffects", "0", CVAR_ARCHIVE | CVAR_CHEAT },
 
     { &cg_primary, "cg_primary", "-1", CVAR_USERINFO | CVAR_ARCHIVE },
 
