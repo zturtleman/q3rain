@@ -624,12 +624,17 @@ void SendPendingPredictableEvents(playerState_t *ps) {
   }
 }
 
+/*
+ ==============
+ G_ExplodeClient
+ ==============
+ */
 static void G_ExplodeClient(gclient_t *client, gentity_t *ent) {
   ent->client->ps.weaponTime = 200;
   ent->client->ps.weaponstate = WEAPON_READY;
   // dont splode when there are no nades :X
   if (client->clipammo[WP_HE] > 0) {
-    FireGrenade(ent, 0, MOD_NADELOVE);
+    FireGrenade(ent, 0, MOD_HE_SPLASH);
     client->clipammo[WP_HE] = 0;
   } else {
     return;

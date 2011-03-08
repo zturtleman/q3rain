@@ -1221,6 +1221,7 @@ static void FireGrenade(gentity_t *ent, int time, int mod) {
   }
   m->nextthink = level.time + time;
   m->splashMethodOfDeath = mod;
+  m->client = ent->client;
 
   dir[0] = 0;
   dir[1] = 0;

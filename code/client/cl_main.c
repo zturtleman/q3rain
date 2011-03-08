@@ -559,10 +559,10 @@ void CL_StopRecord_f(void) {
   Com_Printf("Stopped demo.\n");
 }
 
-/* 
- ================== 
+/*
+ ==================
  CL_DemoFilename
- ================== 
+ ==================
  */
 void CL_DemoFilename(int number, char *fileName) {
   int a, b, c, d;
@@ -1347,9 +1347,9 @@ void CL_RequestMotd(void) {
 
 
 #OLD The authorize server returns a:
-#OLD 
+#OLD
 #OLD keyAthorize <challenge> <accept | deny>
-#OLD 
+#OLD
 #OLD A client will be accepted if the cdkey is valid and it has not been used by any other IP
 #OLD address in the last 15 minutes.
 
@@ -4220,4 +4220,4 @@ void CL_Init(void) {
   qboolean CL_CDKeyValidate(const char *key, const char *checksum) {
     return qtrue;
   }
-  
+

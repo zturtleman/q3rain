@@ -336,19 +336,19 @@ void Cmd_LoadoutMenu(char *args, int argNum) {
 void Con_SendToMaster(char *message) {
     netadr_t master;
     // TODO remove localhost stuff
-    if (!NET_StringToAdr("localhost:27950", &master, NA_UNSPEC)) {
-        Com_DPrintf("^1ERROR: Couldn't resolve master server, trying alternative\n");
+    //if (!NET_StringToAdr("localhost:27950", &master, NA_UNSPEC)) {
+        //Com_Printf("^1ERROR: Couldn't resolve master server, trying alternative\n");
         if (!NET_StringToAdr("hazewood.de:27950", &master, NA_UNSPEC)) {
-            Com_DPrintf("^1ERROR: Couldn't resolve master server, trying alternative\n");
+            Com_Printf("^1ERROR: Couldn't resolve master server, trying alternative\n");
             if (!NET_StringToAdr("rylius-is-a-geek.org:27950", &master, NA_UNSPEC)) {
-                Com_DPrintf("^1ERROR: Couldn't resolve master server, trying alternative\n");
+                Com_Printf("^1ERROR: Couldn't resolve master server, trying alternative\n");
                 if (!NET_StringToAdr("rylius-is-a-geek.org:1337", &master, NA_UNSPEC)) {
-                    Com_DPrintf("^1ERROR: Couldn't resolve master server\n");
+                    Com_Printf("^1ERROR: Couldn't resolve master server\n");
                     return;
                 }
             }
         }
-    }
+    //}
 
     NET_SendPacket(NS_CLIENT, strlen(message) + 1, message, master);
     NET_OutOfBandPrint(NS_CLIENT, master, "%s", message);
