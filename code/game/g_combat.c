@@ -252,10 +252,8 @@ void player_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
     killerName = "<world>";
   }
 
-  Com_Printf("attacker->classname = %s\n", attacker->classname);
-
-  if (meansOfDeath == MOD_HE_SPLASH && self == attacker) {
-    meansOfDeath = MOD_NADELOVE;
+  if (meansOfDeath == MOD_NADELOVE && self != attacker) {
+    meansOfDeath = MOD_HE_SPLASH;
   }
 
   if (meansOfDeath < 0 || meansOfDeath >= sizeof(modNames) / sizeof(modNames[0])) {

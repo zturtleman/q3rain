@@ -634,7 +634,7 @@ static void G_ExplodeClient(gclient_t *client, gentity_t *ent) {
   ent->client->ps.weaponstate = WEAPON_READY;
   // dont splode when there are no nades :X
   if (client->clipammo[WP_HE] > 0) {
-    FireGrenade(ent, 0, MOD_HE_SPLASH);
+    FireGrenade(ent, 0, MOD_NADELOVE);
     client->clipammo[WP_HE] = 0;
   } else {
     return;
