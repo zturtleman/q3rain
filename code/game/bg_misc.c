@@ -43,9 +43,7 @@
  "count" override quantity or duration on most items.
  */
 
-gitem_t bg_itemlist[] = { { NULL, NULL, { NULL, NULL, NULL, NULL },
-/* icon */NULL,
-/* pickup */NULL, 0, 0, 0,
+gitem_t bg_itemlist[] = { { NULL, NULL, { NULL, NULL, NULL, NULL }, /* icon */NULL, /* pickup */NULL, 0, 0, 0,
 /* precache */"",
 /* sounds */"" }, // leave index 0 alone
 
@@ -98,19 +96,32 @@ gitem_t bg_itemlist[] = { { NULL, NULL, { NULL, NULL, NULL, NULL },
 
     /*QUAKED item_health_large (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
      */
-    { "item_health_large", "sound/items/l_health.wav", { "models/powerups/health/large_cross.md3", "models/powerups/health/large_sphere.md3", NULL, NULL },
-    /* icon */"icons/iconh_red",
-    /* pickup */"50 Health", 50, IT_HEALTH, 0,
-    /* precache */"",
-    /* sounds */"" },
+    {
+        "item_health_large",
+        "sound/items/l_health.wav",
+        { "models/powerups/health/large_cross.md3", "models/powerups/health/large_sphere.md3", NULL, NULL },
+        "icons/iconh_red", /* icon */
+        "50 Health", /* pickup */
+        50,
+        IT_HEALTH,
+        0,
+        "",/* precache */
+        "" /* sounds */
+    },
 
     /*QUAKED item_health_mega (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
      */
-    { "item_health_mega", "sound/items/m_health.wav", { "models/powerups/health/mega_cross.md3", "models/powerups/health/mega_sphere.md3", NULL, NULL },
-    /* icon */"icons/iconh_mega",
-    /* pickup */"Mega Health", 100, IT_HEALTH, 0,
-    /* precache */"",
-    /* sounds */"" },
+    { "item_health_mega", // classname
+        "sound/items/m_health.wav",
+        { "models/powerups/health/mega_cross.md3", "models/powerups/health/mega_sphere.md3", NULL, NULL },
+        "icons/iconh_mega",
+        "Mega Health",
+        100,
+        IT_HEALTH,
+        0,/* pickup */
+        "", // precache
+        "" // sounds
+    },
 
     /*QUAKED item_bandage (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
      */
@@ -169,16 +180,22 @@ gitem_t bg_itemlist[] = { { NULL, NULL, { NULL, NULL, NULL, NULL },
 
     /*QUAKED weapon_crossbow (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
      */
-    { "weapon_crossbow", "sound/misc/w_pkup.wav", { "models/weapons/crossbow/crossbow.md3", NULL, NULL, NULL }, "icons/iconw_railgun", /* icon */
-    "Crossbow", /* pickup */
-    3, IT_WEAPON, WP_CROSSBOW,
-    /* precache */"",
-    /* sounds */"" },
+    { "weapon_crossbow", // classname
+        "sound/misc/w_pkup.wav", // pickup sound
+        { "models/weapons/crossbow/crossbow.md3", NULL, NULL, NULL }, // models
+        "icons/iconw_railgun", // icon
+        "Crossbow", // name
+        3, // count
+        IT_WEAPON, // type
+        WP_CROSSBOW, // weapon
+        "", // precache
+        "" // sounds
+    },
 
     /*QUAKED weapon_acr (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
      */
-    { "weapon_acr", "sound/misc/w_pkup.wav",
-    //{ "models/weapons2/railgun/railgun.md3", NULL, NULL, NULL},
+    { "weapon_acr", // classname
+        "sound/misc/w_pkup.wav",
         { "models/weapons/acr/acr.md3", NULL, NULL, NULL },
         /* icon */"icons/iconw_machinegun",
         /* pickup */"Remington ACR",
@@ -190,11 +207,16 @@ gitem_t bg_itemlist[] = { { NULL, NULL, { NULL, NULL, NULL, NULL },
 
     /*QUAKED weapon_he (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
      */
-    { "weapon_he", "sound/misc/w_pkup.wav", { "models/weapons2/grenadel/grenadel.md3", NULL, NULL, NULL },
-    /* icon */"icons/iconw_grenade",
-    /* pickup */"HE Grenade", 2, IT_WEAPON, WP_HE,
-    /* precache */"",
-    /* sounds */"sound/weapons/grenade/hgrenb1a.wav sound/weapons/grenade/hgrenb2a.wav" },
+    { "weapon_he", // classname
+        "sound/misc/w_pkup.wav",
+        { "models/weapons2/grenadel/grenadel.md3", NULL, NULL, NULL },
+        /* icon */"icons/iconw_grenade",
+        /* pickup */"HE Grenade",
+        2,
+        IT_WEAPON,
+        WP_HE,
+        /* precache */"",
+        /* sounds */"sound/weapons/grenade/hgrenb1a.wav sound/weapons/grenade/hgrenb2a.wav" },
 
     /*QUAKED weapon_walther (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
      */
@@ -232,36 +254,6 @@ gitem_t bg_itemlist[] = { { NULL, NULL, { NULL, NULL, NULL, NULL },
     -1, IT_WEAPON, WP_SNOWBOARD, "", /* precache */
     "", /* sounds */
     },
-
-    //
-    // AMMO ITEMS
-    //
-
-    //
-    // HOLDABLE ITEMS
-    //
-
-    //
-    // POWERUP ITEMS
-    //
-
-    /*QUAKED team_CTF_redflag (1 0 0) (-16 -16 -16) (16 16 16)
-     Only in CTF games
-     */
-    { "team_CTF_redflag", NULL, { "models/flags/r_flag.md3", NULL, NULL, NULL },
-    /* icon */"icons/iconf_red1",
-    /* pickup */"Red Flag", 0, IT_TEAM, PW_REDFLAG,
-    /* precache */"",
-    /* sounds */"" },
-
-    /*QUAKED team_CTF_blueflag (0 0 1) (-16 -16 -16) (16 16 16)
-     Only in CTF games
-     */
-    { "team_CTF_blueflag", NULL, { "models/flags/b_flag.md3", NULL, NULL, NULL },
-    /* icon */"icons/iconf_blu1",
-    /* pickup */"Blue Flag", 0, IT_TEAM, PW_BLUEFLAG,
-    /* precache */"",
-    /* sounds */"" },
 
     // end of list marker
     { NULL } };

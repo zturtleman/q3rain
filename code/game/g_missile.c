@@ -38,8 +38,7 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
   VectorCopy(ent->s.pos.trBase, old);
 
   // reflect the velocity on the trace plane
-  hitTime = level.previousTime + (level.time - level.previousTime)
-      * trace->fraction;
+  hitTime = level.previousTime + (level.time - level.previousTime) * trace->fraction;
   BG_EvaluateTrajectoryDelta(&ent->s.pos, hitTime, velocity);
   dot = DotProduct(velocity, trace->plane.normal);
   VectorMA(velocity, -2 * dot, trace->plane.normal, ent->s.pos.trDelta);
@@ -296,8 +295,7 @@ void G_NukeNextStage(gentity_t * ent) {
  Lancer - Destroy a missile
  ================
  */
-void G_MissileDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
-                  int damage, int mod) {
+void G_MissileDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod) {
   if (inflictor == self)
     return;
   self->takedamage = qfalse;
@@ -316,8 +314,7 @@ void G_MissileImpact(gentity_t *ent, trace_t * trace) {
   other = &g_entities[trace->entityNum];
 
   // check for bounce
-  if (!other->takedamage && (ent->s.eFlags & (EF_BOUNCE | EF_BOUNCE_HALF
-      | EF_STATIC))) {
+  if (!other->takedamage && (ent->s.eFlags & (EF_BOUNCE | EF_BOUNCE_HALF | EF_STATIC))) {
     G_BounceMissile(ent, trace);
     return;
   }
@@ -326,8 +323,7 @@ void G_MissileImpact(gentity_t *ent, trace_t * trace) {
     return;
   }
   if (strcmp(ent->classname, "grenade") == 0) {
-    if (other->s.eType == ET_BREAKABLE && other->takedamage && ent->damage
-        > other->health_higher) {
+    if (other->s.eType == ET_BREAKABLE && other->takedamage && ent->damage > other->health_higher) {
       other->health = 0;
       if (G_BreakGlass(other, ent->s.origin, MOD_HE_SPLASH, NULL) == qtrue) {
         return;
@@ -433,8 +429,7 @@ void G_RunMissile(gentity_t * ent) {
     // never explode or bounce on sky
     if (tr.surfaceFlags & SURF_NOIMPACT) {
       // If grapple, reset owner
-      if (ent->parent && ent->parent->client && ent->parent->client->hook
-          == ent) {
+      if (ent->parent && ent->parent->client && ent->parent->client->hook == ent) {
         ent->parent->client->hook = NULL;
       }
       G_FreeEntity(ent);
@@ -459,8 +454,7 @@ void G_BombTouch(gentity_t *ent, gentity_t *otherent, trace_t * trace) {
   if (!otherent->client) {
     return;
   }
-  if (!(otherent->client->buttons & BUTTON_USE)
-      || otherent->client->ps.stats[STAT_HEALTH] <= 0) {
+  if (!(otherent->client->buttons & BUTTON_USE) || otherent->client->ps.stats[STAT_HEALTH] <= 0) {
     otherent->pickupTime = -1;
     return;
   }

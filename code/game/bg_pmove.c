@@ -60,7 +60,7 @@ float pm_snowfriction = 2.0f;
 
 int c_pmove = 0;
 
-#define WALLJUMP_BOOST 180
+#define WALLJUMP_BOOST 240
 #define WALLCLIMB_BOOST 400
 #define MAX_WALLCLIMBS 1
 #define MAX_WALLJUMPS 3
@@ -828,12 +828,14 @@ static qboolean PM_CheckWallJump(void) {
 /*
  =============
  PM_WallJump
+ FIXME complete rewrite
  =============
  */
 static void PM_WallJump(void) {
   int boost;
-  vec3_t flatforward, spot;
+  vec3_t flatforward, spot, dir, velocity, pvel;
   trace_t trace;
+  float dot;
   qboolean jumped = qfalse;
 
   pml.groundPlane = qfalse;
@@ -852,6 +854,20 @@ static void PM_WallJump(void) {
   VectorNormalize(flatforward);
   VectorMA(pm->ps->origin, 1, flatforward, spot);
   pm->trace(&trace, pm->ps->origin, pm->mins, pm->maxs, spot, pm->ps->clientNum, MASK_PLAYERSOLID);
+
+  VectorCopy(trace.plane.normal, velocity);
+  VectorScale(velocity, boost, velocity);
+  velocity[2] = pm->ps->velocity[2] + boost;
+
+  VectorCopy(pm->ps->velocity, pvel);
+  if (velocity[0] != 0 && velocity[1] == 0) {
+    velocity[1] = pvel[1];
+  } else if (velocity[1] != 0 && velocity[0] == 0) {
+    velocity[0] = pvel[0];
+  }
+
+  VectorCopy(velocity, pm->ps->velocity);
+  return;
 
   //Com_Printf("vel 0 = %f vel 1 = %f\n", pm->ps->velocity[0], pm->ps->velocity[1]);
 
