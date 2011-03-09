@@ -812,6 +812,10 @@ static qboolean PM_CheckWallJump(void) {
     return qfalse;
   }
 
+  if (pm->ps->velocity[2] < WALLJUMP_BOOST * -2) {
+    return qfalse;
+  }
+
   flatforward[0] = pml.forward[0];
   flatforward[1] = pml.forward[1];
   flatforward[2] = 0;
@@ -828,12 +832,11 @@ static qboolean PM_CheckWallJump(void) {
 /*
  =============
  PM_WallJump
- FIXME complete rewrite
  =============
  */
 static void PM_WallJump(void) {
   int boost;
-  vec3_t flatforward, spot, dir, velocity, pvel;
+  vec3_t flatforward, spot, velocity;
   trace_t trace;
   float dot;
   qboolean jumped = qfalse;
@@ -847,7 +850,6 @@ static void PM_WallJump(void) {
     boost /= 2;
   }
 
-  // FIXME …really needed?
   flatforward[0] = pml.forward[0];
   flatforward[1] = pml.forward[1];
   flatforward[2] = 0;
@@ -859,101 +861,24 @@ static void PM_WallJump(void) {
   VectorScale(velocity, boost, velocity);
   velocity[2] = pm->ps->velocity[2] + boost;
 
-  VectorCopy(pm->ps->velocity, pvel);
   if (velocity[0] != 0 && velocity[1] == 0) {
-    velocity[1] = pvel[1];
+    velocity[1] = pm->ps->velocity[1];
   } else if (velocity[1] != 0 && velocity[0] == 0) {
-    velocity[0] = pvel[0];
+    velocity[0] = pm->ps->velocity[0];
   }
 
   VectorCopy(velocity, pm->ps->velocity);
-  return;
 
-  //Com_Printf("vel 0 = %f vel 1 = %f\n", pm->ps->velocity[0], pm->ps->velocity[1]);
-
-#define MINIMUM 10
-
-  // 1
-  if (pm->ps->velocity[0] < 0 && pm->ps->velocity[0] > -MINIMUM && pm->ps->velocity[1] < -MINIMUM) {
-    pm->ps->velocity[0] += boost;
-    //Com_Printf("1\n");
-    jumped = qtrue;
-  }
-
-  // 2
-  if (pm->ps->velocity[0] < 0 && pm->ps->velocity[1] > MINIMUM) {
-    pm->ps->velocity[0] -= boost;
-    pm->ps->velocity[0] *= -1;
-    //Com_Printf("2\n");
-    jumped = qtrue;
-  }
-
-  // 3
-  if (pm->ps->velocity[0] > MINIMUM && pm->ps->velocity[1] > 0 && pm->ps->velocity[1] < MINIMUM) {
-    pm->ps->velocity[1] += boost;
-    pm->ps->velocity[1] *= -1;
-    //Com_Printf("3\n");
-    jumped = qtrue;
-  }
-
-  // 4
-  if (pm->ps->velocity[0] < -MINIMUM && pm->ps->velocity[1] > 0 && pm->ps->velocity[1] < MINIMUM) {
-    pm->ps->velocity[1] += boost;
-    pm->ps->velocity[1] *= -1;
-    //Com_Printf("4\n");
-    jumped = qtrue;
-  }
-
-  // 5
-  if (pm->ps->velocity[0] < -MINIMUM && pm->ps->velocity[1] < 0 && pm->ps->velocity[1] > -MINIMUM) {
-    pm->ps->velocity[1] -= boost;
-    pm->ps->velocity[1] *= -1;
-    //Com_Printf("5\n");
-    jumped = qtrue;
-  }
-
-  // 6
-  if (pm->ps->velocity[0] > MINIMUM && pm->ps->velocity[1] < 0 && pm->ps->velocity[1] > -MINIMUM) {
-    pm->ps->velocity[1] -= boost;
-    pm->ps->velocity[1] *= -1;
-    //Com_Printf("6\n");
-    jumped = qtrue;
-  }
-
-  // 7
-  if (pm->ps->velocity[0] > 0 && pm->ps->velocity[0] < MINIMUM && pm->ps->velocity[1] < -MINIMUM) {
-    pm->ps->velocity[0] += boost;
-    pm->ps->velocity[0] *= -1;
-    //Com_Printf("7\n");
-    jumped = qtrue;
-  }
-
-  // 8
-  if (pm->ps->velocity[0] > 0 && pm->ps->velocity[0] < MINIMUM && pm->ps->velocity[1] > MINIMUM) {
-    pm->ps->velocity[0] += boost;
-    pm->ps->velocity[0] *= -1;
-    //Com_Printf("8\n");
-    jumped = qtrue;
-  }
-
-  if (jumped) {
-    pm->ps->velocity[2] += boost * 1.75f;
-
-    pm->ps->walljumps++;
-
-    pm->ps->groundEntityNum = ENTITYNUM_NONE;
-
-    PM_AddEvent(EV_WALLJUMP);
-
-    pm->ps->stamina -= 1000;
-
-    if (pm->cmd.forwardmove >= 0) {
-      PM_ForceLegsAnim(LEGS_JUMP);
-      pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
-    } else {
-      PM_ForceLegsAnim(LEGS_JUMPB);
-      pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
-    }
+  pm->ps->walljumps++;
+  pm->ps->groundEntityNum = ENTITYNUM_NONE;
+  PM_AddEvent(EV_WALLJUMP);
+  pm->ps->stamina -= 1000;
+  if (pm->cmd.forwardmove >= 0) {
+    PM_ForceLegsAnim(LEGS_JUMP);
+    pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
+  } else {
+    PM_ForceLegsAnim(LEGS_JUMPB);
+    pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
   }
 }
 
