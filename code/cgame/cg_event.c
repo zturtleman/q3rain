@@ -634,17 +634,12 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
 
     case EV_JUMP_PAD:
       DEBUGNAME("EV_JUMP_PAD")
-      //		CG_Printf( "EV_JUMP_PAD w/effect #%i\n", es->eventParm );
       {
         localEntity_t *smoke;
         vec3_t up = { 0, 0, 1 };
-
         smoke = CG_SmokePuff(cent->lerpOrigin, up, 32, 1, 1, 1, 0.33f, 1000, cg.time, 0, LEF_PUFF_DONT_SCALE, cgs.media.smokePuffShader);
       }
-
-      // boing sound at origin, jump sound on player
       trap_S_StartSound(cent->lerpOrigin, -1, CHAN_VOICE, cgs.media.jumpPadSound);
-      trap_S_StartSound(NULL, es->number, CHAN_VOICE, CG_CustomSound(es->number, "*jump1.wav"));
       break;
 
     case EV_WALLJUMP:
@@ -677,7 +672,6 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
 
     case EV_ITEM_PICKUP:
       DEBUGNAME("EV_ITEM_PICKUP")
-      ;
       {
         gitem_t *item;
         int index;
@@ -706,7 +700,6 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
 
     case EV_GLOBAL_ITEM_PICKUP:
       DEBUGNAME("EV_GLOBAL_ITEM_PICKUP")
-      ;
       {
         gitem_t *item;
         int index;
@@ -734,7 +727,6 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
       //
     case EV_NOAMMO:
       DEBUGNAME("EV_NOAMMO")
-      ;
       //		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.noAmmoSound );
       if (es->number == cg.snap->ps.clientNum) {
         CG_OutOfAmmoChange();
@@ -742,88 +734,71 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
       break;
     case EV_CHANGE_WEAPON:
       DEBUGNAME("EV_CHANGE_WEAPON")
-      ;
       trap_S_StartSound(NULL, es->number, CHAN_AUTO, cgs.media.selectSound);
       break;
     case EV_FIRE_WEAPON:
       DEBUGNAME("EV_FIRE_WEAPON")
-      ;
       CG_FireWeapon(cent);
       break;
 
     case EV_USE_ITEM0:
       DEBUGNAME("EV_USE_ITEM0")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM1:
       DEBUGNAME("EV_USE_ITEM1")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM2:
       DEBUGNAME("EV_USE_ITEM2")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM3:
       DEBUGNAME("EV_USE_ITEM3")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM4:
       DEBUGNAME("EV_USE_ITEM4")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM5:
       DEBUGNAME("EV_USE_ITEM5")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM6:
       DEBUGNAME("EV_USE_ITEM6")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM7:
       DEBUGNAME("EV_USE_ITEM7")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM8:
       DEBUGNAME("EV_USE_ITEM8")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM9:
       DEBUGNAME("EV_USE_ITEM9")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM10:
       DEBUGNAME("EV_USE_ITEM10")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM11:
       DEBUGNAME("EV_USE_ITEM11")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM12:
       DEBUGNAME("EV_USE_ITEM12")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM13:
       DEBUGNAME("EV_USE_ITEM13")
-      ;
       CG_UseItem(cent);
       break;
     case EV_USE_ITEM14:
       DEBUGNAME("EV_USE_ITEM14")
-      ;
       CG_UseItem(cent);
       break;
 
@@ -834,26 +809,22 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
       //
     case EV_PLAYER_TELEPORT_IN:
       DEBUGNAME("EV_PLAYER_TELEPORT_IN")
-      ;
       trap_S_StartSound(NULL, es->number, CHAN_AUTO, cgs.media.teleInSound);
       CG_SpawnEffect(position);
       break;
 
     case EV_PLAYER_TELEPORT_OUT:
       DEBUGNAME("EV_PLAYER_TELEPORT_OUT")
-      ;
       trap_S_StartSound(NULL, es->number, CHAN_AUTO, cgs.media.teleOutSound);
       CG_SpawnEffect(position);
       break;
 
     case EV_ITEM_POP:
       DEBUGNAME("EV_ITEM_POP")
-      ;
       trap_S_StartSound(NULL, es->number, CHAN_AUTO, cgs.media.respawnSound);
       break;
     case EV_ITEM_RESPAWN:
       DEBUGNAME("EV_ITEM_RESPAWN")
-      ;
       cent->miscTime = cg.time; // scale up from this
       trap_S_StartSound(NULL, es->number, CHAN_AUTO, cgs.media.respawnSound);
       break;
@@ -964,7 +935,6 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
       // local player sounds are triggered in CG_CheckLocalSounds,
       // so ignore events on the player
       DEBUGNAME("EV_PAIN")
-      ;
       if (cent->currentState.number != cg.snap->ps.clientNum) {
         CG_PainEvent(cent, es->eventParm);
       }
@@ -1067,37 +1037,31 @@ void CG_EntityEvent(centity_t *cent, vec3_t position) {
 
     case EV_NUKE_4:
       DEBUGNAME("EV_NUKE_4")
-      ;
       CG_Nuke(position, 4);
       break;
 
     case EV_NUKE_5:
       DEBUGNAME("EV_NUKE_5")
-      ;
       CG_Nuke(position, 5);
       break;
 
     case EV_NUKE_6:
       DEBUGNAME("EV_NUKE_6")
-      ;
       CG_Nuke(position, 6);
       break;
 
     case EV_NUKE_7:
       DEBUGNAME("EV_NUKE_7")
-      ;
       CG_Nuke(position, 7);
       break;
 
     case EV_SHRAPNEL_IMPACT:
       DEBUGNAME("EV_SHRAPNEL_IMPACT")
-      ;
       CG_MissileHitWall(-2, 0, position, dir, IMPACTSOUND_METAL);
       break;
 
     default:
       DEBUGNAME("UNKNOWN")
-      ;
       CG_Error("Unknown event: %i\n", event);
       break;
   }

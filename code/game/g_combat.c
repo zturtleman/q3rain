@@ -793,8 +793,12 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t
       targ->enemy = attacker;
       targ->die(targ, inflictor, attacker, take, mod);
       return;
-    } else if (targ->pain && mod != MOD_BLEED) {
-      targ->pain(targ, attacker, take);
+    } else {
+      if (targ->pain && mod != MOD_BLEED) {
+        targ->pain(targ, attacker, take);
+      } else {
+        targ->client->ps.bleeding = 1;
+      }
     }
     if (crandom() < -0.4f || mod == MOD_WINDOW) {
       if (mod != MOD_BLEED && mod != MOD_HANDS && mod != MOD_HE && mod != MOD_HE_SPLASH && mod != MOD_WATER && mod != MOD_SLIME && mod != MOD_LAVA && mod

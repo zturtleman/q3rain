@@ -1105,6 +1105,7 @@ int stamina;
 // combat
 int wounds;
 int cooldown;
+int bleeding; // if we lost health this frame due to bleeding
 // weather
 int levelTemperature;
 } playerState_t;

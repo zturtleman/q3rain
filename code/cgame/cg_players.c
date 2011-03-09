@@ -2438,6 +2438,14 @@ void CG_Player(centity_t *cent) {
   if (cg.snap->ps.clientNum == cent->currentState.number) {
     VectorCopy(head.origin, cg.headOrigin);
     vectoangles(head.axis[0], cg.headAngles);
+    if (/*cg.snap->ps.bleeding > 0*/qtrue) {
+      localEntity_t *le = CG_AllocLocalEntity();
+      VectorCopy(torso.origin, le->pos.trBase);
+      le->pos.trType = TR_GRAVITY;
+      le->leBounceSoundType = LEBS_BLOOD;
+      le->leType = LE_FRAGMENT;
+      CG_Printf("bleeding\n");
+    }
   }
 
   //
