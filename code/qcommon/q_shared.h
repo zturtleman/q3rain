@@ -1221,6 +1221,7 @@ int legsAnim; // mask off ANIM_TOGGLEBIT
 int torsoAnim; // mask off ANIM_TOGGLEBIT
 
 int stamina;
+int bleeding;
 
 int generic1;
 } entityState_t;

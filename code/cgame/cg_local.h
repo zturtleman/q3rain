@@ -357,6 +357,8 @@ qhandle_t modelIcon;
 animation_t animations[MAX_TOTALANIMATIONS];
 
 sfxHandle_t sounds[MAX_CUSTOM_SOUNDS];
+
+int bleedTime;
 } clientInfo_t;
 
 // each WP_* weapon enum has an associated weaponInfo_t

@@ -747,6 +747,7 @@ void BG_PlayerStateToEntityState(playerState_t *ps, entityState_t *s, qboolean s
   s->generic1 = ps->generic1;
 
   s->stamina = ps->stamina;
+  s->bleeding = ps->wounds;
 }
 
 /*
@@ -827,6 +828,9 @@ void BG_PlayerStateToEntityStateExtraPolate(playerState_t *ps, entityState_t *s,
 
   s->loopSound = ps->loopSound;
   s->generic1 = ps->generic1;
+
+  s->stamina = ps->stamina;
+  s->bleeding = ps->wounds;
 }
 
 /*

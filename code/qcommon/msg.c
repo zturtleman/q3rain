@@ -866,6 +866,7 @@ netField_t entityStateFields[] = {
     { NETF(constantLight), 32},
     { NETF(frame), 16},
     { NETF(stamina), 16},
+    { NETF(bleeding), 2},
 };
 
 
