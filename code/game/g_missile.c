@@ -74,7 +74,6 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
   }
 
   if (strcmp(ent->classname, "c4") == 0) {
-    Com_Printf("c4 bounce\n");
     if (trace->allsolid == qtrue) {
       // bomb sticks in wall, keep it there
       G_SetOrigin(ent, old);
@@ -88,7 +87,6 @@ void G_BounceMissile(gentity_t *ent, trace_t *trace) {
     ent->s.angles2[2] = DEG2RAD(90);
     if (trace->plane.normal[2] > 0.2) {
       G_SetOrigin(ent, trace->endpos);
-      Com_Printf("bomb stopped\n");
       return;
     }
   }

@@ -781,7 +781,13 @@ void Weapon_Barrett_Fire(gentity_t *ent, int count) {
     VectorMA(end, r, right, end);
     VectorMA(end, u, up, end);
   } else {
-    if (spread != BARRETT_SPREAD * STATICSPREAD) {
+    if (spread != BARRETT_SPREAD * STATICSPREAD) { // moving, so add spread
+      VectorMA(end, r, right, end);
+      VectorMA(end, u, up, end);
+    } else { // no spread, add barretts default spread
+      r = random() * M_PI * 2.0f;
+      u = cos(r) * crandom() * (BARRETT_SPREAD * 4);
+      r = cos(r) * crandom() * (BARRETT_SPREAD * 4);
       VectorMA(end, r, right, end);
       VectorMA(end, u, up, end);
     }
@@ -1061,7 +1067,7 @@ void Weapon_Snowboard_Fire(gentity_t *ent) {
 
 /*
  ===============
-KickBack
+ KickBack
  ===============
  */
 static void Kickback(gentity_t *ent, int distance, int rate) {

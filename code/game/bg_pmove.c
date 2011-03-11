@@ -2162,13 +2162,13 @@ static void PM_Weapon(void) {
       addTime = 100;
       break;
     case WP_KNIFE:
-      addTime = 300;
-      break;
-    case WP_HANDS:
       addTime = 500;
       break;
+    case WP_HANDS:
+      addTime = 300;
+      break;
     case WP_BARRETT:
-      addTime = 800;
+      addTime = 1000;
       break;
     case WP_INTERVENTION:
       addTime = 800;
