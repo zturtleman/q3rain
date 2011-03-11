@@ -2013,7 +2013,7 @@ void CG_Tracer(vec3_t source, vec3_t dest) {
   len = VectorNormalize(forward);
 
   // start at least a little ways from the muzzle
-  if (len < 100) {
+  if (len < 10) {
     return;
   }
   begin = 50 + random() * (len - 60);
@@ -2127,8 +2127,8 @@ void CG_Bullet(vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, i
 
   // if the shooter is currently valid, calc a source point and possibly
   // do trail effects
-  if (sourceEntityNum >= 0 && cg_tracerChance.value > 0) {
-    if (CG_CalcMuzzlePoint(sourceEntityNum, start)) {
+  if (sourceEntityNum >= 0) {
+    if (CG_CalcMuzzlePoint(sourceEntityNum, start) && cg_tracerChance.value > 0) {
       sourceContentType = trap_CM_PointContents(start, 0);
       destContentType = trap_CM_PointContents(end, 0);
 
@@ -2146,7 +2146,7 @@ void CG_Bullet(vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, i
       }
 
       // draw a tracer
-      if (random() < cg_tracerChance.value) {
+      if (random() < cg_tracerChance.value / 2) {
         CG_Tracer(start, end);
       }
     }

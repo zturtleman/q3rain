@@ -1571,7 +1571,7 @@ int StartClipsForWeapon(int w) {
  */
 void Cmd_Drop_f(gentity_t *ent) {
   playerState_t *ps = &ent->client->ps;
-  if (!level.cutscene) {
+  if (!level.cutscene && ps->weapon > 1) {
     ThrowWeapon(ent);
   }
 }

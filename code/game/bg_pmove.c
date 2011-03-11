@@ -2270,6 +2270,7 @@ void PM_UpdateViewAngles(playerState_t *ps, const usercmd_t * cmd) {
   for (i = 0; i < 3; i++) {
     temp = cmd->angles[i] + ps->delta_angles[i];
     if (i == PITCH) {
+      temp += ps->weaponPitch;
       // don't let the player look up or down more than 90 degrees
       if (temp > 16000) {
         ps->delta_angles[i] = 16000 - cmd->angles[i];
@@ -2280,6 +2281,14 @@ void PM_UpdateViewAngles(playerState_t *ps, const usercmd_t * cmd) {
       }
     }
     ps->viewangles[i] = SHORT2ANGLE(temp);
+  }
+  if (ps->pitchRate <= 0) {
+    ps->pitchRate = 1;
+  }
+  if (ps->weaponPitch < 0) {
+    ps->weaponPitch += pml.frametime * 1000 * ps->pitchRate;
+  } else {
+    ps->weaponPitch = 0;
   }
 
 }

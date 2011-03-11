@@ -1106,6 +1106,8 @@ int stamina;
 int wounds;
 int cooldown;
 int bleeding; // if we lost health this frame due to bleeding
+int weaponPitch;
+int pitchRate;
 // weather
 int levelTemperature;
 } playerState_t;

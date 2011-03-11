@@ -596,7 +596,7 @@ void Weapon_ACR_Fire(gentity_t *ent) {
 #define MAX_INTERVENTION_WALLS  1
 #define MAX_INTERVENTION_UNITS  64
 #define INTERVENTION_DAMAGE     100
-#define INTERVENTION_RANGE      8192
+#define INTERVENTION_RANGE      7800
 #define INTERVENTION_SPREAD     8
 
 void Weapon_Intervention_Fire(gentity_t *ent, int count) {
@@ -721,12 +721,12 @@ void Weapon_Intervention_Fire(gentity_t *ent, int count) {
  weapon_barrett_fire
  =================
  */
-#define MAX_BARRETT_HITS    4
+#define MAX_BARRETT_HITS    3
 #define MAX_BARRETT_WALLS   2
 #define MAX_BARRETT_UNITS   96
-#define BARRETT_DAMAGE      200
-#define BARRETT_RANGE       8129
-#define BARRETT_SPREAD      12
+#define BARRETT_DAMAGE      150
+#define BARRETT_RANGE       7000
+#define BARRETT_SPREAD      20
 
 void Weapon_Barrett_Fire(gentity_t *ent, int count) {
   vec3_t end, oldmuzzle;
@@ -1061,11 +1061,22 @@ void Weapon_Snowboard_Fire(gentity_t *ent) {
 
 /*
  ===============
+KickBack
+ ===============
+ */
+static void Kickback(gentity_t *ent, int distance, int rate) {
+  ent->client->ps.weaponPitch += distance;
+  ent->client->ps.pitchRate = rate;
+  ent->client->ps.delta_angles[PITCH] = 0;
+}
+
+/*
+ ===============
  FireWeapon
  ===============
  */
 void FireWeapon(gentity_t *ent) {
-
+  int i;
   //Remove Ammo if not infinite
   if (ent->client->clipammo[ent->client->ps.weapon] != -1) {
     ent->client->clipammo[ent->client->ps.weapon]--;
@@ -1101,22 +1112,27 @@ void FireWeapon(gentity_t *ent) {
       if (g_zoomreset.integer) {
         ent->client->ps.zoomFov = 0;
       }
+      Kickback(ent, -3000, 4);
       break;
     case WP_INTERVENTION:
       Weapon_Intervention_Fire(ent, 0);
       if (g_zoomreset.integer) {
         ent->client->ps.zoomFov = 0;
       }
+      Kickback(ent, -1500, 3);
       break;
     case WP_CROSSBOW:
       Weapon_Crossbow_Fire(ent);
       ent->client->ps.zoomFov = 0;
+      Kickback(ent, -750, 2);
       break;
     case WP_ACR:
       Weapon_ACR_Fire(ent);
+      Kickback(ent, -200, 1);
       break;
     case WP_WALTHER:
       Weapon_Walther_Fire(ent);
+      Kickback(ent, -400, 2);
       break;
     case WP_INJECTOR:
       Weapon_Injector_Fire(ent);
