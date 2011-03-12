@@ -721,21 +721,21 @@ void ClientUserinfoChanged(int clientNum) {
     if (strcmp(oldname, client->pers.netname)) {
       trap_SendServerCommand(-1, va("print \"%s" S_COLOR_WHITE " renamed to %s\n\"", oldname, client->pers.netname));
     }
-    s = Info_ValueForKey(userinfo, "cg_primary");
-    //Com_Printf("cuic primary = %s\n", s);
-    client->ps.persistant[PERS_PRIMARY] = atoi(s);
+    /*s = Info_ValueForKey(userinfo, "cg_primary");
+     //Com_Printf("cuic primary = %s\n", s);
+     client->ps.persistant[PERS_PRIMARY] = atoi(s);
 
-    s = Info_ValueForKey(userinfo, "cg_secondary");
-    client->ps.persistant[PERS_SECONDARY] = atoi(s);
+     s = Info_ValueForKey(userinfo, "cg_secondary");
+     client->ps.persistant[PERS_SECONDARY] = atoi(s);
 
-    s = Info_ValueForKey(userinfo, "cg_pistol");
-    client->ps.persistant[PERS_PISTOL] = atoi(s);
+     s = Info_ValueForKey(userinfo, "cg_pistol");
+     client->ps.persistant[PERS_PISTOL] = atoi(s);
 
-    s = Info_ValueForKey(userinfo, "cg_grenade");
-    client->ps.persistant[PERS_GRENADE] = atoi(s);
+     s = Info_ValueForKey(userinfo, "cg_grenade");
+     client->ps.persistant[PERS_GRENADE] = atoi(s);
 
-    s = Info_ValueForKey(userinfo, "cg_misc");
-    client->ps.persistant[PERS_MISC] = atoi(s);
+     s = Info_ValueForKey(userinfo, "cg_misc");
+     client->ps.persistant[PERS_MISC] = atoi(s);*/
   }
 
   // set max health
@@ -1208,7 +1208,6 @@ void ClientSpawn(gentity_t *ent) {
   }
 
   // health will count down towards max_health
-  //ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] + 25;
   ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH];
 
   // restore legshot speed
@@ -1282,15 +1281,15 @@ void ClientSpawn(gentity_t *ent) {
       Com_Printf("^1round should be starting!\n");
     }
 
-//    if (g_gametype.integer == GT_TEAMSURVIVOR) {
-//      level.numSpawnedClients++;
-//      if (level.numSpawnedClients >= level.numPlayingClients) {
-//        level.roundState = ROUND_PROGRESS;
-//        level.nextState = -1;
-//        Com_Printf("%i/%i clients spawned, starting round\n", level.numSpawnedClients, level.numConnectedClients);
-//        //level.numSpawnedClients = 0;
-//      }
-//    }
+    //    if (g_gametype.integer == GT_TEAMSURVIVOR) {
+    //      level.numSpawnedClients++;
+    //      if (level.numSpawnedClients >= level.numPlayingClients) {
+    //        level.roundState = ROUND_PROGRESS;
+    //        level.nextState = -1;
+    //        Com_Printf("%i/%i clients spawned, starting round\n", level.numSpawnedClients, level.numConnectedClients);
+    //        //level.numSpawnedClients = 0;
+    //      }
+    //    }
   }
 
   // run the presend to set anything else

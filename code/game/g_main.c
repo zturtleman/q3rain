@@ -163,11 +163,12 @@ static cvarTable_t gameCvarTable[] = {
     { &g_rankings, "g_rankings", "0", 0, 0, qfalse },
 
     { &g_playerspeed, "g_playerspeed", "320", CVAR_CHEAT, 0, qfalse },
-    { &g_primary, "g_primary", "-1", CVAR_SERVERINFO, 0, qfalse },
-    { &g_secondary, "g_secondary", "-1", CVAR_SERVERINFO, 0, qfalse },
-    { &g_pistol, "g_pistol", "-1", CVAR_SERVERINFO, 0, qfalse },
-    { &g_grenade, "g_grenade", "-1", CVAR_SERVERINFO, 0, qfalse },
-    { &g_misc, "g_misc", "-1", CVAR_SERVERINFO, 0, qfalse },
+
+    { &g_primary, "g_primary", "-1", CVAR_ARCHIVE, 0, qfalse },
+    { &g_secondary, "g_secondary", "-1", CVAR_ARCHIVE, 0, qfalse },
+    { &g_pistol, "g_pistol", "-1", CVAR_ARCHIVE, 0, qfalse },
+    { &g_grenade, "g_grenade", "-1", CVAR_ARCHIVE, 0, qfalse },
+    { &g_misc, "g_misc", "-1", CVAR_ARCHIVE, 0, qfalse },
 
     { &g_zoomreset, "cg_zoomreset", "1", CVAR_ARCHIVE, 0, qfalse },
 };

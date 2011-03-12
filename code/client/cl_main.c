@@ -3212,11 +3212,11 @@ void CL_Init(void) {
   Cvar_Get("password", "", CVAR_USERINFO);
   Cvar_Get("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE);
 
-  Cvar_Get("cg_primary", "-1", CVAR_USERINFO | CVAR_ARCHIVE);
+  /*Cvar_Get("cg_primary", "-1", CVAR_USERINFO | CVAR_ARCHIVE);
   Cvar_Get("cg_secondary", "-1", CVAR_USERINFO | CVAR_ARCHIVE);
   Cvar_Get("cg_pistol", "-1", CVAR_USERINFO | CVAR_ARCHIVE);
   Cvar_Get("cg_grenade", "-1", CVAR_USERINFO | CVAR_ARCHIVE);
-  Cvar_Get("cg_misc", "-1", CVAR_USERINFO | CVAR_ARCHIVE);
+  Cvar_Get("cg_misc", "-1", CVAR_USERINFO | CVAR_ARCHIVE);*/
 
 #ifdef USE_RUBY
   cl_ruby = Cvar_Get("cl_ruby", "0", CVAR_ARCHIVE | CVAR_LATCH);
