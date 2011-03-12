@@ -1074,6 +1074,11 @@ static void Kickback(gentity_t *ent, int distance, int rate) {
   ent->client->ps.weaponPitch += distance;
   ent->client->ps.pitchRate = rate;
   ent->client->ps.delta_angles[PITCH] = 0;
+  if (ent->client->ps.weaponPitch > 8000) {
+    ent->client->ps.weaponPitch = 8000;
+  } else if (ent->client->ps.weaponPitch < -8000) {
+    ent->client->ps.weaponPitch = -8000;
+  }
 }
 
 /*

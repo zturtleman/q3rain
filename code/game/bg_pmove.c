@@ -732,7 +732,7 @@ static qboolean PM_CheckWallClimb(void) {
   VectorNormalize(flatforward);
   VectorMA(pm->ps->origin, 1, flatforward, spot);
   pm->trace(&trace, pm->ps->origin, pm->mins, pm->maxs, spot, pm->ps->clientNum, MASK_PLAYERSOLID);
-  if ((trace.fraction >= 1.0) || (trace.contents != CONTENTS_SOLID)) {
+  if ((trace.fraction >= 1.0) || !(trace.contents & (CONTENTS_SOLID | CONTENTS_PLAYERCLIP)) || trace.surfaceFlags & SURF_SKY) {
     return qfalse;
   }
 
@@ -822,7 +822,7 @@ static qboolean PM_CheckWallJump(void) {
   VectorNormalize(flatforward);
   VectorMA(pm->ps->origin, 1, flatforward, spot);
   pm->trace(&trace, pm->ps->origin, pm->mins, pm->maxs, spot, pm->ps->clientNum, MASK_PLAYERSOLID);
-  if ((trace.fraction >= 1.0) || (trace.contents != CONTENTS_SOLID)) {
+  if ((trace.fraction >= 1.0) || !(trace.contents & (CONTENTS_SOLID | CONTENTS_PLAYERCLIP)) || trace.surfaceFlags & SURF_SKY) {
     return qfalse;
   }
 

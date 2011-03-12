@@ -2441,19 +2441,25 @@ void CG_Player(centity_t *cent) {
   }
 
   if (cent->currentState.bleeding && cent->currentState.weapon != WP_NONE && ci->bleedTime <= cg.time) {
-    localEntity_t *blood;
-    blood = CG_SmokePuff(torso.origin, vec3_origin, // origin
-    10, // radius
-    1, 1, 1, 1, // color
-    750, // trailTime
-    cg.time, // startTime
-    0, // fadeInTime
-    0, cgs.media.bloodTrailShader);
-    blood->leType = LE_FALL_SCALE_FADE;
-    blood->leMarkType = LEMT_BLOOD;
-    blood->leFlags = LEF_PUFF_DONT_SCALE;
-    // drop a total of 40 units over its lifetime
-    blood->pos.trDelta[2] = 40;
+    localEntity_t *le;
+    refEntity_t *re;
+    vec3_t down = { 0, 0, -50 };
+    // FIXME add hModel for blood drips so we get rid of the trail
+    le = CG_AllocLocalEntity();
+    re = &le->refEntity;
+    le->leType = LE_FRAGMENT;
+    le->leMarkType = LEMT_BLOOD;
+    le->leBounceSoundType = LEBS_NONE;
+    le->radius = re->radius = 4;
+    le->startTime = cg.time;
+    le->endTime = le->startTime + 3000;
+    AxisCopy(axisDefault, re->axis);
+    le->pos.trType = TR_GRAVITY;
+    VectorCopy(torso.origin, re->origin);
+    VectorCopy(torso.origin, le->pos.trBase);
+    VectorCopy(down, le->pos.trDelta);
+    le->pos.trTime = cg.time;
+    le->bounceFactor = 0.1f;
     ci->bleedTime = cg.time + (2000 - (cent->currentState.bleeding * 100));
   }
 

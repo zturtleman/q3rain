@@ -275,7 +275,7 @@ void CG_AddFragment(localEntity_t *le) {
     trap_R_AddRefEntityToScene(&le->refEntity);
 
     // add a blood trail
-    if (le->leBounceSoundType == LEBS_BLOOD) {
+    if (le->leMarkType == LEMT_BLOOD) {
       CG_BloodTrail(le);
     }
 

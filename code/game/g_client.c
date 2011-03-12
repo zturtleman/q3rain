@@ -1096,6 +1096,9 @@ void ClientSpawn(gentity_t *ent) {
 
   client->ps.wounds = 0;
 
+  client->ps.weaponPitch = 0;
+  client->ps.pitchRate = 1;
+
   client->airOutTime = level.time + 12000;
 
   trap_GetUserinfo(index, userinfo, sizeof(userinfo));
