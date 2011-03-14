@@ -451,24 +451,22 @@ int RaySphereIntersections(vec3_t origin, float radius, vec3_t point, vec3_t dir
 /*
  ============
  G_LocationDamage
- LOCATIONS
+ // FIXME remove unused attacker parm
  ============
  */
-int G_LocationDamage(vec3_t point, gentity_t* targ, gentity_t* attacker, int take) {
+int G_LocationDamage(vec3_t point, gentity_t* targ, gentity_t* attacker, int take, int mod) {
   vec3_t bulletPath;
   vec3_t bulletAngle;
-
   int clientHeight;
   int clientFeetZ;
   int clientRotation;
   int bulletHeight;
   int bulletRotation; // Degrees rotation around client.
-  // used to check Back of head vs. Face
-  int impactRotation;
+  int impactRotation; // used to check Back of head vs. Face
 
-  // First things first.  If we're not damaging them, why are we here?
-  if (!take)
+  if (!take) {
     return 0;
+  }
 
   // Point[2] is the REAL world Z. We want Z relative to the clients feet
 
@@ -542,30 +540,54 @@ int G_LocationDamage(vec3_t point, gentity_t* targ, gentity_t* attacker, int tak
         take *= 1.1; // Shoulders
       break;
     case LOCATION_CHEST:
-      if (targ->client->lasthurt_location & (LOCATION_FRONT | LOCATION_BACK))
+      if (targ->client->lasthurt_location & (LOCATION_FRONT | LOCATION_BACK)) {
         take *= 1.3; // Belly or back
-      else
+      } else {
         take *= 0.8; // Arms
+        if (targ->client->lasthurt_location & LOCATION_LEFT) {
+          targ->client->ps.damageLocations[LDMG_LARM] += take;
+        } else {
+          targ->client->ps.damageLocations[LDMG_RARM] += take;
+        }
+        take = 0;
+      }
       break;
     case LOCATION_STOMACH:
       take *= 1.2;
       break;
     case LOCATION_GROIN:
       if (targ->client->lasthurt_location & LOCATION_FRONT)
-        take *= 1.3; // Groin shot
-      break;
-    case LOCATION_LEG:
-      take *= 0.7;
-      targ->client->ps.legsfactor = 23; //LEGSHOTS
+        take *= 1.3;
       break;
     case LOCATION_FOOT:
-      take *= 0.5;
-      targ->client->ps.legsfactor = 21;
+    case LOCATION_LEG:
+      // dont lower our superiorly calculated falling damage
+      if (mod != MOD_FALLING) {
+        take *= 0.7;
+        targ->client->ps.legsfactor = 23;
+        if (targ->client->lasthurt_location & LOCATION_LEFT) {
+          targ->client->ps.damageLocations[LDMG_LLEG] += take;
+        } else if (targ->client->lasthurt_location & LOCATION_RIGHT) {
+          targ->client->ps.damageLocations[LDMG_RLEG] += take;
+        } else {
+          // choose random leg if hit comes from behind/front
+          if (random() < 0.5) {
+            targ->client->ps.damageLocations[LDMG_LLEG] += take;
+          } else {
+            targ->client->ps.damageLocations[LDMG_RLEG] += take;
+          }
+        }
+        take = 1; // to start bleeding, we dont care about 1 hp anyways
+      } else {
+        targ->client->ps.damageLocations[LDMG_LLEG] += take;
+        targ->client->ps.damageLocations[LDMG_RLEG] += take;
+        if (take < 75) {
+          take = 0;
+        }
+      }
       break;
-
   }
   return take;
-
 }
 
 /*
@@ -762,16 +784,10 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t
       VectorCopy(targ->r.currentOrigin, client->damage_from);
       client->damage_fromWorld = qtrue;
     }
-  }
-
-  if (targ->client) {
-    // set the last client who damaged the target
-    targ->client->lasthurt_client = attacker->s.number;
-    targ->client->lasthurt_mod = mod;
-
-    // LOCATIONS
-    if (point && targ && targ->health > 0 && attacker && take && mod != MOD_WINDOW && dflags != DAMAGE_RADIUS) {
-      take = G_LocationDamage(point, targ, attacker, take);
+    client->lasthurt_client = attacker->s.number;
+    client->lasthurt_mod = mod;
+    if (point && targ && targ->health > 0 && take && mod != MOD_WINDOW && !(dflags & DAMAGE_RADIUS)) {
+      take = G_LocationDamage(point, targ, attacker, take, mod);
     } else {
       targ->client->lasthurt_location = LOCATION_NONE;
     }
@@ -802,7 +818,7 @@ void G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t
         targ->client->ps.bleeding = 1;
       }
     }
-    if (crandom() < -0.4f || mod == MOD_WINDOW) {
+    if (crandom() < -0.4f || mod == MOD_WINDOW || ((client->ps.damageLocations[LDMG_RLEG] >= 50 || client->ps.damageLocations[LDMG_LLEG] >= 50) && client->lasthurt_location & LOCATION_LEG)) {
       if (mod != MOD_BLEED && mod != MOD_HANDS && mod != MOD_HE && mod != MOD_HE_SPLASH && mod != MOD_WATER && mod != MOD_SLIME && mod != MOD_LAVA && mod
           != MOD_CRUSH && mod != MOD_MOOR && mod != MOD_FALLING && mod != MOD_TELEFRAG && mod != MOD_SUICIDE && mod != MOD_TRIGGER_HURT && mod != MOD_NADELOVE
           && mod != MOD_ADMIN && mod != MOD_BOMB && mod != MOD_NUKE) {

@@ -499,7 +499,6 @@ void CG_GetColorForHealth(int health, int armor, vec4_t hcolor) {
  =================
  */
 void CG_ColorForHealth(vec4_t hcolor) {
-
   CG_GetColorForHealth(cg.snap->ps.stats[STAT_HEALTH], cg.snap->ps.stats[STAT_ARMOR], hcolor);
 }
 

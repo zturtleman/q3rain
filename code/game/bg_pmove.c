@@ -453,6 +453,10 @@ static qboolean PM_CheckJump(void) {
     return qfalse;
   }
 
+  if (pm->ps->damageLocations[LDMG_RLEG] >= 50 && pm->ps->damageLocations[LDMG_LLEG] >= 50) {
+    return qfalse;
+  }
+
   // must wait for jump to be released
   if (pm->ps->pm_flags & PMF_JUMP_HELD) {
     // clear upmove so cmdscale doesn't lower running speed
@@ -524,6 +528,11 @@ static qboolean PM_CheckWaterJump(void) {
   }
 
   if (pm->ps->jumpCooldown >= pm->ps->levelTime) {
+    return qfalse;
+  }
+
+  if (pm->ps->damageLocations[LDMG_RLEG] >= 50 && pm->ps->damageLocations[LDMG_LLEG] >= 50) {
+    // letem drown :D
     return qfalse;
   }
 
@@ -677,6 +686,10 @@ static void PM_WaterMove(void) {
     wishspeed = pm->ps->speed * pm_swimScale;
   }
 
+  if (pm->ps->damageLocations[LDMG_RLEG] >= 50 && pm->ps->damageLocations[LDMG_LLEG] >= 50) {
+    wishspeed = 0;
+  }
+
   PM_Accelerate(wishdir, wishspeed, pm_wateraccelerate);
 
   // make sure we can go up slopes easily under water
@@ -723,6 +736,10 @@ static qboolean PM_CheckWallClimb(void) {
   }
 
   if (pm->ps->velocity[2] <= -200) {
+    return qfalse;
+  }
+
+  if (pm->ps->damageLocations[LDMG_RLEG] >= 50 && pm->ps->damageLocations[LDMG_LLEG] >= 50) {
     return qfalse;
   }
 
@@ -813,6 +830,10 @@ static qboolean PM_CheckWallJump(void) {
   }
 
   if (pm->ps->velocity[2] < WALLJUMP_BOOST * -2) {
+    return qfalse;
+  }
+
+  if (pm->ps->damageLocations[LDMG_RLEG] >= 50 && pm->ps->damageLocations[LDMG_LLEG] >= 50) {
     return qfalse;
   }
 
@@ -1198,8 +1219,11 @@ static void PM_WalkMove(pmove_t *pmove) {
       wishspeed = pm->ps->speed * pm_duckScale;
     }
   }
-  if (wishspeed < pm->ps->maxspeed / 3) {
-    wishspeed = pm->ps->maxspeed / 3;
+  if (wishspeed < pm->ps->maxspeed / 3.5f) {
+    wishspeed = pm->ps->maxspeed / 3.5f;
+  }
+  if (pm->ps->damageLocations[LDMG_RLEG] >= 50 && pm->ps->damageLocations[LDMG_LLEG] >= 50) {
+    wishspeed = 0;
   }
 
   // clamp the speed lower if wading or walking on the bottom
@@ -1783,6 +1807,14 @@ static void PM_CheckDuck(void) {
     }
   }
 
+  if (pm->ps->damageLocations[LDMG_RLEG] >= 50 && pm->ps->damageLocations[LDMG_LLEG] >= 50) {
+    pm->ps->pm_flags |= PMF_DUCKED; // should be some special state for wounded laying
+    PM_ContinueLegsAnim(LEGS_IDLECR); // same here
+    // just need some player model animations
+    // but theres no player model
+    // guess i need to kick v3n again - oh wait
+  }
+
   if (pm->ps->pm_flags & PMF_DUCKED) {
     pm->maxs[2] = 16;
     pm->ps->viewheight = CROUCH_VIEWHEIGHT;
@@ -1803,6 +1835,10 @@ static void PM_Footsteps(void) {
   float bobmove;
   int old;
   qboolean footstep;
+
+  if (pm->ps->damageLocations[LDMG_RLEG] >= 50 && pm->ps->damageLocations[LDMG_LLEG] >= 50) {
+    return;
+  }
 
   //
   // calculate speed and cycle to be used for

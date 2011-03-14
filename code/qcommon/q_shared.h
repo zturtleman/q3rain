@@ -1011,6 +1011,14 @@ int dataCount;
 // so if a playerState_t is transmitted, the entityState_t can be fully derived
 // from it.
 
+typedef enum {
+  LDMG_RLEG,
+  LDMG_LLEG,
+  LDMG_RARM,
+  LDMG_LARM,
+  MAX_LDMG,
+} locationDamage_t;
+
 typedef struct playerState_s {
 int commandTime; // cmd->serverTime of last executed command
 int pm_type;
@@ -1105,11 +1113,13 @@ int stamina;
 // combat
 int wounds;
 int cooldown;
-int bleeding; // if we lost health this frame due to bleeding
+int bleeding; // if we lost health this frame due to bleeding FIXME still needed?
 int weaponPitch;
 int pitchRate;
 // weather
 int levelTemperature;
+// locational damage
+int damageLocations[MAX_LDMG];
 } playerState_t;
 
 //====================================================================

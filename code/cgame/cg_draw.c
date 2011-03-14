@@ -1235,6 +1235,42 @@ static int CG_DrawPickupItem(int y) {
   return y;
 }
 
+vec4_t orange = { 1, 0.43f, 0, 1 };
+vec4_t red = { 1, 0, 0, 1 };
+vec4_t green = { 0, 1, 0, 1 };
+
+static void DamageColor(int dmg, float *color) {
+  if (dmg < 25) {
+    Vector4Copy(green, color);
+  } else if (dmg < 50) {
+    Vector4Copy(orange, color);
+  } else {
+    Vector4Copy(red, color);
+  }
+}
+/*
+ ================
+ CG_DrawLimbStatus
+ ================
+ */
+static void CG_DrawLimbStatus() {
+  int rleg, lleg, rarm, larm;
+  vec4_t color;
+  int x = 16, y = 352;
+  rleg = cg.snap->ps.damageLocations[LDMG_RLEG];
+  lleg = cg.snap->ps.damageLocations[LDMG_LLEG];
+  rarm = cg.snap->ps.damageLocations[LDMG_RARM];
+  larm = cg.snap->ps.damageLocations[LDMG_LARM];
+  DamageColor(rarm, color);
+  CG_DrawStringExt(x, y, va("R (%i)", rarm), color, qtrue, qfalse, 8, 16, 8);
+  DamageColor(larm, color);
+  CG_DrawStringExt(x + 64, y, va("L (%i)", larm), color, qtrue, qfalse, 8, 16, 8);
+  DamageColor(rleg, color);
+  CG_DrawStringExt(x, y + 32, va("R (%i)", rleg), color, qtrue, qfalse, 8, 16, 8);
+  DamageColor(lleg, color);
+  CG_DrawStringExt(x + 64, y + 32, va("L (%i)", lleg), color, qtrue, qfalse, 8, 16, 8);
+}
+
 /*
  =====================
  CG_DrawLowerLeft
@@ -1243,10 +1279,9 @@ static int CG_DrawPickupItem(int y) {
  */
 static void CG_DrawLowerLeft(void) {
   float y;
-
   y = 480 - ICON_SIZE;
-
   y = CG_DrawPickupItem(y);
+  CG_DrawLimbStatus();
 }
 
 //===========================================================================================
@@ -2311,6 +2346,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame) {
   CG_DrawLagometer();
 
   CG_DrawUpperRight(stereoFrame);
+  CG_DrawLowerLeft();
 
   if (!CG_DrawFollow()) {
     CG_DrawWarmup();

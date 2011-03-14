@@ -484,7 +484,12 @@ void ClientEvents(gentity_t *ent, int oldEventSequence) {
         VectorSet(dir, 0, 0, 1);
         ent->client->ps.legsfactor = (int) (f * 10);
         ent->pain_debounce_time = level.time + 200; // no normal pain sound
-        G_Damage(ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
+        {
+          vec3_t point;
+          VectorCopy(ent->client->ps.origin, point);
+          point[2] -= 56;
+          G_Damage(ent, NULL, NULL, NULL, point, damage, DAMAGE_NO_ARMOR, MOD_FALLING);
+        }
         if (ent->client->ps.powerups[PW_ADRENALINE] > 0) {
           factor /= 2;
         }
@@ -745,10 +750,13 @@ void ClientThink_real(gentity_t *ent) {
 
   client->ps.gravity = g_gravity.value;
 
-  // set speed
-  //client->ps.speed = g_speed.value; // LEGSHOTS
-
   adrenaline = client->ps.powerups[PW_ADRENALINE] > level.time;
+
+  if (client->ps.damageLocations[LDMG_RLEG] >= 50 && client->ps.damageLocations[LDMG_LLEG] >= 50) {
+    client->ps.speed = 0;
+    client->ps.sprintAdd = 0;
+    adrenaline = 0;
+  }
 
   //Com_Printf("legsfactor = %i\n", client->ps.legsfactor);
   if (adrenaline) {
